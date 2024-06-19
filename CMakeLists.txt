@@ -10,13 +10,9 @@ set(SRCS
     src/main.cpp
 )
 
-find_package( OpenCV REQUIRED CONFIG)
-include_directories( ${OpenCV_INCLUDE_DIRS} )
-
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-
+# set(THREADS_PREFER_PTHREAD_FLAG ON)
+# find_package(Threads REQUIRED)
 
 add_executable(uChariotBase ${SRCS})
-target_link_libraries( uChariotBase ${OpenCV_LIBS} Threads::Threads)
+target_link_libraries( uChariotBase ) # Threads::Threads)
 target_include_directories( uChariotBase PUBLIC ./include/)
