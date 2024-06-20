@@ -8,6 +8,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(SRCS
     src/main.cpp
+    src/CanConnection.cpp
+    src/Robot.cpp
+    src/VescController.cpp
+    src/Utils.cpp
 )
 
 # set(THREADS_PREFER_PTHREAD_FLAG ON)
