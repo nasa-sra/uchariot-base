@@ -15,4 +15,4 @@ interface.
 
 [More information on the SPI-CAN network interface](https://www.waveshare.com/wiki/RS485_CAN_HAT).
 [More information on the VESC 6 MKV controller CAN interface](https://trampaboards.com/vesc-6-mkv--the-next-generation--benjamin-vedder-electronic-speed-controller-p-27517.html).
-
+[CAN Bus Protocol and Frame Data](https://vesc-project.com/sites/default/files/imce/u15301/VESC6_CAN_CommandsTelemetry.pdf)
