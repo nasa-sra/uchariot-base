@@ -1,3 +1,4 @@
 /build
 /pibuild
 /.vscode
+/cmake-build-debug/
