@@ -1,7 +1,7 @@
-#include <stdio.h>
+#include <cstdio>
 #include <stdexcept>
-#include <signal.h>
-#include <stdlib.h>
+#include <csignal>
+#include <cstdlib>
 
 #include "CanConnection.h"
 #include "Robot.h"
