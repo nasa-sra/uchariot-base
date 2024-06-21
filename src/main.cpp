@@ -28,7 +28,7 @@ int main() {
 
     Robot robot;
 
-    std::thread network_thrd(handleSigInt, 0);
+    std::thread network_thrd(&NetworkingManager::run_listen_thrd, &networkingManager);
 
     robot.run(50, running);
 
