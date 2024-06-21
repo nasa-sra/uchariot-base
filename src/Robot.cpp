@@ -1,7 +1,7 @@
 
 #include <chrono>
 #include <thread>
-#include <stdio.h>
+#include <cstdio>
 
 #include "Robot.h"
 
