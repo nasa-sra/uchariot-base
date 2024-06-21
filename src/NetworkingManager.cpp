@@ -25,7 +25,7 @@ void NetworkingManager::run_listen_thrd() {
     while (true) {
         char buffer[2048] = {0};
         ssize_t val = recv(clientConnection, buffer, sizeof(buffer), 0);
-
+        printf("%s", reinterpret_cast<const char *>(val));
         if (val == 0) break;
 
     }

@@ -1,10 +1,12 @@
 #include <cstdio>
 #include <stdexcept>
 #include <csignal>
+#include <thread>
 #include <cstdlib>
 
 #include "CanConnection.h"
 #include "Robot.h"
+#include "NetworkingManager.h"
 
 bool running = true;
 
@@ -22,7 +24,11 @@ int main() {
         return 1;
     }
 
+    NetworkingManager networkingManager;
+
     Robot robot;
+
+    std::thread network_thrd(handleSigInt, 0);
 
     robot.run(50, running);
 
