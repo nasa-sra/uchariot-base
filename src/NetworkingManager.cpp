@@ -1,6 +1,6 @@
+#include <cstdio>
 #include <thread>
 #include <sys/socket.h>
-#include <print>
 
 #include "NetworkingManager.h"
 
@@ -13,7 +13,7 @@ NetworkingManager::NetworkingManager() {
 
     if (bind(piSocket, (struct sockaddr*)&piAddress, sizeof (piAddress)) == -1) {
         printf("Socket Creation Failed");
-        std::terminate();
+        // std::terminate();
     }
 
     listen(piSocket, 2);
@@ -22,13 +22,14 @@ NetworkingManager::NetworkingManager() {
 }
 
 void NetworkingManager::run_listen_thrd() {
+    printf("Hello");
     while (true) {
+        printf("Hello");
         char buffer[2048] = {0};
         ssize_t val = recv(clientConnection, buffer, sizeof(buffer), 0);
         printf("%s", reinterpret_cast<const char *>(val));
         if (val == 0) break;
-
     }
 
-    close(piSocket);
+    // close(piSocket);
 }

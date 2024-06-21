@@ -23,12 +23,16 @@ int main() {
         printf("Error connecting can - %s", e.what());
         return 1;
     }
+    printf("Here");
 
     NetworkingManager networkingManager;
 
     Robot robot;
 
-    std::thread network_thrd(&NetworkingManager::run_listen_thrd, &networkingManager);
+    printf("Here");
+
+    networkingManager.run_listen_thrd();
+    // std::thread network_thrd(&NetworkingManager::run_listen_thrd, &networkingManager);
 
     robot.run(50, running);
 
