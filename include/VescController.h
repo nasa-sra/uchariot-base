@@ -4,15 +4,11 @@
 
 class VescController {
 public:
+    VescController(uint16_t id) : _can(&CanConnection::GetInstance()), _can_id(id) {}
 
-    VescController(int id);
-
-    void setCmd(float cmd);
+    void SetCmd(float cmd);
 
 private:
-
-    void sendDutyCycle();
-
     enum CAN_PACKET_ID {
         CAN_PACKET_SET_DUTY = 0,
         CAN_PACKET_SET_CURRENT,
@@ -27,8 +23,5 @@ private:
     };
 
     CanConnection* _can;
-    int _canId;
-
-    double _cmdDutyCycle;
-
+    uint16_t _can_id;
 };
