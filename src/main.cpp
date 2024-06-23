@@ -28,5 +28,7 @@ int main() {
     
     can->CloseConnection();
 
+    network_manager.CloseConnection();
+
     return 0;
 }

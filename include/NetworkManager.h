@@ -12,6 +12,8 @@ class NetworkManager {
 public:
     NetworkManager();
     void Listener(Robot& robot);
+
+    void CloseConnection();
 private:
     int _net_socket;
     sockaddr_in _net_addr;

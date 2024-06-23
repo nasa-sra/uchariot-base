@@ -39,3 +39,9 @@ void NetworkManager::Listener(Robot& robot) {
 
     // close(_net_socket);
 }
+
+
+void NetworkManager::CloseConnection() {
+    close(_client_conn);
+    close(_net_socket);
+}
