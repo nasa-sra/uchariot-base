@@ -49,6 +49,9 @@ public:
 
 private:
 
+    void ManageController();
+    void ScheduleNextIter(int rate, std::chrono::steady_clock::time_point start_time);
+
     Controllers* _controllers;
     Subsystems* _subsystems;
 

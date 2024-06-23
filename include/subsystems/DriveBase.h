@@ -21,7 +21,6 @@ public:
 
     DriveBase() : _left_front(1), _right_front(4), _left_back(2), _right_back(3) {}
 
-    void Init() override;
     void Update() override;
 
     static DriveBase& GetInstance() {

@@ -13,11 +13,11 @@ class TeleopController : public ControllerBase {
 public:
     TeleopController() : _left_speed(0), _right_speed(0), _drive_base(&DriveBase::GetInstance()) {}
 
-    inline void Init() override {
+    inline void Load() override {
         _left_speed = 0;
         _right_speed = 0;
     }; 
-    inline void DeInit() override {
+    inline void Unload() override {
         _left_speed = 0;
         _right_speed = 0;
     }

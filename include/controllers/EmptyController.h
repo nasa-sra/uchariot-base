@@ -7,9 +7,9 @@
 class EmptyController : public ControllerBase {
     EmptyController() = default;
 public: 
-    void Init() override {};
+    void Load() override {};
     void Update() override {};
-    void DeInit() override {};
+    void Unload() override {};
 
     static EmptyController& GetInstance() {
         static EmptyController _instance;
