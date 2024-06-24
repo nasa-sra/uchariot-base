@@ -17,10 +17,10 @@ DriveBase::DriveBase() :
         _left_back.SetScale(scale);
         _right_back.SetScale(scale);
 
-        _left_front.SetScale(VescController::Mode::DUTY_CYCLE);
-        _right_front.SetScale(VescController::Mode::DUTY_CYCLE);
-        _left_back.SetScale(VescController::Mode::DUTY_CYCLE);
-        _right_back.SetScale(VescController::Mode::DUTY_CYCLE);
+        _left_front.SetMode(VescController::Mode::DUTY_CYCLE);
+        _right_front.SetMode(VescController::Mode::DUTY_CYCLE);
+        _left_back.SetMode(VescController::Mode::DUTY_CYCLE);
+        _right_back.SetMode(VescController::Mode::DUTY_CYCLE);
 }
 
 
