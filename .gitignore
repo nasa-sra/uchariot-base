@@ -1,6 +1,8 @@
 /build
 /pibuild
 /.vscode
+/.idea
+**/__pycache__/
 /cmake-build-debug/
 CMakeCache.txt
 CMakeFiles/

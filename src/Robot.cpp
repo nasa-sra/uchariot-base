@@ -30,7 +30,7 @@ void Robot::ManageController() {
     }
 }
 
-void Robot::ScheduleNextIter(int rate, std::chrono::steady_clock::time_point start_time) {
+void Robot::ScheduleNextIter(int rate, std::chrono::high_resolution_clock::time_point start_time) {
     int dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count();
     if (dt < 1000 / rate) {
         std::this_thread::sleep_for(std::chrono::milliseconds(int(1000.0 / rate - dt)));
