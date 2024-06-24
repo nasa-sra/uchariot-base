@@ -3,8 +3,10 @@ cmake_minimum_required(VERSION 3.18)
 project(UChariot-Base)
 
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "-O2")
+set(CMAKE_CXX_FLAGS "-O2 -pthread")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set (CMAKE_CXX_STANDARD 17)
+
 
 set(SRCS
     src/main.cpp
@@ -12,7 +14,9 @@ set(SRCS
     src/Robot.cpp
     src/VescController.cpp
     src/Utils.cpp
-    src/NetworkingManager.cpp
+    src/NetworkManager.cpp
+    src/controllers/TeleopController.cpp
+    src/subsystems/DriveBase.cpp
 )
 
 # set(THREADS_PREFER_PTHREAD_FLAG ON)

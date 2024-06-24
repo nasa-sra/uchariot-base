@@ -6,34 +6,29 @@
 
 #include "CanConnection.h"
 #include "Robot.h"
-#include "NetworkingManager.h"
+#include "NetworkManager.h"
+#include "Utils.h"
 
 bool running = true;
 
-void handleSigInt(int s) { running = false; }
+void HandleSigInt(int s) { running = false; }
 
 int main() {
 
-    signal(SIGINT, handleSigInt);
+    signal(SIGINT, HandleSigInt);
 
-    CanConnection* can;
-    try {
-        can = CanConnection::getInstance();
-    } catch (std::runtime_error& e) {
-        printf("Error connecting can - %s", e.what());
-        return 1;
-    }
+    CanConnection* can = &CanConnection::GetInstance(); // Threadsafe singleton
     
     Robot robot;
-    printf("fghjkl");
-    NetworkingManager networkingManager;
+    NetworkManager network_manager;
 
-    // networkingManager.run_listen_thrd(robot);
-    // std::thread network_thrd(&NetworkingManager::run_listen_thrd, &networkingManager);
+    std::thread network_worker(&NetworkManager::Listener, &network_manager, std::ref(robot));
 
-    robot.run(50, running);
+    robot.Run(200, running);
+    
+    can->CloseConnection();
 
-    can->closeConnection();
+    network_manager.CloseConnection();
 
     return 0;
 }

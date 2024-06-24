@@ -604,7 +604,7 @@ public:
     //! Initialize JSON text token-by-token parsing
     /*!
      */
-    void IterativeParseInit() {
+    void IterativeParseLoad() {
         parseResult_.Clear();
         state_ = IterativeParsingStartState;
     }
