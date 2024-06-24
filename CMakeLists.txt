@@ -7,6 +7,9 @@ set(CMAKE_CXX_FLAGS "-O2 -pthread")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_CXX_STANDARD 17)
 
+if(NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
+    add_compile_definitions(SIMULATION=true)
+endif()
 
 set(SRCS
     src/main.cpp
@@ -19,9 +22,6 @@ set(SRCS
     src/subsystems/DriveBase.cpp
 )
 
-# set(THREADS_PREFER_PTHREAD_FLAG ON)
-# find_package(Threads REQUIRED)
-
 add_executable(uChariotBase ${SRCS})
-target_link_libraries( uChariotBase ) # Threads::Threads)
+target_link_libraries( uChariotBase )
 target_include_directories( uChariotBase PUBLIC ./include/)

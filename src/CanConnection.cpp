@@ -4,7 +4,7 @@ CanConnection::CanConnection() {
 
     Utils::LogFmt("Setting up can0\r\n");
 
-#ifdef linux
+#ifndef SIMULATION
     
     system("sudo ip link set can0 type can bitrate 500000");
     system("sudo ifconfig can0 up");
@@ -42,7 +42,7 @@ CanConnection::CanConnection() {
 
 void CanConnection::Send(CanFrame* in_frame) {
 
-#ifdef linux
+#ifndef SIMULATION
     struct can_frame frame;
     frame.can_id = in_frame->arb_id | CAN_EFF_FLAG;
     frame.len = in_frame->len;
@@ -68,7 +68,7 @@ void CanConnection::LogFrame(CanFrame* frame) {
 }
 
 void CanConnection::CloseConnection() {
-#ifdef linux
+#ifndef SIMULATION
     close(_socket);
     system("sudo ifconfig can0 down");
 #endif

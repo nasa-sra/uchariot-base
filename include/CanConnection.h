@@ -13,7 +13,7 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 
-#ifdef linux
+#ifndef SIMULATION
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #endif
