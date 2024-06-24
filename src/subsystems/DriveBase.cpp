@@ -12,15 +12,16 @@ DriveBase::DriveBase() :
         float gearRatio = 6.0; // Maybe?
         float wheelRadius = 12.0; // in !definitely not!
         float scale = gearRatio * 60 / (2 * M_PI * wheelRadius); // converts from in/s to motor RPM
-        _left_front.SetScale(scale);
-        _right_front.SetScale(scale);
+        _left_front.SetScale(-scale);
+        _right_front.SetScale(-scale);
         _left_back.SetScale(scale);
         _right_back.SetScale(scale);
 
-        _left_front.SetMode(VescController::Mode::DUTY_CYCLE);
-        _right_front.SetMode(VescController::Mode::DUTY_CYCLE);
-        _left_back.SetMode(VescController::Mode::DUTY_CYCLE);
-        _right_back.SetMode(VescController::Mode::DUTY_CYCLE);
+        VescController::Mode mode = VescController::Mode::VELOCITY;
+        _left_front.SetMode(mode);
+        _right_front.SetMode(mode);
+        _left_back.SetMode(mode);
+        _right_back.SetMode(mode);
 }
 
 

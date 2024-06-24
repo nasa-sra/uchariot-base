@@ -11,7 +11,7 @@
 class NetworkManager {
 public:
     NetworkManager();
-    void Listener(Robot& robot);
+    void Listener(Robot& robot, bool& running);
 
     void CloseConnection();
 private:

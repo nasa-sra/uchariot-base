@@ -22,12 +22,13 @@ int main() {
     Robot robot;
     NetworkManager network_manager;
 
-    std::thread network_worker(&NetworkManager::Listener, &network_manager, std::ref(robot));
+    std::thread network_worker(&NetworkManager::Listener, &network_manager, std::ref(robot), std::ref(running));
 
     robot.Run(200, running);
     
     can->CloseConnection();
 
+    network_worker.join();
     network_manager.CloseConnection();
 
     return 0;
