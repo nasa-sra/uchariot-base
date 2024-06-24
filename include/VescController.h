@@ -4,9 +4,19 @@
 
 class VescController {
 public:
+    enum Mode {
+        DUTY_CYCLE = 0,
+        VELOCITY,
+        POSITION,
+        CURRENT
+    };
+
     VescController(uint16_t id) : _can(&CanConnection::GetInstance()), _can_id(id) {}
 
+    void SetMode(Mode mode);
     void SetCmd(float cmd);
+
+    void SetScale(float scale) {_scale = scale;}
 
 private:
     enum CAN_PACKET_ID {
@@ -22,6 +32,13 @@ private:
         CAN_PACKET_MAKE_ENUM_32_BITS = 0xFFFFFFFF,
     };
 
+    void sendDutyCycle(float dc);
+    void sendRPM(float rpm);
+    void sendPosition(float deg);
+    void sendCurrent(float amps);
+
     CanConnection* _can;
     uint16_t _can_id;
+    Mode _mode {DUTY_CYCLE};
+    float _scale {1.0};
 };

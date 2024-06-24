@@ -19,7 +19,7 @@ class DriveBase : public SubsystemBase {
 public:
     inline void SetOutput(DriveOutput output) { _output = output; }
 
-    DriveBase() : _left_front(1), _right_front(4), _left_back(2), _right_back(3) {}
+    DriveBase();
 
     void Update() override;
 

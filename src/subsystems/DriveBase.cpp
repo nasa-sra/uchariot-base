@@ -1,4 +1,28 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "subsystems/DriveBase.h"
+
+DriveBase::DriveBase() : 
+    _left_front(1),
+    _right_front(4),
+    _left_back(2),
+    _right_back(3) {
+
+        float gearRatio = 6.0; // Maybe?
+        float wheelRadius = 12.0; // in !definitely not!
+        float scale = gearRatio * 60 / (2 * M_PI * wheelRadius); // converts from in/s to motor RPM
+        _left_front.SetScale(scale);
+        _right_front.SetScale(scale);
+        _left_back.SetScale(scale);
+        _right_back.SetScale(scale);
+
+        _left_front.SetScale(VescController::Mode::DUTY_CYCLE);
+        _right_front.SetScale(VescController::Mode::DUTY_CYCLE);
+        _left_back.SetScale(VescController::Mode::DUTY_CYCLE);
+        _right_back.SetScale(VescController::Mode::DUTY_CYCLE);
+}
+
 
 void DriveBase::Update() {
 
