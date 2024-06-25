@@ -4,6 +4,10 @@ def drive(left, right):
     data = json.dumps({'left_speed': left, 'right_speed': right})
     client_sock.send(common.create_cmd('teleop_drive', data))
 
+def setController(controller):
+    data = json.dumps({'name': controller})
+    client_sock.send(common.create_cmd('set_controller', data))
+
 def invalid():
     print('Invalid input, stopping robot...')
     drive(0, 0)
@@ -27,6 +31,14 @@ if __name__ == '__main__':
             drive(0, 0)
             time.sleep(1)
             running = False
+
+        elif user == 'teleop':
+            print('Setting controller to teleop')
+            setController('teleop')
+        
+        elif user == 'disable':
+            print('Setting controller to empty')
+            setController('empty')
 
         elif user.startswith('drive'):
             try:

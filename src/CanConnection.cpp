@@ -77,6 +77,7 @@ void CanConnection::Recieve(bool& running) {
     int nbytes;
     struct can_frame frame;
     while(running) {
+#ifndef SIMULATION
         nbytes = read(_socket, &frame, sizeof(frame));
         if(nbytes > 0) {
             uint16_t id = frame.can_id && 0x000000FF;
@@ -89,6 +90,7 @@ void CanConnection::Recieve(bool& running) {
             // for(i = 0; i < 8; i++)
             //     printf("data[%d] = %d\r\n", i, frame.data[i]);
         }
+#endif
     }
 }
 
@@ -101,6 +103,7 @@ void CanConnection::LogFrame(CanFrame* frame) {
 }
 
 void CanConnection::CloseConnection() {
+    Utils::LogFmt("Closing can network");
     _recieveThread.join();
 #ifndef SIMULATION
     close(_socket);

@@ -43,6 +43,7 @@ void Robot::ScheduleNextIter(int rate, std::chrono::high_resolution_clock::time_
 void Robot::Run(int rate, bool& running) {
     auto start_time = std::chrono::high_resolution_clock::now();
 
+    Utils::LogFmt("Robot Running");
     while (running) {
         start_time = std::chrono::high_resolution_clock::now();
 

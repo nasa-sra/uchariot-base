@@ -21,16 +21,13 @@ int main() {
     can->Start(running);
     
     Robot robot;
-    NetworkManager network_manager;
-
-    std::thread network_worker(&NetworkManager::Listener, &network_manager, std::ref(robot), std::ref(running));
+    NetworkManager network_manager(8001);
+    network_manager.Start([&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
 
     robot.Run(50, running);
     
     can->CloseConnection();
-
-    network_worker.join();
-    network_manager.CloseConnection();
+    network_manager.CloseConnections();
 
     return 0;
 }
