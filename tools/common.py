@@ -18,4 +18,4 @@ def client_socket_from_args(args):
     return client_sock
 
 def create_cmd(cmd, data):
-    return str.encode('[' + cmd + ']' + data)
+    return str.encode('[' + cmd + ']' + data + ';')

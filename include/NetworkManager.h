@@ -25,7 +25,7 @@ private:
 
     void acceptConnection();
     void receivePacket(int fd);
-    void handlePacket(char* buffer, size_t len);
+    void handlePacket(char* buffer, int start, size_t len);
 
     int _net_socket;
     sockaddr_in _net_addr;

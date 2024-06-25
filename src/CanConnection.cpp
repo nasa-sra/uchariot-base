@@ -80,7 +80,7 @@ void CanConnection::Recieve(bool& running) {
 #ifndef SIMULATION
         nbytes = read(_socket, &frame, sizeof(frame));
         if(nbytes > 0) {
-            uint16_t id = frame.can_id && 0x000000FF;
+            uint16_t id = frame.can_id & 0x000000FF;
             auto callback = _callbacks.find(id);
             if (callback != _callbacks.end()) {
                 callback->second(CanFrame(frame));

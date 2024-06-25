@@ -39,7 +39,14 @@ void VescController::SetCmd(float cmd) {
 }
 
 void VescController::packetHandler(CanFrame frame) {
-    uint8_t statusID = frame.arb_id && 0x0000FF00;
+    uint8_t statusID = (frame.arb_id & 0x0000FF00) >> 8;
+
+    // std::cout << statusID << ": 0x" << std::hex;
+    // int i = 0;
+    // for(i = 0; i < 8; i++)
+    //     std::cout << frame.data[i];
+    // std::cout << std::endl;
+    
     switch (statusID) {
         case CAN_PACKET_STATUS:
             readStatus1Packet(frame.data);
@@ -56,6 +63,7 @@ void VescController::readStatus1Packet(uint8_t* data) {
     _current /= 10;
     memcpy(&_output, data+6, 2);
     _output /= 1000;
+    // Utils::LogFmt("id: %i velocity: %f", _can_id, _velocity);
 }
 
 void VescController::sendDutyCycle(float dc) {

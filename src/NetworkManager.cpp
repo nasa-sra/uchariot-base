@@ -36,12 +36,12 @@ void NetworkManager::Run() {
     _fdmax = _net_socket;
 
     struct timeval tv;
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
 
     // Utils::LogFmt("Server running");
     while (_running) {
 
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
         read_fds = _fds;
         if (select(_fdmax+1, &read_fds, NULL, NULL, &tv) == -1) {
             Utils::ErrFmt("NetworkManager - Error on select");
@@ -106,14 +106,21 @@ void NetworkManager::receivePacket(int fd) {
             }
         }
     } else if (fd == _cmdClient) {
-        handlePacket(buffer, BUFFER_SIZE);
+        int start = 0;
+        for (int i = 0; i < BUFFER_SIZE; i++) {
+            if (buffer[i] == ';') {
+                handlePacket(buffer, start, i - start);
+                start = i + 1;
+            }
+        }
     }
 }
 
-void NetworkManager::handlePacket(char* buffer, size_t len) {
-    if (buffer[0] == '\0') return; // no data avialable
-    if (buffer[0] != '[') return;  // not in valid format
-    std::string raw_input(buffer, len);   // convert to C++ str
+void NetworkManager::handlePacket(char* buffer, int start, size_t len) {
+    
+    if (buffer[start] == '\0') return; // no data avialable
+    if (buffer[start] != '[') return;  // not in valid format
+    std::string raw_input(buffer + start, len);   // convert to C++ str
     // Utils::LogFmt("Received valid input: %s\n", raw_input.c_str());
 
     size_t delim_index = raw_input.find(']');
