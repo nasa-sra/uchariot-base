@@ -11,6 +11,10 @@ if(NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
     add_compile_definitions(SIMULATION=true)
 endif()
 
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    add_compile_definitions(LINUX=true)
+endif()
+
 set(SRCS
     src/main.cpp
     src/CanConnection.cpp

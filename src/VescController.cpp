@@ -4,28 +4,58 @@
 
 #include "Utils.h"
 
+VescController::VescController(uint16_t id) : 
+    _can(&CanConnection::GetInstance()) {
+    
+    _can_id = id;
+    _can->RegisterPacketHandler(id, [this](CanFrame frame) {this->packetHandler(frame);});
+}
+
 void VescController::SetMode(Mode mode) {
     _mode = mode;
 }
 
 void VescController::SetCmd(float cmd) {
-    switch (_mode)
-    {
-    case DUTY_CYCLE:
-        sendDutyCycle(cmd);
-        break;
-    case VELOCITY:
-        sendRPM(cmd * _scale);
-        break;
-    case POSITION:
-        sendPosition(cmd * _scale);
-        break;
-    case CURRENT:
-        sendCurrent(cmd);
-        break;
-    default:
-        break;
+    switch (_mode) {
+        case DUTY_CYCLE:
+            _cmdDutyCycle = cmd;
+            sendDutyCycle(_cmdDutyCycle);
+            break;
+        case VELOCITY:
+            _cmdVelocity = cmd * _scale;
+            sendRPM(_cmdVelocity);
+            break;
+        case POSITION:
+            _cmdPosition = cmd * _scale;
+            sendPosition(_cmdPosition);
+            break;
+        case CURRENT:
+            _cmdCurrent = cmd;
+            sendCurrent(_cmdCurrent);
+            break;
+        default:
+            break;
     }
+}
+
+void VescController::packetHandler(CanFrame frame) {
+    uint8_t statusID = frame.arb_id && 0x0000FF00;
+    switch (statusID) {
+        case CAN_PACKET_STATUS:
+            readStatus1Packet(frame.data);
+            break;
+        default:
+            break;
+    }
+}
+
+void VescController::readStatus1Packet(uint8_t* data) {
+    memcpy(&_velocity, data, 4);
+    _velocity /= _scale;
+    memcpy(&_current, data+4, 2);
+    _current /= 10;
+    memcpy(&_output, data+6, 2);
+    _output /= 1000;
 }
 
 void VescController::sendDutyCycle(float dc) {

@@ -18,13 +18,14 @@ int main() {
     signal(SIGINT, HandleSigInt);
 
     CanConnection* can = &CanConnection::GetInstance(); // Threadsafe singleton
+    can->Start(running);
     
     Robot robot;
     NetworkManager network_manager;
 
     std::thread network_worker(&NetworkManager::Listener, &network_manager, std::ref(robot), std::ref(running));
 
-    robot.Run(200, running);
+    robot.Run(50, running);
     
     can->CloseConnection();
 

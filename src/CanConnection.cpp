@@ -40,6 +40,20 @@ CanConnection::CanConnection() {
 
 }
 
+void CanConnection::Start(bool& running) {
+    _recieveThread = std::thread(&CanConnection::Recieve, this, std::ref(running));
+}
+
+void CanConnection::RegisterPacketHandler(uint16_t id, std::function<void(CanFrame)> handler) {
+    struct can_filter filter;
+    filter.can_id = id;
+    filter.can_mask = 0x000000FF;
+    _filters.push_back(filter);
+    setsockopt(_socket, SOL_CAN_RAW, CAN_RAW_FILTER, _filters.data(), sizeof(can_filter) * _filters.size());
+
+    _callbacks[id] = handler;
+}
+
 void CanConnection::Send(CanFrame* in_frame) {
 
 #ifndef SIMULATION
@@ -59,6 +73,25 @@ void CanConnection::Send(CanFrame* in_frame) {
 #endif
 }
 
+void CanConnection::Recieve(bool& running) {
+    int nbytes;
+    struct can_frame frame;
+    while(running) {
+        nbytes = read(_socket, &frame, sizeof(frame));
+        if(nbytes > 0) {
+            uint16_t id = frame.can_id && 0x000000FF;
+            auto callback = _callbacks.find(id);
+            if (callback != _callbacks.end()) {
+                callback->second(CanFrame(frame));
+            }
+            // printf("can_id = 0x%X\r\ncan_dlc = %d \r\n", frame.can_id, frame.can_dlc);
+            // int i = 0;
+            // for(i = 0; i < 8; i++)
+            //     printf("data[%d] = %d\r\n", i, frame.data[i]);
+        }
+    }
+}
+
 void CanConnection::LogFrame(CanFrame* frame) {
     printf("CAN Frame id=%08x data=", frame->arb_id);
     for (int i = 0; i < frame->len; i++) {
@@ -68,6 +101,7 @@ void CanConnection::LogFrame(CanFrame* frame) {
 }
 
 void CanConnection::CloseConnection() {
+    _recieveThread.join();
 #ifndef SIMULATION
     close(_socket);
     system("sudo ifconfig can0 down");
