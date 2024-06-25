@@ -40,8 +40,8 @@ public:
     Robot() :
         _controllers(new Controllers()),
         _subsystems(new Subsystems()),
-        _active_controller_name("empty"),
-        _active_controller((ControllerBase*)_controllers->empty) {}
+        _active_controller_name("teleop"),
+        _active_controller((ControllerBase*)_controllers->teleop) {}
 
     void Run(int rate, bool& running);
 
