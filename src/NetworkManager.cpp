@@ -4,18 +4,19 @@
 #include "NetworkManager.h"
 
 NetworkManager::NetworkManager() {
-    if (_net_socket = socket(AF_INET, SOCK_STREAM, 0) == -1) {
-        Utils::ErrFmt("NetworkManager Socket Creation Failed");
+    _net_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (_net_socket == -1) {
+        Utils::LogFmt("NetworkManager failed to create socket");
     }
     _net_addr.sin_family = AF_INET;
     _net_addr.sin_port = htons(8000);
     _net_addr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(_net_socket, (struct sockaddr*)&_net_addr, sizeof (_net_addr)) == -1) {
-        Utils::ErrFmt("NetworkManager Socket Bind Failed");
+        Utils::LogFmt("NetworkManager Socket Bind Failed");
     }
 
-    Utils::ErrFmt("Listening on port 8000");
+    Utils::LogFmt("Listening on port 8000");
     listen(_net_socket, 2);
 }
 

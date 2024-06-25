@@ -2,7 +2,7 @@
 
 CanConnection::CanConnection() {
 
-    Utils::LogFmt("Setting up can0\r\n");
+    Utils::LogFmt("Setting up can0");
 
 #ifndef SIMULATION
     
