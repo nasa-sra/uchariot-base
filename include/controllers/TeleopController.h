@@ -7,19 +7,20 @@
 
 class TeleopController : public ControllerBase {
 
-    double _left_speed, _right_speed;
+    double _turn, _fwd, _speed;
     DriveBase* _drive_base;
 
 public:
-    TeleopController() : _left_speed(0), _right_speed(0), _drive_base(&DriveBase::GetInstance()) {}
+    TeleopController() : _turn(0), _fwd(0), _speed(0), _drive_base(&DriveBase::GetInstance()) {}
 
     inline void Load() override {
-        _left_speed = 0;
-        _right_speed = 0;
+        _turn = 0;
+        _fwd = 0;
+        _speed = 0;
     }; 
+
     inline void Unload() override {
-        _left_speed = 0;
-        _right_speed = 0;
+        Load(); // shit
     }
 
     void Update() override;

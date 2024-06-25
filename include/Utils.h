@@ -23,7 +23,7 @@ void BufferAppendInt32(uint8_t* buffer, int32_t number, int32_t* index);
 void BufferAppendFloat16(uint8_t* buffer, float number, float scale, int32_t* index);
 void BufferAppendFloat32(uint8_t* buffer, float number, float scale, int32_t* index);
 
-// Returns a YYYY-MM-DD %HH:MM:SS format date for the current day.
+// Returns a YYYY-MM-DD HH:MM:SS format date for the current day.
 std::string CurrentDateTimeStr(void);
 
 // A function to extend the functionality of the Java
