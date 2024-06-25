@@ -18,8 +18,8 @@ void TeleopController::Update() {
         right = std::abs(1 - _turn) * (left - min * left) + min * left;
     }
     else {  // handle left 
-        left = _speed * _fwd;
-        right = std::abs(1 - _turn) * (left - min * left) + min * left;
+        right = _speed * _fwd;
+        left = std::abs(1 - _turn) * (right - min * right) + min * right;
     }
  
     _drive_base->SetOutput(DriveOutput(left, right));
