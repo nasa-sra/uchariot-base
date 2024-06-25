@@ -44,6 +44,7 @@ private:
     };
 
     void readStatus1Packet(uint8_t* data);
+    void readStatus5Packet(uint8_t* data);
 
     void sendDutyCycle(float dc);
     void sendRPM(float rpm);
@@ -63,4 +64,5 @@ private:
     double _velocity{0.0};
     double _current{0.0};
     double _output{0.0};
+    double _voltageIn{0.0};
 };

@@ -38,18 +38,27 @@ void VescController::SetCmd(float cmd) {
     }
 }
 
+static void print_buf(const char *title, const unsigned char *buf, size_t buf_len)
+{
+    size_t i = 0;
+    for(i = 0; i < buf_len; ++i)
+    fprintf(stdout, "%02X%s", buf[i],
+             ( i + 1 ) % 16 == 0 ? "\r\n" : " " );
+
+}
+
 void VescController::packetHandler(CanFrame frame) {
     uint8_t statusID = (frame.arb_id & 0x0000FF00) >> 8;
-
-    // std::cout << statusID << ": 0x" << std::hex;
-    // int i = 0;
-    // for(i = 0; i < 8; i++)
-    //     std::cout << frame.data[i];
+    // std::cout << (int) statusID << ": ";
+    // print_buf("", frame.data, frame.len);
     // std::cout << std::endl;
     
     switch (statusID) {
         case CAN_PACKET_STATUS:
             readStatus1Packet(frame.data);
+            break;
+        case CAN_PACKET_STATUS_5:
+            readStatus5Packet(frame.data);
             break;
         default:
             break;
@@ -57,13 +66,23 @@ void VescController::packetHandler(CanFrame frame) {
 }
 
 void VescController::readStatus1Packet(uint8_t* data) {
-    memcpy(&_velocity, data, 4);
-    _velocity /= _scale;
-    memcpy(&_current, data+4, 2);
-    _current /= 10;
-    memcpy(&_output, data+6, 2);
-    _output /= 1000;
-    // Utils::LogFmt("id: %i velocity: %f", _can_id, _velocity);
+    std::reverse(data, data + 8); // Convert to little endian
+    int16_t buf;
+    memcpy(&buf, data, 2);
+    _output = buf / 1000;
+    memcpy(&buf, data+2, 2);
+    _current = buf / 10;
+    int32_t lBuf;
+    memcpy(&lBuf, data+4, 4);
+    _velocity = lBuf / _scale;
+}
+
+void VescController::readStatus5Packet(uint8_t* data) {
+    std::reverse(data, data + 8); // Convert to little endian
+    int32_t buf;
+    memcpy(&buf, data, 4);
+    _voltageIn = buf / 10;
+    // ignore tachometer
 }
 
 void VescController::sendDutyCycle(float dc) {
