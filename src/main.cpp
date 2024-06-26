@@ -8,7 +8,7 @@
 #include "Robot.h"
 #include "NetworkManager.h"
 #include "Utils.h"
-#include "IMU.h"
+#include "subsystems/IMU.h"
 
 bool running = true;
 
@@ -23,9 +23,10 @@ int main() {
     
     Robot robot;
     NetworkManager network_manager(8001);
+    IMU imu;
     network_manager.Start([&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
 
-    robot.Run(50, running);
+    robot.Run(50, running, imu);
     
     can->CloseConnection();
     network_manager.CloseConnections();

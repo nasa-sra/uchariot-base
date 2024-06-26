@@ -40,7 +40,7 @@ void Robot::ScheduleNextIter(int rate, std::chrono::high_resolution_clock::time_
 }
 
 // The main robot process scheduler.
-void Robot::Run(int rate, bool& running) {
+void Robot::Run(int rate, bool& running, IMU& imu) {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     Utils::LogFmt("Robot Running");
@@ -55,6 +55,9 @@ void Robot::Run(int rate, bool& running) {
 
         // Update subsystems
         _subsystems->drive->Update();
+
+        imu.fetchData();
+        printf("Gyro Z: %f", imu.getGyro(2));
 
         // Handle periodic update scheduling 
         ScheduleNextIter(rate, start_time);

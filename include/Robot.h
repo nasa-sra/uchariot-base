@@ -8,6 +8,7 @@
 #include "Base.h"
 #include "controllers/EmptyController.h"
 #include "controllers/TeleopController.h"
+#include "subsystems/IMU.h"
 
 // This structure is just a container for all the various
 // controllers to keep code organized.
@@ -43,7 +44,7 @@ public:
         _active_controller_name("teleop"),
         _active_controller((ControllerBase*)_controllers->teleop) {}
 
-    void Run(int rate, bool& running);
+    void Run(int rate, bool& running, IMU& imu);
 
     void HandleNetCmd(const std::string& cmd, rapidjson::Document& doc);
 

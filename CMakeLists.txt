@@ -24,8 +24,10 @@ set(SRCS
     src/NetworkManager.cpp
     src/controllers/TeleopController.cpp
     src/subsystems/DriveBase.cpp
+    src/subsystems/IMU.cpp
+    src/I2C.cpp
 )
 
 add_executable(uChariotBase ${SRCS})
-target_link_libraries( uChariotBase )
+target_link_libraries(uChariotBase i2c)
 target_include_directories( uChariotBase PUBLIC ./include/)

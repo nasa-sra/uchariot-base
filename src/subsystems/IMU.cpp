@@ -1,5 +1,10 @@
-#include "IMU.h"
+#include "subsystems/IMU.h"
 #include "Utils.h"
+
+IMU::IMU(){
+    setAccConfig(2);
+    setGyroConfig(2);
+}
 
 int IMU::setAccConfig(int config_num){
     int status;

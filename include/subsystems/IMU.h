@@ -1,23 +1,11 @@
 #pragma once
 
-#include <iostream>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <time.h>
-#include <errno.h>
-#include <string.h>
-#include <cmath>
-#include <linux/i2c-dev.h>
-#include <i2c/smbus.h>
-
 #include "I2C.h"
 
 class IMU {
   public:
 
-    IMU(){};
+    IMU();
 
     int setAccConfig(int config_num);
     int setGyroConfig(int config_num);
