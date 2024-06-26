@@ -61,7 +61,7 @@ private:
     CanConnection* _can;
     uint16_t _can_id;
     float _scale {1.0};
-    int _disconnectTimer{100};
+    int _disconnectTimer{0};
 
     bool _connected{false};
     Mode _mode {DUTY_CYCLE};

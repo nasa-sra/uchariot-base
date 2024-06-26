@@ -18,19 +18,19 @@ int main() {
 
     signal(SIGINT, HandleSigInt);
 
-    CanConnection* can = &CanConnection::GetInstance(); // Threadsafe singleton
+    CanConnection* can = &CanConnection::GetInstance();
     can->Start(running);
     
     Robot robot;
-    NetworkManager network_manager(8001);
-    network_manager.Start([&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
+    NetworkManager::GetInstance().Start(8001, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
 
-    StateReporter::GetInstance().SetLogging(true);
+    StateReporter::GetInstance().EnableLogging();
+    // StateReporter::GetInstance().EnableTelemetry();
 
     robot.Run(50, running);
     
     can->CloseConnection();
-    network_manager.CloseConnections();
+    NetworkManager::GetInstance().CloseConnections();
     StateReporter::GetInstance().Close();
 
     return 0;

@@ -15,14 +15,19 @@ typedef std::function<void(std::string, rapidjson::Document&)> PacketCallback;
 class NetworkManager {
 public:
 
-    NetworkManager(int port);
+    static NetworkManager& GetInstance() {
+        static NetworkManager _instance;
+        return _instance;
+    }
 
-    void Start(PacketCallback packetCallback);
-    void Run();
+    void Start(int port, PacketCallback packetCallback);
     void CloseConnections();
 
 private:
 
+    NetworkManager();
+
+    void run();
     void acceptConnection();
     void receivePacket(int fd);
     void handlePacket(char* buffer, int start, size_t len);

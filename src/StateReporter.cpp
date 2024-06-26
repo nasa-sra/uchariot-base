@@ -1,6 +1,7 @@
 
 #include <sys/stat.h>
 
+#include "rapidjson/document.h"
 #include "Utils.h"
 #include "StateReporter.h"
 
@@ -13,6 +14,7 @@ void StateReporter::UpdateKey(std::string key, double val) {
 }
 
 void StateReporter::PushState() {
+    _stateRefreshed = true;
     if (_logging) {
         if (_logFile.is_open()) {
             logState();
@@ -21,6 +23,41 @@ void StateReporter::PushState() {
                 logState();
         }
     }
+}
+
+void StateReporter::EnableLogging() {
+    _logging = true;
+}
+
+void StateReporter::EnableTelemetry() {
+    _telemetryThread = std::thread(&StateReporter::sendState, this);
+}
+
+void StateReporter::Close() {
+    if (_logFile.is_open())
+        _logFile.close();
+}
+
+void StateReporter::sendState() {
+    // rapidjson::Document doc;
+    // doc.SetObject();
+    // rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+    // for (auto i = _state.begin(); i != _state.end(); i++) {
+    //     doc.AddMember(i->first, i->second, allocator);
+    // }
+
+    // while(1) {
+    //     while(!_stateRefreshed) {
+    //         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    //     }
+
+    //     for (auto i = _state.begin(); i != _state.end(); i++) {
+    //         auto member = doc.FindMember(i->first.c_str());
+    //         member->value.SetDouble(i->second);
+    //     }
+
+    //     _stateRefreshed = false;
+    // }
 }
 
 bool StateReporter::initLogFile() {
@@ -69,9 +106,4 @@ void StateReporter::logState() {
     row = row.substr(0, row.size() - 2);
     _logFile << row << '\n';
 
-}
-
-void StateReporter::Close() {
-    if (_logFile.is_open())
-        _logFile.close();
 }

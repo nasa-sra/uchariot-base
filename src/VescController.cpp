@@ -14,6 +14,9 @@ VescController::VescController(uint16_t id) :
 void VescController::Update() {
     _connected = _disconnectTimer < 10;
     _disconnectTimer++;
+
+    if (!_connected)
+        Utils::LogFmt("Warning: Vesc Controller Id %i is not connected", _can_id);
 }
 
 void VescController::SetMode(Mode mode) {
@@ -84,7 +87,7 @@ void VescController::readStatus1Packet(uint8_t* data) {
 void VescController::readStatus5Packet(uint8_t* data) {
     std::reverse(data, data + 8); // Convert to little endian
     int32_t buf;
-    memcpy(&buf, data, 4);
+    memcpy(&buf, data+2, 2);
     _voltageIn = buf / 10;
     // ignore tachometer
 }
