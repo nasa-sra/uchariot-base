@@ -59,6 +59,11 @@ void Robot::Run(int rate, bool& running) {
         // Update subsystems
         _subsystems->drive->Update();
 
+        // Report state
+        cmds.ReportState();
+        _subsystems->drive->ReportState();
+        StateReporter::GetInstance().PushState();
+
         // Handle periodic update scheduling 
         ScheduleNextIter(rate, start_time);
     }

@@ -114,3 +114,14 @@ void VescController::sendCurrent(float amps) {
     _can->Send(new CanFrame(arbId, buffer, send_index));
 }
 
+void VescController::ReportState(std::string prefix) {
+    StateReporter::GetInstance().UpdateKey(prefix + "mode", _mode);
+    StateReporter::GetInstance().UpdateKey(prefix + "cmd_duty_cycle", _cmdDutyCycle);
+    StateReporter::GetInstance().UpdateKey(prefix + "cmd_velocity", _cmdVelocity);
+    StateReporter::GetInstance().UpdateKey(prefix + "cmd_position", _cmdPosition);
+    StateReporter::GetInstance().UpdateKey(prefix + "cmd_current", _cmdCurrent);
+    StateReporter::GetInstance().UpdateKey(prefix + "velocity", _velocity);
+    StateReporter::GetInstance().UpdateKey(prefix + "current", _current);
+    StateReporter::GetInstance().UpdateKey(prefix + "output", _output);
+    StateReporter::GetInstance().UpdateKey(prefix + "voltage_in", _voltageIn);
+}

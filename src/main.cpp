@@ -8,6 +8,7 @@
 #include "Robot.h"
 #include "NetworkManager.h"
 #include "Utils.h"
+#include "StateReporter.h"
 
 bool running = true;
 
@@ -24,10 +25,13 @@ int main() {
     NetworkManager network_manager(8001);
     network_manager.Start([&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
 
+    StateReporter::GetInstance().SetLogging(true);
+
     robot.Run(50, running);
     
     can->CloseConnection();
     network_manager.CloseConnections();
+    StateReporter::GetInstance().Close();
 
     return 0;
 }

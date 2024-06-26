@@ -4,6 +4,11 @@
 
 struct ControlCmds {
     DriveBaseCmds drive;
+
+    void ReportState(std::string prefix="/") {
+        prefix += "control_cmds/";
+        drive.ReportState(prefix);
+    }
 };
 
 // Baseclass for a controller module, defines init,

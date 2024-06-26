@@ -26,4 +26,5 @@ ControlCmds TeleopController::Run() {
     }
  
     cmds.drive = DriveBaseCmds(left, right);
+    return cmds;
 }

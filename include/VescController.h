@@ -1,6 +1,9 @@
 #pragma once
 
+#include <string>
+
 #include "CanConnection.h"
+#include "StateReporter.h"
 
 class VescController {
 public:
@@ -15,10 +18,12 @@ public:
 
     void SetMode(Mode mode);
     void SetCmd(float cmd);
-
     void SetScale(float scale) {_scale = scale;}
 
+    double GetVoltage() {return _voltageIn;}
+
     void packetHandler(CanFrame frame);
+    void ReportState(std::string prefix = "/");
 
 private:
     enum CAN_CMD_PACKET_ID {
@@ -53,9 +58,9 @@ private:
 
     CanConnection* _can;
     uint16_t _can_id;
-    Mode _mode {DUTY_CYCLE};
     float _scale {1.0};
 
+    Mode _mode {DUTY_CYCLE};
     double _cmdDutyCycle{0.0};
     double _cmdVelocity{0.0};
     double _cmdPosition{0.0};
