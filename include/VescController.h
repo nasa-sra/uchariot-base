@@ -16,6 +16,8 @@ public:
 
     VescController(uint16_t id);
 
+    void Update();
+
     void SetMode(Mode mode);
     void SetCmd(float cmd);
     void SetScale(float scale) {_scale = scale;}
@@ -59,7 +61,9 @@ private:
     CanConnection* _can;
     uint16_t _can_id;
     float _scale {1.0};
+    int _disconnectTimer{100};
 
+    bool _connected{false};
     Mode _mode {DUTY_CYCLE};
     double _cmdDutyCycle{0.0};
     double _cmdVelocity{0.0};

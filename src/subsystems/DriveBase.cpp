@@ -42,6 +42,11 @@ void DriveBase::Update() {
     _right_back.SetCmd(_cmds._rb_speed);
     _cmds = DriveBaseCmds(); // reset to 0
 
+    _left_front.Update();
+    _right_front.Update();
+    _left_back.Update();
+    _right_back.Update();
+
     _voltage = (_left_front.GetVoltage() + _right_front.GetVoltage() + _left_back.GetVoltage() + _right_back.GetVoltage()) / 4;
 }
 

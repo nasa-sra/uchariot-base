@@ -11,6 +11,11 @@ VescController::VescController(uint16_t id) :
     _can->RegisterPacketHandler(id, [this](CanFrame frame) {this->packetHandler(frame);});
 }
 
+void VescController::Update() {
+    _connected = _disconnectTimer < 10;
+    _disconnectTimer++;
+}
+
 void VescController::SetMode(Mode mode) {
     _mode = mode;
 }
@@ -60,6 +65,8 @@ void VescController::packetHandler(CanFrame frame) {
         default:
             break;
     }
+
+    _disconnectTimer = 0;
 }
 
 void VescController::readStatus1Packet(uint8_t* data) {
@@ -115,6 +122,7 @@ void VescController::sendCurrent(float amps) {
 }
 
 void VescController::ReportState(std::string prefix) {
+    StateReporter::GetInstance().UpdateKey(prefix + "connected", _connected);
     StateReporter::GetInstance().UpdateKey(prefix + "mode", _mode);
     StateReporter::GetInstance().UpdateKey(prefix + "cmd_duty_cycle", _cmdDutyCycle);
     StateReporter::GetInstance().UpdateKey(prefix + "cmd_velocity", _cmdVelocity);
