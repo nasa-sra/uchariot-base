@@ -49,9 +49,6 @@ static void print_buf(const char *title, const unsigned char *buf, size_t buf_le
 
 void VescController::packetHandler(CanFrame frame) {
     uint8_t statusID = (frame.arb_id & 0x0000FF00) >> 8;
-    // std::cout << (int) statusID << ": ";
-    // print_buf("", frame.data, frame.len);
-    // std::cout << std::endl;
     
     switch (statusID) {
         case CAN_PACKET_STATUS:

@@ -5,7 +5,6 @@
 #include <cstdio>
 
 #include "rapidjson/document.h"
-#include "Base.h"
 #include "controllers/EmptyController.h"
 #include "controllers/TeleopController.h"
 

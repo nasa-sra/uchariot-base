@@ -29,9 +29,9 @@ void DriveBase::Update() {
 
     // Utils::LogFmt("Drivebase Speeds: lb %f  lf %f  rb %f  sb %f", _output._lb_speed, _output._lf_speed, _output._rb_speed, _output._rf_speed);
 
-    _left_back.SetCmd(_output._lb_speed);
-    _left_front.SetCmd(_output._lf_speed);
-    _right_back.SetCmd(_output._rb_speed);
-    _right_front.SetCmd(_output._rf_speed);
-    _output = DriveOutput(); // reset to 0
+    _left_back.SetCmd(_cmds._lb_speed);
+    _left_front.SetCmd(_cmds._lf_speed);
+    _right_back.SetCmd(_cmds._rb_speed);
+    _right_front.SetCmd(_cmds._rf_speed);
+    _cmds = DriveBaseCmds(); // reset to 0
 }
