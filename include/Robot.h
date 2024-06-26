@@ -5,9 +5,10 @@
 #include <cstdio>
 
 #include "rapidjson/document.h"
-#include "Base.h"
+
 #include "controllers/EmptyController.h"
 #include "controllers/TeleopController.h"
+#include "StateReporter.h"
 
 // This structure is just a container for all the various
 // controllers to keep code organized.
@@ -57,4 +58,5 @@ private:
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;
+
 };

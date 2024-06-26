@@ -22,6 +22,7 @@ set(SRCS
     src/VescController.cpp
     src/Utils.cpp
     src/NetworkManager.cpp
+    src/StateReporter.cpp
     src/controllers/TeleopController.cpp
     src/subsystems/DriveBase.cpp
 )

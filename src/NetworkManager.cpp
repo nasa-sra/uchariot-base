@@ -1,7 +1,9 @@
 
 #include "NetworkManager.h"
 
-NetworkManager::NetworkManager(int port) {
+NetworkManager::NetworkManager() {}
+
+void NetworkManager::Start(int port, PacketCallback packetCallback) {
 
     FD_ZERO(&_fds);
 
@@ -21,15 +23,13 @@ NetworkManager::NetworkManager(int port) {
     listen(_net_socket, 10);
     FD_SET(_net_socket, &_fds);
     _running = true;
-}
 
-void NetworkManager::Start(PacketCallback packetCallback) {
     _packetCallback = packetCallback;
-    _serverThread = std::thread(&NetworkManager::Run, this);
+    _serverThread = std::thread(&NetworkManager::run, this);
 }
 
 // This is mostly from here https://beej.us/guide/bgnet/html/#select
-void NetworkManager::Run() {
+void NetworkManager::run() {
 
     fd_set read_fds;
     FD_ZERO(&read_fds);

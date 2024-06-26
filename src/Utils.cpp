@@ -21,11 +21,11 @@ void Utils::BufferAppendFloat32(uint8_t* buffer, float number, float scale, int3
     BufferAppendInt32(buffer, (int32_t)(number * scale), index);
 }
 
-std::string Utils::CurrentDateTimeStr(void) {
+std::string Utils::CurrentDateTimeStr(const char* fmt) {
     time_t now = time(0);
     struct tm tstruct;
     char buf[80];
     tstruct = *localtime(&now);
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tstruct);
+    strftime(buf, sizeof(buf), fmt, &tstruct);
     return buf;
 }

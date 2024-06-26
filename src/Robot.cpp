@@ -50,11 +50,19 @@ void Robot::Run(int rate, bool& running) {
         // Swap out controllers if it is changed via network manager
         ManageController();
 
-        // Update the active controller 
-        _active_controller->Update();
+        // Run the active controller
+        ControlCmds cmds = _active_controller->Run();
+
+        // Commmand subsystems
+        _subsystems->drive->SetCmds(cmds.drive);
 
         // Update subsystems
         _subsystems->drive->Update();
+
+        // Report state
+        cmds.ReportState();
+        _subsystems->drive->ReportState();
+        StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling 
         ScheduleNextIter(rate, start_time);
