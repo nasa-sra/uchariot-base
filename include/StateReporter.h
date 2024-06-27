@@ -36,6 +36,7 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> _startTime;
 
     bool _stateRefreshed{false};
+    bool _telemetry{false};
     std::thread _telemetryThread;
 
 };

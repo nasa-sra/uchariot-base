@@ -25,7 +25,7 @@ int main() {
     NetworkManager::GetInstance().Start(8001, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
 
     StateReporter::GetInstance().EnableLogging();
-    // StateReporter::GetInstance().EnableTelemetry();
+    StateReporter::GetInstance().EnableTelemetry();
 
     robot.Run(50, running);
     

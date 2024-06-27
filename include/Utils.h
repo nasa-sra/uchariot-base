@@ -103,6 +103,6 @@ template<typename T> long VectorIndexOf(const std::vector<T> v, const T x) {
     return pos;
 }
 
-
+int ScheduleRate(int rate, std::chrono::high_resolution_clock::time_point start_time);
 
 }; // namespace Utils

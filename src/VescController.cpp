@@ -15,8 +15,12 @@ void VescController::Update() {
     _connected = _disconnectTimer < 10;
     _disconnectTimer++;
 
+    _velocity++;
+
+#ifndef SIMULATION
     if (!_connected)
         Utils::LogFmt("Warning: Vesc Controller Id %i is not connected", _can_id);
+#endif
 }
 
 void VescController::SetMode(Mode mode) {

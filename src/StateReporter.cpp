@@ -2,7 +2,12 @@
 #include <sys/stat.h>
 
 #include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/prettywriter.h"
+
 #include "Utils.h"
+#include "NetworkManager.h"
 #include "StateReporter.h"
 
 StateReporter::StateReporter() {
@@ -30,34 +35,54 @@ void StateReporter::EnableLogging() {
 }
 
 void StateReporter::EnableTelemetry() {
+    _telemetry = true;
     _telemetryThread = std::thread(&StateReporter::sendState, this);
 }
 
 void StateReporter::Close() {
+    _telemetry = false;
+    _logging = false;
     if (_logFile.is_open())
         _logFile.close();
 }
 
 void StateReporter::sendState() {
-    // rapidjson::Document doc;
-    // doc.SetObject();
-    // rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
-    // for (auto i = _state.begin(); i != _state.end(); i++) {
-    //     doc.AddMember(i->first, i->second, allocator);
-    // }
 
-    // while(1) {
-    //     while(!_stateRefreshed) {
-    //         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    //     }
+    while(!_stateRefreshed) { std::this_thread::sleep_for(std::chrono::milliseconds(1)); }
 
-    //     for (auto i = _state.begin(); i != _state.end(); i++) {
-    //         auto member = doc.FindMember(i->first.c_str());
-    //         member->value.SetDouble(i->second);
-    //     }
+    // TODO: Actually format JSON doc
+    rapidjson::Document doc;
+    doc.SetObject();
+    rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+    for (auto i = _state.begin(); i != _state.end(); i++) {
+        rapidjson::Value name(i->first.c_str(), i->first.size());
+        doc.AddMember(name, i->second, allocator);
+    }
 
-    //     _stateRefreshed = false;
-    // }
+    auto start_time = std::chrono::high_resolution_clock::now();
+    while(_telemetry) {
+        start_time = std::chrono::high_resolution_clock::now();
+
+        while(!_stateRefreshed) { std::this_thread::sleep_for(std::chrono::milliseconds(1)); }
+
+        for (auto i = _state.begin(); i != _state.end(); i++) {
+            auto member = doc.FindMember(i->first.c_str());
+            // std::cout << i->first << " Json: " << member->value.GetDouble() << " Actual: " << i->second << "\n";
+            member->value.SetDouble(i->second);
+        }
+
+        rapidjson::StringBuffer strbuf;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
+        doc.Accept(writer);
+
+        NetworkManager::GetInstance().SendAll(strbuf.GetString(), strbuf.GetSize());
+
+        int overrun = Utils::ScheduleRate(1, start_time);
+        if (overrun > 0) {
+            Utils::LogFmt("StateReporter sendState overran by %i ms", overrun);
+        }
+        _stateRefreshed = false;
+    }
 }
 
 bool StateReporter::initLogFile() {
