@@ -1,7 +1,9 @@
 
 #include "NetworkManager.h"
 
-NetworkManager::NetworkManager(int port) {
+NetworkManager::NetworkManager() {}
+
+void NetworkManager::Start(int port, PacketCallback packetCallback) {
 
     FD_ZERO(&_fds);
 
@@ -21,15 +23,13 @@ NetworkManager::NetworkManager(int port) {
     listen(_net_socket, 10);
     FD_SET(_net_socket, &_fds);
     _running = true;
-}
 
-void NetworkManager::Start(PacketCallback packetCallback) {
     _packetCallback = packetCallback;
-    _serverThread = std::thread(&NetworkManager::Run, this);
+    _serverThread = std::thread(&NetworkManager::run, this);
 }
 
 // This is mostly from here https://beej.us/guide/bgnet/html/#select
-void NetworkManager::Run() {
+void NetworkManager::run() {
 
     fd_set read_fds;
     FD_ZERO(&read_fds);
@@ -77,6 +77,7 @@ void NetworkManager::acceptConnection() {
             Utils::LogFmt("New client %i connected", conn);
         }
         _clientNum++;
+        _clientSockets.push_back(conn);
     }
 }
 
@@ -90,6 +91,7 @@ void NetworkManager::receivePacket(int fd) {
         } else { 
             Utils::LogFmt("NetworkManager - Error on recv");
         }
+        _clientSockets.erase(std::remove(_clientSockets.begin(), _clientSockets.end(), fd), _clientSockets.end());
         _clientNum--;
         close(fd);
         FD_CLR(fd, &_fds);
@@ -133,13 +135,38 @@ void NetworkManager::handlePacket(char* buffer, int start, size_t len) {
     _packetCallback(cmd, document);
 }
 
+void NetworkManager::SendAll(const char* buffer, int len) {
+    for (int fd : _clientSockets) {
+        Send(fd, buffer, len);
+    }
+}
+
+void NetworkManager::Send(int fd, const char* buffer, int len) {
+    int total = 0;
+    int bytesleft = len;
+    int n;
+
+    while(total < len) {
+        n = send(fd, buffer + total, bytesleft, 0);
+        if (n == -1) {
+            Utils::LogFmt("NetworkManger - Error on send");
+            return;
+        }
+        total += n;
+        bytesleft -= n;
+    }
+}
+
+
 void NetworkManager::CloseConnections() {
     Utils::LogFmt("Closing connections");
     _running = false;
 
-    for (int i = 0; i <= _fdmax; i++) {
-        close(i);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    for (int fd : _clientSockets) {
+        close(fd);
     }
+    close(_net_socket);
 
     _serverThread.join();
 }

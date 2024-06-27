@@ -8,6 +8,7 @@ set(TOOLCHAIN_DIR /usr/bin)
 set(CMAKE_SYSROOT ~/uchariot-sys/sysroot)
 link_directories(/usr/aarch64-linux-gnu/lib)
 include_directories(/usr/aarch64-linux-gnu/include)
+include_directories(${CMAKE_SYSROOT}/usr/include)
 
 set(CMAKE_C_COMPILER ${TOOLCHAIN_DIR}/aarch64-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/aarch64-linux-gnu-g++)

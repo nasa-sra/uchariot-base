@@ -5,9 +5,10 @@
 #include <cstdio>
 
 #include "rapidjson/document.h"
-#include "Base.h"
+
 #include "controllers/EmptyController.h"
 #include "controllers/TeleopController.h"
+#include "StateReporter.h"
 #include "subsystems/IMU.h"
 
 // This structure is just a container for all the various
@@ -51,11 +52,11 @@ public:
 private:
 
     void ManageController();
-    void ScheduleNextIter(int rate, std::chrono::high_resolution_clock::time_point start_time);
 
     Controllers* _controllers;
     Subsystems* _subsystems;
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;
+
 };

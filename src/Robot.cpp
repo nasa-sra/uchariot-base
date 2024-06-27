@@ -30,15 +30,6 @@ void Robot::ManageController() {
     }
 }
 
-void Robot::ScheduleNextIter(int rate, std::chrono::high_resolution_clock::time_point start_time) {
-    int dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count();
-    if (dt < 1000 / rate) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(int(1000.0 / rate - dt)));
-    } else {
-        Utils::LogFmt("Robot overrun of %i ms", dt);
-    }
-}
-
 // The main robot process scheduler.
 void Robot::Run(int rate, bool& running, IMU& imu) {
     auto start_time = std::chrono::high_resolution_clock::now();
@@ -50,16 +41,27 @@ void Robot::Run(int rate, bool& running, IMU& imu) {
         // Swap out controllers if it is changed via network manager
         ManageController();
 
-        // Update the active controller 
-        _active_controller->Update();
+        // Run the active controller
+        ControlCmds cmds = _active_controller->Run();
+
+        // Commmand subsystems
+        _subsystems->drive->SetCmds(cmds.drive);
 
         // Update subsystems
         _subsystems->drive->Update();
 
         imu.fetchData();
         printf("Gyro Z: %f", imu.getGyro(2));
+        
+        // Report state
+        cmds.ReportState();
+        _subsystems->drive->ReportState();
+        StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling 
-        ScheduleNextIter(rate, start_time);
+        int overrun = Utils::ScheduleRate(rate, start_time);
+        if (overrun > 0) {
+            Utils::LogFmt("Robot Run overran by %i ms", overrun);
+        }
     }
 }

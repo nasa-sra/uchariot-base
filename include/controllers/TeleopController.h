@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Base.h"
+#include "ControllerBase.h"
 #include "VescController.h"
-#include "subsystems/DriveBase.h"
 #include "rapidjson/document.h"
 
 class TeleopController : public ControllerBase {
@@ -20,10 +19,10 @@ public:
     }; 
 
     inline void Unload() override {
-        Load(); // shit
+        Load();
     }
 
-    void Update() override;
+    ControlCmds Run() override;
 
     void HandleNetworkInput(rapidjson::Document& doc);
 

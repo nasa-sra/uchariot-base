@@ -9,6 +9,7 @@
 #include "NetworkManager.h"
 #include "Utils.h"
 #include "subsystems/IMU.h"
+#include "StateReporter.h"
 
 bool running = true;
 
@@ -18,18 +19,22 @@ int main() {
 
     signal(SIGINT, HandleSigInt);
 
-    CanConnection* can = &CanConnection::GetInstance(); // Threadsafe singleton
+    CanConnection* can = &CanConnection::GetInstance();
     can->Start(running);
     
     Robot robot;
-    NetworkManager network_manager(8001);
     IMU imu;
-    network_manager.Start([&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
+    NetworkManager::GetInstance().Start(8001, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
+
+    StateReporter::GetInstance().EnableLogging();
+    StateReporter::GetInstance().EnableTelemetry();
 
     robot.Run(50, running, imu);
     
     can->CloseConnection();
-    network_manager.CloseConnections();
+    NetworkManager::GetInstance().CloseConnections();
+    StateReporter::GetInstance().Close();
+    Utils::LogFmt("Shutdown");
 
     return 0;
 }

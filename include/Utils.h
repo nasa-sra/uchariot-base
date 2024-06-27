@@ -24,7 +24,7 @@ void BufferAppendFloat16(uint8_t* buffer, float number, float scale, int32_t* in
 void BufferAppendFloat32(uint8_t* buffer, float number, float scale, int32_t* index);
 
 // Returns a YYYY-MM-DD HH:MM:SS format date for the current day.
-std::string CurrentDateTimeStr(void);
+std::string CurrentDateTimeStr(const char* fmt = "%Y-%m-%d %H:%M:%S");
 
 // A function to extend the functionality of the Java
 // Map interface's getOrDefault method to the C++ map.
@@ -103,6 +103,6 @@ template<typename T> long VectorIndexOf(const std::vector<T> v, const T x) {
     return pos;
 }
 
-
+int ScheduleRate(int rate, std::chrono::high_resolution_clock::time_point start_time);
 
 }; // namespace Utils

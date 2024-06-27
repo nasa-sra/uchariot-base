@@ -7,7 +7,10 @@ void TeleopController::HandleNetworkInput(rapidjson::Document& doc) {
     _turn = doc["turn"].GetDouble();      // [-1, 1]
 }
 
-void TeleopController::Update() {
+ControlCmds TeleopController::Run() {
+
+    ControlCmds cmds;
+
     const double deadband = 0.05, min = 0.125;
     if (std::abs(_fwd) < deadband) _fwd = 0;
     if (std::abs(_turn) < deadband) _turn = 0;
@@ -22,5 +25,6 @@ void TeleopController::Update() {
         left = right + (_turn * (right - min * right));
     }
  
-    _drive_base->SetOutput(DriveOutput(left, right));
+    cmds.drive = DriveBaseCmds(left, right);
+    return cmds;
 }
