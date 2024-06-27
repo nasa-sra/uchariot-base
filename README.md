@@ -22,7 +22,7 @@ To crosscompile for the raspberry pi, you first need to create a sysroot directo
 You can use
 `rsync -vR --progress -rl --delete-after --safe-links uchariot@10.93.24.4:/{lib,usr,opt/vc/lib} $HOME/uchariot-sys/sysroot`
 to copy the pi's lib and usr directories to the sysroot. You then need to install the cross compiler for aarch64. 
-`sudo apt install gcc-aarch64-linux-gnu`
+`sudo apt install g++-aarch64-linux-gnu`
 Then create a pibuild directory and run
 `cmake -DCMAKE_TOOLCHAIN_FILE=../piToolchain.cmake ..`
 and 
