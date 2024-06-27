@@ -74,38 +74,39 @@ void IMU::Update(double dt) {
     y = wiringPiI2CReadReg16(_imuFd, GYRO_Y_LOW);
     z = wiringPiI2CReadReg16(_imuFd, GYRO_Z_LOW);
 
-    _gyroData.x = ((float)x) * _gyro_lsb_to_degsec / 1000; // - gyroXoffset;
-    _gyroData.y = ((float)y) * _gyro_lsb_to_degsec / 1000; // - gyroYoffset;
-    _gyroData.z = ((float)z) * _gyro_lsb_to_degsec / 1000; // - gyroZoffset;
+    _gyroRates.x = ((float)x) * _gyro_lsb_to_degsec / 1000; // - gyroXoffset;
+    _gyroRates.y = ((float)y) * _gyro_lsb_to_degsec / 1000; // - gyroYoffset;
+    _gyroRates.z = ((float)z) * _gyro_lsb_to_degsec / 1000; // - gyroZoffset;
     
     x = wiringPiI2CReadReg16(_imuFd, ACCEL_X_LOW);
     y = wiringPiI2CReadReg16(_imuFd, ACCEL_Y_LOW);
     z = wiringPiI2CReadReg16(_imuFd, ACCEL_Z_LOW);
 
-    _accelData.x = ((float)x) * _acc_lsb_to_g / 1000; // - accXoffset;
-    _accelData.y = ((float)y) * _acc_lsb_to_g / 1000; // - accYoffset;
-    _accelData.z = ((float)z) * _acc_lsb_to_g / 1000; // - accZoffset;
+    _accelerations.x = ((float)x) * _acc_lsb_to_g / 1000; // - accXoffset;
+    _accelerations.y = ((float)y) * _acc_lsb_to_g / 1000; // - accYoffset;
+    _accelerations.z = ((float)z) * _acc_lsb_to_g / 1000; // - accZoffset;
 
-    _gyroAngles.x += _accelData.x * dt + 0.0075; // integrate angular rotation for angles
-    _gyroAngles.y += _accelData.y * dt + 0.0075; // integrate angular rotation for angles
-    _gyroAngles.z += _accelData.z * dt + 0.0075; // integrate angular rotation for angles
+    float driftFactor = 0.0075;
+    _gyroAngles.x += _gyroRates.x * dt + driftFactor; // integrate angular rotation for angles
+    _gyroAngles.y += _gyroRates.y * dt + driftFactor; // integrate angular rotation for angles
+    _gyroAngles.z += _gyroRates.z * dt + driftFactor; // integrate angular rotation for angles
 
  }
 
  void IMU::ReportState(std::string prefix) {
-    // StateReporter::GetInstance().UpdateKey(prefix + "roll", _gyroData.x);
-    // StateReporter::GetInstance().UpdateKey(prefix + "pitch", _gyroData.y);
-    StateReporter::GetInstance().UpdateKey(prefix + "yaw", _gyroData.z);
+    // StateReporter::GetInstance().UpdateKey(prefix + "roll", _gyroRates.x);
+    // StateReporter::GetInstance().UpdateKey(prefix + "pitch", _gyroRates.y);
+    StateReporter::GetInstance().UpdateKey(prefix + "yaw", _gyroAngles.z);
 }
 
- Utils::Vector3 IMU::getAccel() {
-    return _accelData;
+ Utils::Vector3 IMU::getAccelerations() {
+    return _accelerations;
  }
 
- Utils::Vector3 IMU::getGyro() {
-    return _gyroData;
+ Utils::Vector3 IMU::getGyroRates() {
+    return _gyroRates;
  }
 
 float IMU::getYaw() {
-    return _gyroAngles.z;
+    return _gyroAngles.z * 1.3;
 }

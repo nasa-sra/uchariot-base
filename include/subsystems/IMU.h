@@ -26,8 +26,8 @@ class IMU : SubsystemBase {
     void Update(double dt);
     void ReportState(std::string prefix = "/");
 
-    Utils::Vector3 getAccel();
-    Utils::Vector3 getGyro();
+    Utils::Vector3 getAccelerations();
+    Utils::Vector3 getGyroRates();
 
     float getYaw();
 
@@ -41,8 +41,8 @@ class IMU : SubsystemBase {
     int _acc_lsb_to_g;
     int _gyro_lsb_to_degsec;
 
-    Utils::Vector3 _accelData;
-    Utils::Vector3 _gyroData;
+    Utils::Vector3 _accelerations;
+    Utils::Vector3 _gyroRates;
 
     Utils::Vector3 _gyroAngles;
 };
@@ -55,8 +55,8 @@ class IMU : SubsystemBase {
     void Update() {}
     void ReportState(std::string prefix = "/") {}
 
-    Utils::Vector3 getAccel() {return Utils::Vector3(0.0, 0.0, 0.0);}
-    Utils::Vector3 getGyro() {return Utils::Vector3(0.0, 0.0, 0.0);}
+    Utils::Vector3 getAccelerations() {return Utils::Vector3(0.0, 0.0, 0.0);}
+    Utils::Vector3 getGyroRates() {return Utils::Vector3(0.0, 0.0, 0.0);}
 
     float getYaw() {return -1.0;}
 };

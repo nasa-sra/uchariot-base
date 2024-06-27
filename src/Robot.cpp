@@ -57,14 +57,6 @@ void Robot::Run(int rate, bool& running) {
         _driveBase.Update(dt);
         _imu.Update(dt);
 
-        static int a = 0;
-        static float heading = 0;
-        a++;
-        if (a == 20) {
-            Utils::LogFmt("Gyro Z: %f", _imu.getYaw());
-            a = 0;
-        }
-
         // Report state
         cmds.ReportState();
         _driveBase.ReportState();
