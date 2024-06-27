@@ -148,9 +148,10 @@ void StateReporter::sendState() {
 
         NetworkManager::GetInstance().SendAll(strbuf.GetString(), strbuf.GetSize());
 
-        int overrun = Utils::ScheduleRate(10, start_time);
-        if (overrun > 0) {
-            Utils::LogFmt("StateReporter sendState overran by %i ms", overrun);
+        int rate = 10; // Hz
+        double dt = Utils::ScheduleRate(rate, start_time);
+        if (dt > 1.0 / rate) {
+            Utils::LogFmt("StateReporter sendState overran by %f s", dt);
         }
         _stateRefreshed = false;
     }

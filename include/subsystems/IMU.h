@@ -1,31 +1,64 @@
 #pragma once
 
-#include "I2C.h"
+#include "subsystems/SubsystemBase.h"
+#include "Utils.h"
 
-class IMU {
+#ifndef SIMULATION
+#include <wiringPiI2C.h>
+
+#define LSM6DSOX_ADDR 0x6A
+#define ACCEL_REG 0x10
+#define GYRO_REG 0x11
+
+#define GYRO_X_LOW 0x22
+#define GYRO_Y_LOW 0x24
+#define GYRO_Z_LOW 0x26
+
+#define ACCEL_X_LOW 0x28
+#define ACCEL_Y_LOW 0x2A
+#define ACCEL_Z_LOW 0x2C
+
+class IMU : SubsystemBase {
   public:
 
     IMU();
 
-    int setAccConfig(int config_num);
-    int setGyroConfig(int config_num);
-    float getAccel(int index);
-    float* getAccelRaw();
-    float getGyro(int index);
-    float* getGyroRaw();
-    void fetchData();
+    void Update(double dt);
+    void ReportState(std::string prefix = "/");
+
+    Utils::Vector3 getAccel();
+    Utils::Vector3 getGyro();
+
+    float getYaw();
 
   private:
 
-    I2C accelGyro{0x6A, 21};
-    I2C magnetometer{0x1C, 21};
-    
-    const uint8_t _accel_register = 0x10;
-    const uint8_t _gyro_register = 0x11;
+    int setAccConfig(int config_num);
+    int setGyroConfig(int config_num);
 
+    int _imuFd;
+    
     int _acc_lsb_to_g;
     int _gyro_lsb_to_degsec;
 
-    float accel[3];
-    float gyro[3];
+    Utils::Vector3 _accelData;
+    Utils::Vector3 _gyroData;
+
+    Utils::Vector3 _gyroAngles;
 };
+#else
+class IMU : SubsystemBase {
+  public:
+
+    IMU() {}
+
+    void Update() {}
+    void ReportState(std::string prefix = "/") {}
+
+    Utils::Vector3 getAccel() {return Utils::Vector3(0.0, 0.0, 0.0);}
+    Utils::Vector3 getGyro() {return Utils::Vector3(0.0, 0.0, 0.0);}
+
+    float getYaw() {return -1.0;}
+};
+
+#endif

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <vector>
 
 #include "rapidjson/document.h"
 

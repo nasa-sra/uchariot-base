@@ -32,13 +32,13 @@ std::string Utils::CurrentDateTimeStr(const char* fmt) {
     return buf;
 }
 
-// Used to enforce a rate (Hz) on a loop, returns ms overrun
-int Utils::ScheduleRate(int rate, std::chrono::high_resolution_clock::time_point start_time) {
+// Used to enforce a rate (Hz) on a loop, returns dt in s
+double Utils::ScheduleRate(int rate, std::chrono::high_resolution_clock::time_point start_time) {
     int dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count();
     if (dt < 1000 / rate) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(int(1000.0 / rate - dt)));
+        std::this_thread::sleep_for(std::chrono::milliseconds(int(1000.0 / rate - dt - 2)));
     } else {
-        return dt;
+        return dt / 1000.0;
     }
-    return 0;
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count() / 1000.0;
 }

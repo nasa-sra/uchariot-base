@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "-O2 -pthread")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_CXX_STANDARD 17)
 
-if(NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
+if(NOT ${CMAKE_CROSSCOMPILING})
     add_compile_definitions(SIMULATION=true)
 endif()
 
@@ -25,13 +25,20 @@ set(SRCS
     src/StateReporter.cpp
     src/controllers/TeleopController.cpp
     src/subsystems/DriveBase.cpp
-    src/subsystems/IMU.cpp
-    src/I2C.cpp
 )
 
-find_library(WIRING_PI_LIB libwiringPi.so ) # ${CMAKE_SYSROOT}/usr/lib/aarch64-linux-gnu/
-find_library(WIRING_PI_DEV_LIB libwiringPiDev.so ) # ${CMAKE_SYSROOT}/usr/lib/aarch64-linux-gnu/
+set(LIBS )
+
+if (${CMAKE_CROSSCOMPILING})
+    list(APPEND SRCS src/subsystems/IMU.cpp)
+
+    find_library(WIRING_PI_LIB libwiringPi.so )
+    find_library(WIRING_PI_DEV_LIB libwiringPiDev.so )
+    find_library(CRYPT_LIB libcrypt.so.1.1.0)
+    list(APPEND LIBS ${WIRING_PI_LIB} ${WIRING_PI_DEV_LIB} ${CRYPT_LIB})
+
+endif()
 
 add_executable(uChariotBase ${SRCS})
-target_link_libraries( uChariotBase ${WIRING_PI_LIB} ${WIRING_PI_DEV_LIB})
+target_link_libraries( uChariotBase ${LIBS})
 target_include_directories( uChariotBase PUBLIC ./include/)

@@ -7,6 +7,11 @@ ControllerBase* Controllers::FromName(const std::string& name) {
     return empty;
 }
 
+Robot::Robot() :
+    _controllers(new Controllers()),
+    _active_controller_name("teleop"),
+    _active_controller((ControllerBase*)_controllers->teleop) {}
+
 // Recive a network command and handle it appropriately.
 void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
     // A set_controller command is handled directly by Robot, 
@@ -31,9 +36,10 @@ void Robot::ManageController() {
 }
 
 // The main robot process scheduler.
-void Robot::Run(int rate, bool& running, IMU& imu) {
+void Robot::Run(int rate, bool& running) {
     auto start_time = std::chrono::high_resolution_clock::now();
 
+    double dt = 1.0 / rate;
     Utils::LogFmt("Robot Running");
     while (running) {
         start_time = std::chrono::high_resolution_clock::now();
@@ -45,23 +51,30 @@ void Robot::Run(int rate, bool& running, IMU& imu) {
         ControlCmds cmds = _active_controller->Run();
 
         // Commmand subsystems
-        _subsystems->drive->SetCmds(cmds.drive);
+        _driveBase.SetCmds(cmds.drive);
 
         // Update subsystems
-        _subsystems->drive->Update();
+        _driveBase.Update(dt);
+        _imu.Update(dt);
 
-        imu.fetchData();
-        printf("Gyro Z: %f", imu.getGyro(2));
-        
+        static int a = 0;
+        static float heading = 0;
+        a++;
+        if (a == 20) {
+            Utils::LogFmt("Gyro Z: %f", _imu.getYaw());
+            a = 0;
+        }
+
         // Report state
         cmds.ReportState();
-        _subsystems->drive->ReportState();
+        _driveBase.ReportState();
+        _imu.ReportState();
         StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling 
-        int overrun = Utils::ScheduleRate(rate, start_time);
-        if (overrun > 0) {
-            Utils::LogFmt("Robot Run overran by %i ms", overrun);
+        dt = Utils::ScheduleRate(rate, start_time);
+        if (dt > 1.0 / rate) {
+            Utils::LogFmt("Robot Run overran by %f s", dt);
         }
     }
 }
