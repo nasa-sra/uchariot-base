@@ -32,6 +32,7 @@ int main() {
     can->CloseConnection();
     NetworkManager::GetInstance().CloseConnections();
     StateReporter::GetInstance().Close();
+    Utils::LogFmt("Shutdown");
 
     return 0;
 }

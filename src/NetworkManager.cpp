@@ -162,10 +162,11 @@ void NetworkManager::CloseConnections() {
     Utils::LogFmt("Closing connections");
     _running = false;
 
-    close(_net_socket);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     for (int fd : _clientSockets) {
         close(fd);
     }
+    close(_net_socket);
 
     _serverThread.join();
 }

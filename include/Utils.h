@@ -24,7 +24,7 @@ void BufferAppendFloat16(uint8_t* buffer, float number, float scale, int32_t* in
 void BufferAppendFloat32(uint8_t* buffer, float number, float scale, int32_t* index);
 
 // Returns a YYYY-MM-DD HH:MM:SS format date for the current day.
-std::string CurrentDateTimeStr(const char* fmt = "%Y-%m-%d %H:%M:%");
+std::string CurrentDateTimeStr(const char* fmt = "%Y-%m-%d %H:%M:%S");
 
 // A function to extend the functionality of the Java
 // Map interface's getOrDefault method to the C++ map.
