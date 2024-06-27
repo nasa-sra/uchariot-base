@@ -33,11 +33,14 @@ int I2C::writeRegister(uint8_t register_addr, uint8_t value) {
     //     Utils::ErrFmt("Write to I2C address %d failed", _addr);
     // }
 
-    char buf[10];
+    char buf[2];
 
     buf[0] = register_addr;
     buf[1] = value;
-    if (write(_file, buf, 2) != 2) {
-        Utils::ErrFmt("Write to I2C address %d failed", _addr);
-    }
+    Utils::LogFmt("%d", write(_file, buf, 2));
+    // if (write(_file, buf, 2) != 2) {
+    //     Utils::ErrFmt("Write to I2C address %d failed", _addr);
+    // }
+
+    return 0;
 }

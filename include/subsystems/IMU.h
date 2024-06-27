@@ -17,8 +17,8 @@ class IMU {
 
   private:
 
-    I2C accelGyro{0x6A, 20};
-    I2C magnetometer{0x1C, 20};
+    I2C accelGyro{0x6A, 21};
+    I2C magnetometer{0x1C, 21};
     
     const uint8_t _accel_register = 0x10;
     const uint8_t _gyro_register = 0x11;
