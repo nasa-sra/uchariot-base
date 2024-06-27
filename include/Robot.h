@@ -5,6 +5,8 @@
 #include <cstdio>
 
 #include "rapidjson/document.h"
+#include "subsystems/DriveBase.h"
+#include "subsystems/GPS.h"
 
 #include "controllers/EmptyController.h"
 #include "controllers/TeleopController.h"
@@ -28,8 +30,9 @@ struct Controllers {
 // subsystems, also just to keep the code organized.
 struct Subsystems {
     DriveBase* drive;
+    GPS* gps;
 
-    Subsystems() : drive(&DriveBase::GetInstance()) {}
+    Subsystems() : drive(&DriveBase::GetInstance()), gps(&GPS::GetInstance()) {}
 };
 
 // The main robot class is resonsible for:
