@@ -25,6 +25,18 @@ set(SRCS
     src/StateReporter.cpp
     src/controllers/TeleopController.cpp
     src/subsystems/DriveBase.cpp
+    src/subsystems/GPS.cpp
+    src/Serial.cpp
+    src/nmea/context.c
+    src/nmea/generate.c
+    src/nmea/generator.c
+    src/nmea/gmath.c
+    src/nmea/info.c
+    src/nmea/parse.c
+    src/nmea/parser.c
+    src/nmea/sentence.c
+    src/nmea/time.c
+    src/nmea/tok.c
 )
 
 set(LIBS )

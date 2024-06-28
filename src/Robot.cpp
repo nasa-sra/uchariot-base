@@ -47,6 +47,8 @@ void Robot::Run(int rate, bool& running) {
         // Swap out controllers if it is changed via network manager
         ManageController();
 
+        _subsystems->gps->Update();
+
         // Run the active controller
         ControlCmds cmds = _active_controller->Run();
 

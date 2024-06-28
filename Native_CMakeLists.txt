@@ -16,12 +16,25 @@ set(SRCS
     src/VescController.cpp
     src/Utils.cpp
     src/NetworkManager.cpp
+    src/StateReporter.cpp
     src/controllers/TeleopController.cpp
     src/subsystems/DriveBase.cpp
     src/subsystems/IMU.cpp
     src/I2C.cpp
+    src/subsystems/GPS.cpp
+    src/Serial.cpp
+    src/nmea/context.c
+    src/nmea/generate.c
+    src/nmea/generator.c
+    src/nmea/gmath.c
+    src/nmea/info.c
+    src/nmea/parse.c
+    src/nmea/parser.c
+    src/nmea/sentence.c
+    src/nmea/time.c
+    src/nmea/tok.c
 )
 
 add_executable(uChariotBase ${SRCS})
-target_link_libraries(uChariotBase i2c)
+target_link_libraries( uChariotBase )
 target_include_directories( uChariotBase PUBLIC ./include/)

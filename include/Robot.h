@@ -5,6 +5,8 @@
 #include <cstdio>
 
 #include "rapidjson/document.h"
+#include "subsystems/DriveBase.h"
+#include "subsystems/GPS.h"
 
 #include "controllers/EmptyController.h"
 #include "controllers/TeleopController.h"
