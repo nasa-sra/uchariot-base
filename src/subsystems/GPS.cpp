@@ -59,6 +59,8 @@ void GPS::Update(double dt) {
 
 void GPS::ReportState(std::string prefix) {
     prefix += "gps/";
+    StateReporter::GetInstance().UpdateKey(prefix + "latitude", _info.lat);
+    StateReporter::GetInstance().UpdateKey(prefix + "longitude", _info.lon);
 }
 
 GPS::~GPS() {
