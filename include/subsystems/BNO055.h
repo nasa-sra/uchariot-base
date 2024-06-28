@@ -10,7 +10,7 @@ class BNO055 : public IMUBase {
 
     BNO055();
 
-    void Update(double dt);
+    void Update(double dt) override;
 
   private:
 

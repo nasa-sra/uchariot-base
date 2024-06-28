@@ -10,7 +10,7 @@ class LSM6DSOX : public IMUBase {
 
     LSM6DSOX();
 
-    void Update(double dt);
+    void Update(double dt) override;
 
     Utils::Vector3 getAccelerations() {return _accelerations;}
     Utils::Vector3 getGyroRates() {return _gyroRates;}
