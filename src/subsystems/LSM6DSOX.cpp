@@ -1,19 +1,21 @@
 
-#include "StateReporter.h"
-#include "subsystems/IMU.h"
+#include <wiringPiI2C.h>
 
-IMU::IMU() {
+#include "StateReporter.h"
+#include "subsystems/LSM6DSOX.h"
+
+LSM6DSOX::LSM6DSOX() : IMUBase() {
 
     _imuFd = wiringPiI2CSetup(LSM6DSOX_ADDR);
     if (_imuFd == -1) {
-        Utils::LogFmt("IMU failed to init i2c communication");
+        Utils::LogFmt("LSM6DSOX IMU failed to init i2c communication");
     }
 
     setAccConfig(0);
     setGyroConfig(0);
 }
 
-int IMU::setAccConfig(int config_num) {
+int LSM6DSOX::setAccConfig(int config_num) {
     int status;
 
     switch(config_num){
@@ -40,7 +42,7 @@ int IMU::setAccConfig(int config_num) {
     return status;
 }
 
-int IMU::setGyroConfig(int config_num){
+int LSM6DSOX::setGyroConfig(int config_num){
     int status;
 
     switch(config_num){
@@ -67,7 +69,7 @@ int IMU::setGyroConfig(int config_num){
     return status;
 }
 
-void IMU::Update(double dt) {
+void LSM6DSOX::Update(double dt) {
 
     int16_t x, y, z;
     x = wiringPiI2CReadReg16(_imuFd, GYRO_X_LOW);
@@ -92,21 +94,3 @@ void IMU::Update(double dt) {
     _gyroAngles.z += _gyroRates.z * dt + driftFactor; // integrate angular rotation for angles
 
  }
-
- void IMU::ReportState(std::string prefix) {
-    // StateReporter::GetInstance().UpdateKey(prefix + "roll", _gyroRates.x);
-    // StateReporter::GetInstance().UpdateKey(prefix + "pitch", _gyroRates.y);
-    StateReporter::GetInstance().UpdateKey(prefix + "yaw", _gyroAngles.z);
-}
-
- Utils::Vector3 IMU::getAccelerations() {
-    return _accelerations;
- }
-
- Utils::Vector3 IMU::getGyroRates() {
-    return _gyroRates;
- }
-
-float IMU::getYaw() {
-    return _gyroAngles.z * 1.3;
-}
