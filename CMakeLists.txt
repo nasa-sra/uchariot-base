@@ -25,6 +25,7 @@ set(SRCS
     src/NetworkManager.cpp
     src/StateReporter.cpp
     src/controllers/TeleopController.cpp
+    src/controllers/PathingController.cpp
     src/subsystems/DriveBase.cpp
 )
 

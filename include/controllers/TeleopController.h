@@ -9,7 +9,7 @@ class TeleopController : public ControllerBase {
     double _turn, _fwd, _speed;
 
 public:
-    TeleopController() : _turn(0), _fwd(0), _speed(0) {}
+    TeleopController() : ControllerBase("teleop"), _turn(0), _fwd(0), _speed(0) {}
 
     inline void Load() override {
         _turn = 0;
