@@ -50,7 +50,7 @@ GPSSentence GPS::ParseSentence() {
     return sentence;
 }
 
-void GPS::Update() {
+void GPS::Update(double dt) {
     std::string line = _serial.ReceiveLine();
     nmea_parse(&_parser, line.c_str(), (int)line.length(), &_info);
 

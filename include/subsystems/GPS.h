@@ -16,18 +16,15 @@ class GPS : public SubsystemBase {
 public:
     GPS();
     ~GPS();
-    void Update() override;
+    void Update(double dt) override;
     void ReportState(std::string prefix = "/") override;
 
-    static GPS& GetInstance() {
-        static GPS _instance;
-        return _instance;
-    }
-   
 private:
     SerialConn _serial;
     nmeaINFO _info;
     nmeaPARSER _parser;
 
     void SendCommand(const std::string& str_cmd, bool do_checksum = true);
+    std::string ReadSentence();
+    GPSSentence ParseSentence();
 };

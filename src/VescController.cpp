@@ -15,8 +15,10 @@ void VescController::Update() {
     _connected = _disconnectTimer < 10;
     _disconnectTimer++;
 
+#ifndef SIMULATION
     if (!_connected)
         Utils::LogFmt("Warning: Vesc Controller Id %i is not connected", _can_id);
+#endif
 }
 
 void VescController::SetMode(Mode mode) {
@@ -127,12 +129,12 @@ void VescController::sendCurrent(float amps) {
 void VescController::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "connected", _connected);
     StateReporter::GetInstance().UpdateKey(prefix + "mode", _mode);
-    StateReporter::GetInstance().UpdateKey(prefix + "cmd_duty_cycle", _cmdDutyCycle);
+    // StateReporter::GetInstance().UpdateKey(prefix + "cmd_duty_cycle", _cmdDutyCycle);
     StateReporter::GetInstance().UpdateKey(prefix + "cmd_velocity", _cmdVelocity);
-    StateReporter::GetInstance().UpdateKey(prefix + "cmd_position", _cmdPosition);
-    StateReporter::GetInstance().UpdateKey(prefix + "cmd_current", _cmdCurrent);
+    // StateReporter::GetInstance().UpdateKey(prefix + "cmd_position", _cmdPosition);
+    // StateReporter::GetInstance().UpdateKey(prefix + "cmd_current", _cmdCurrent);
     StateReporter::GetInstance().UpdateKey(prefix + "velocity", _velocity);
     StateReporter::GetInstance().UpdateKey(prefix + "current", _current);
     StateReporter::GetInstance().UpdateKey(prefix + "output", _output);
-    StateReporter::GetInstance().UpdateKey(prefix + "voltage_in", _voltageIn);
+    // StateReporter::GetInstance().UpdateKey(prefix + "voltage_in", _voltageIn);
 }

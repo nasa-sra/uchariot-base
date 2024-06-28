@@ -7,10 +7,9 @@
 class TeleopController : public ControllerBase {
 
     double _turn, _fwd, _speed;
-    DriveBase* _drive_base;
 
 public:
-    TeleopController() : _turn(0), _fwd(0), _speed(0), _drive_base(&DriveBase::GetInstance()) {}
+    TeleopController() : _turn(0), _fwd(0), _speed(0) {}
 
     inline void Load() override {
         _turn = 0;

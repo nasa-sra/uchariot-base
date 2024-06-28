@@ -23,16 +23,10 @@ public:
 
     DriveBase();
 
-    void Update() override;
+    void Update(double dt) override;
     void ReportState(std::string prefix = "/") override;
 
     inline void SetCmds(DriveBaseCmds cmds) { _cmds = cmds; }
-
-
-    static DriveBase& GetInstance() {
-        static DriveBase _instance;
-        return _instance;
-    }
    
 private:
     DriveBaseCmds _cmds;

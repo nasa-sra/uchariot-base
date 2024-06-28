@@ -18,13 +18,17 @@
 
 namespace Utils {
 
+struct Vector3 {
+    float x, y, z;
+};
+
 void BufferAppendInt16(uint8_t* buffer, int16_t number, int32_t* index);
 void BufferAppendInt32(uint8_t* buffer, int32_t number, int32_t* index);
 void BufferAppendFloat16(uint8_t* buffer, float number, float scale, int32_t* index);
 void BufferAppendFloat32(uint8_t* buffer, float number, float scale, int32_t* index);
 
 // Returns a YYYY-MM-DD HH:MM:SS format date for the current day.
-std::string CurrentDateTimeStr(const char* fmt = "%Y-%m-%d %H:%M:%");
+std::string CurrentDateTimeStr(const char* fmt = "%Y-%m-%d %H:%M:%S");
 
 // A function to extend the functionality of the Java
 // Map interface's getOrDefault method to the C++ map.
@@ -78,7 +82,6 @@ template<typename... A> void PrintLnFmt(const std::string& fmt, A&&... args) {
     std::cout << _strfmt(fmt + "\n", _convert(std::forward<A>(args))...);
 }
 
-
 // This one also prints the time at the beginning b/c its a log
 template<typename... A> void LogFmt(const std::string& fmt, A&&... args) {
     std::cout << _strfmt("[" + CurrentDateTimeStr() + "] " + fmt + "\n", _convert(std::forward<A>(args))...);
@@ -103,6 +106,6 @@ template<typename T> long VectorIndexOf(const std::vector<T> v, const T x) {
     return pos;
 }
 
-
+double ScheduleRate(int rate, std::chrono::high_resolution_clock::time_point start_time);
 
 }; // namespace Utils
