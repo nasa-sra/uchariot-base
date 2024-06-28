@@ -38,6 +38,8 @@ void Robot::Run(int rate, bool& running) {
                 break;
             case ControlMode::PATHING:
                 cmds = _pathingController->Run();
+                // Eventually will be somthing like
+                // cmds = _pathingController->Run(_imu.GetHeading(), _gps.GetPosition());
                 break;
             
             default:

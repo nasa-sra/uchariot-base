@@ -12,10 +12,16 @@ ControlCmds PathingController::Run() {
 
     if (!_runningPath && _pathName != "") {
         _runningPath = loadPath(_pathName);
+        /*
+        TODO
+            Path needs to get shifted by starting point 
+            then projected into the plane normal to the starting point vector from the center of the earth
+            (this would ignore the effects effects of the curvature of the earth)
+        */
     }
 
     if (_runningPath) {
-        // run path
+        // run path with peer pursuit
     }
 
     return cmds;
@@ -76,7 +82,7 @@ bool PathingController::loadPath(std::string filePath) {
 			while (ss >> coord) {
 
 				Utils::GeoPoint point = parseCoordinates(coord, false);
-				Eigen::Vector3d pos = Utils::geoToEarthCoord(point); // TODO: shift coordinates by starting point
+				Eigen::Vector3d pos = Utils::geoToEarthCoord(point);
 
                 PathStep step;
 				step.pos = pos;

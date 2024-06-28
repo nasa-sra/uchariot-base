@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ControllerBase.h"
+#include "controllers/ControllerBase.h"
 #include "rapidjson/document.h"
 
 struct PathStep {
