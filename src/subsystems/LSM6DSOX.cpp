@@ -4,6 +4,18 @@
 #include "StateReporter.h"
 #include "subsystems/LSM6DSOX.h"
 
+#define LSM6DSOX_ADDR 0x6A
+#define ACCEL_REG 0x10
+#define GYRO_REG 0x11
+
+#define GYRO_X_LOW 0x22
+#define GYRO_Y_LOW 0x24
+#define GYRO_Z_LOW 0x26
+
+#define ACCEL_X_LOW 0x28
+#define ACCEL_Y_LOW 0x2A
+#define ACCEL_Z_LOW 0x2C
+
 LSM6DSOX::LSM6DSOX() : IMUBase() {
 
     _imuFd = wiringPiI2CSetup(LSM6DSOX_ADDR);

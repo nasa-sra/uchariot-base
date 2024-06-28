@@ -32,6 +32,7 @@ set(LIBS )
 
 if (${CMAKE_CROSSCOMPILING})
     list(APPEND SRCS src/subsystems/LSM6DSOX.cpp)
+    list(APPEND SRCS src/subsystems/BNO055.cpp)
 
     find_library(WIRING_PI_LIB libwiringPi.so )
     find_library(WIRING_PI_DEV_LIB libwiringPiDev.so )

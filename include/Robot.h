@@ -11,7 +11,7 @@
 #include "StateReporter.h"
 
 #ifndef SIMULATION
-#include "subsystems/LSM6DSOX.h"
+#include "subsystems/BNO055.h"
 #else
 #include "subsystems/IMUBase.h"
 #endif
@@ -51,7 +51,7 @@ private:
     DriveBase _driveBase;
 
 #ifndef SIMULATION
-    LSM6DSOX _imu;
+    BNO055 _imu;
 #else
     SimIMU _imu;
 #endif
