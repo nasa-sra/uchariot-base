@@ -8,6 +8,10 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#define _USE_MATH_DEFINES
+#include <cmath>
+
+#include <Eigen/Core>
 
 #ifdef __GNUC__
 #define vsprintf_s vsnprintf
@@ -103,5 +107,15 @@ template<typename T> long VectorIndexOf(const std::vector<T> v, const T x) {
 }
 
 double ScheduleRate(int rate, std::chrono::high_resolution_clock::time_point start_time);
+
+struct GeoPoint {
+
+	double lat, lon, alt;
+    GeoPoint() : lat(0.0), lon(0.0), alt(0.0) {}
+
+};
+
+// converts geopoint to a cartesian coordinates with the earth's center as the origin and the poles as the z axis
+Eigen::Vector3d geoToEarthCoord(GeoPoint point);
 
 }; // namespace Utils

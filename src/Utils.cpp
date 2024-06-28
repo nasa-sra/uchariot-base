@@ -42,3 +42,14 @@ double Utils::ScheduleRate(int rate, std::chrono::high_resolution_clock::time_po
     }
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count() / 1000.0;
 }
+
+Eigen::Vector3d Utils::geoToEarthCoord(GeoPoint point) {
+
+	const int earthRadius = 6378137; // m
+
+	point.lat *= M_PI / 180;
+	point.lon *= M_PI / 180;
+
+	double distance = point.alt + earthRadius;
+	return Eigen::Vector3d(cos(point.lon) * distance * cos(point.lat), sin(point.lon) * distance * cos(point.lat), distance * sin(point.lat));
+}

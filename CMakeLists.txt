@@ -27,6 +27,7 @@ set(SRCS
     src/controllers/TeleopController.cpp
     src/controllers/PathingController.cpp
     src/subsystems/DriveBase.cpp
+    src/tinyxml2.cpp
 )
 
 set(LIBS)

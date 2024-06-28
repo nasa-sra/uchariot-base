@@ -10,6 +10,8 @@ void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
 
     if (cmd == "teleop_drive") {
         _teleopController->HandleNetworkInput(doc);
+    } else if (cmd == "run_path") {
+        _pathingController->HandleNetworkInput(doc);
     }
 }
 
