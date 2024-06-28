@@ -88,21 +88,21 @@ void LSM6DSOX::Update(double dt) {
     y = wiringPiI2CReadReg16(_imuFd, GYRO_Y_LOW);
     z = wiringPiI2CReadReg16(_imuFd, GYRO_Z_LOW);
 
-    _gyroRates.x = ((float)x) * _gyro_lsb_to_degsec / 1000; // - gyroXoffset;
-    _gyroRates.y = ((float)y) * _gyro_lsb_to_degsec / 1000; // - gyroYoffset;
-    _gyroRates.z = ((float)z) * _gyro_lsb_to_degsec / 1000; // - gyroZoffset;
+    _gyroRates.x() = ((float)x) * _gyro_lsb_to_degsec / 1000; // - gyroXoffset;
+    _gyroRates.y() = ((float)y) * _gyro_lsb_to_degsec / 1000; // - gyroYoffset;
+    _gyroRates.z() = ((float)z) * _gyro_lsb_to_degsec / 1000; // - gyroZoffset;
     
     x = wiringPiI2CReadReg16(_imuFd, ACCEL_X_LOW);
     y = wiringPiI2CReadReg16(_imuFd, ACCEL_Y_LOW);
     z = wiringPiI2CReadReg16(_imuFd, ACCEL_Z_LOW);
 
-    _accelerations.x = ((float)x) * _acc_lsb_to_g / 1000; // - accXoffset;
-    _accelerations.y = ((float)y) * _acc_lsb_to_g / 1000; // - accYoffset;
-    _accelerations.z = ((float)z) * _acc_lsb_to_g / 1000; // - accZoffset;
+    _accelerations.x() = ((float)x) * _acc_lsb_to_g / 1000; // - accXoffset;
+    _accelerations.y() = ((float)y) * _acc_lsb_to_g / 1000; // - accYoffset;
+    _accelerations.z() = ((float)z) * _acc_lsb_to_g / 1000; // - accZoffset;
 
     float driftFactor = 0.0075;
-    _gyroAngles.x += _gyroRates.x * dt + driftFactor; // integrate angular rotation for angles
-    _gyroAngles.y += _gyroRates.y * dt + driftFactor; // integrate angular rotation for angles
-    _gyroAngles.z += _gyroRates.z * dt + driftFactor; // integrate angular rotation for angles
+    _gyroAngles.x() += _gyroRates.x() * dt + driftFactor; // integrate angular rotation for angles
+    _gyroAngles.y() += _gyroRates.y() * dt + driftFactor; // integrate angular rotation for angles
+    _gyroAngles.z() += _gyroRates.z() * dt + driftFactor; // integrate angular rotation for angles
 
  }

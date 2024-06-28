@@ -26,8 +26,8 @@ void BNO055::Update(double dt) {
     y = wiringPiI2CReadReg16(_imuFd, EUL_Y_LOW_REG);
     z = wiringPiI2CReadReg16(_imuFd, EUL_Z_LOW_REG);
 
-    _gyroAngles.x = ((float)x) / 16;
-    _gyroAngles.y = ((float)y) / 16;
-    _gyroAngles.z = ((float)z) / 16;
+    _gyroAngles.x() = ((float)x) / 16;
+    _gyroAngles.y() = ((float)y) / 16;
+    _gyroAngles.z() = ((float)z) / 16;
 
  }

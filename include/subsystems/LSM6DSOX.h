@@ -12,8 +12,8 @@ class LSM6DSOX : public IMUBase {
 
     void Update(double dt) override;
 
-    Utils::Vector3 getAccelerations() {return _accelerations;}
-    Utils::Vector3 getGyroRates() {return _gyroRates;}
+    Eigen::Vector3f getAccelerations() {return _accelerations;}
+    Eigen::Vector3f getGyroRates() {return _gyroRates;}
 
   private:
 
@@ -25,7 +25,7 @@ class LSM6DSOX : public IMUBase {
     int _acc_lsb_to_g;
     int _gyro_lsb_to_degsec;
 
-    Utils::Vector3 _accelerations;
-    Utils::Vector3 _gyroRates;
+    Eigen::Vector3f _accelerations;
+    Eigen::Vector3f _gyroRates;
 
 };
