@@ -52,11 +52,11 @@ class IMU : SubsystemBase {
 
     IMU() {}
 
-    void Update() {}
+    void Update(double dt) {}
     void ReportState(std::string prefix = "/") {}
 
-    Utils::Vector3 getAccelerations() {return Utils::Vector3(0.0, 0.0, 0.0);}
-    Utils::Vector3 getGyroRates() {return Utils::Vector3(0.0, 0.0, 0.0);}
+    Utils::Vector3 getAccelerations() {return {0.0, 0.0, 0.0};}
+    Utils::Vector3 getGyroRates() {return {0.0, 0.0, 0.0};}
 
     float getYaw() {return -1.0;}
 };
