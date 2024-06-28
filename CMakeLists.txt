@@ -28,7 +28,10 @@ set(SRCS
     src/subsystems/DriveBase.cpp
 )
 
-set(LIBS )
+set(LIBS)
+
+find_package(Eigen3 CONFIG REQUIRED)
+list(APPEND LIBS Eigen3::Eigen)
 
 if (${CMAKE_CROSSCOMPILING})
     list(APPEND SRCS src/subsystems/LSM6DSOX.cpp)

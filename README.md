@@ -7,7 +7,7 @@ Then just ssh onto the pi and run the executable in ~/uchariot-base/build/ with 
 
 ## Building
 You can test the robot code by building and running it on Linux, like with WSL or a VM. The code will run in simulation, meaning there will be no connections to the CAN bus or other perphials.  
-Install the build tools with `sudo apt install g++ cmake`  
+Install the build tools with `sudo apt install g++ cmake libeigen3-dev`  
 Then build with  
 ```
 mkdir build  
