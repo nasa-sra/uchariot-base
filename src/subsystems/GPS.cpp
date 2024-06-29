@@ -8,8 +8,12 @@ GPS::GPS() : _serial("/dev/ttyAMA0", 115200) {
     nmea_zero_INFO(&_info);
     nmea_parser_init(&_parser);
 
-    SendCommand("PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0");
-    SendCommand("PMTK220,500");
+    SendCommand("PMTK314,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0"); //Turn on all data
+    SendCommand("PMTK251,115200"); //Set Baud rate
+    SendCommand("PMTK220,500"); //Set to 5Hz
+    SendCommand("PMTK301,2"); //Turn on WAAS
+    SendCommand("PMTK501,2"); //Set to use WAAS
+    SendCommand("PMTK313,1"); //Turn on SBAS
 }
 
 void GPS::SendCommand(const std::string& str_cmd, bool do_checksum) {
