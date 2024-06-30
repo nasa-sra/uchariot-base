@@ -11,7 +11,12 @@
 #include "controllers/EmptyController.h"
 #include "controllers/TeleopController.h"
 #include "StateReporter.h"
-#include "subsystems/IMU.h"
+
+#ifndef SIMULATION
+#include "subsystems/BNO055.h"
+#else
+#include "subsystems/IMUBase.h"
+#endif
 
 // This structure is just a container for all the various
 // controllers to keep code organized.
@@ -46,7 +51,12 @@ private:
     Controllers* _controllers;
     
     DriveBase _driveBase;
-    IMU _imu;
+
+#ifndef SIMULATION
+    BNO055 _imu;
+#else
+    SimIMU _imu;
+#endif
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;

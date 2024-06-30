@@ -18,10 +18,6 @@
 
 namespace Utils {
 
-struct Vector3 {
-    float x, y, z;
-};
-
 void BufferAppendInt16(uint8_t* buffer, int16_t number, int32_t* index);
 void BufferAppendInt32(uint8_t* buffer, int32_t number, int32_t* index);
 void BufferAppendFloat16(uint8_t* buffer, float number, float scale, int32_t* index);

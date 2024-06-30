@@ -9,6 +9,7 @@ set (CMAKE_CXX_STANDARD 17)
 
 if(NOT ${CMAKE_CROSSCOMPILING})
     add_compile_definitions(SIMULATION=true)
+    message("Compiling for simulation")
 endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
@@ -39,10 +40,14 @@ set(SRCS
     src/nmea/tok.c
 )
 
-set(LIBS )
+set(LIBS)
+
+find_package(Eigen3 CONFIG REQUIRED)
+list(APPEND LIBS Eigen3::Eigen)
 
 if (${CMAKE_CROSSCOMPILING})
-    list(APPEND SRCS src/subsystems/IMU.cpp)
+    list(APPEND SRCS src/subsystems/LSM6DSOX.cpp)
+    list(APPEND SRCS src/subsystems/BNO055.cpp)
 
     find_library(WIRING_PI_LIB libwiringPi.so )
     find_library(WIRING_PI_DEV_LIB libwiringPiDev.so )

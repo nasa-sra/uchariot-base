@@ -1,19 +1,33 @@
 
-#include "StateReporter.h"
-#include "subsystems/IMU.h"
+#include <wiringPiI2C.h>
 
-IMU::IMU() {
+#include "StateReporter.h"
+#include "subsystems/LSM6DSOX.h"
+
+#define LSM6DSOX_ADDR 0x6A
+#define ACCEL_REG 0x10
+#define GYRO_REG 0x11
+
+#define GYRO_X_LOW 0x22
+#define GYRO_Y_LOW 0x24
+#define GYRO_Z_LOW 0x26
+
+#define ACCEL_X_LOW 0x28
+#define ACCEL_Y_LOW 0x2A
+#define ACCEL_Z_LOW 0x2C
+
+LSM6DSOX::LSM6DSOX() : IMUBase() {
 
     _imuFd = wiringPiI2CSetup(LSM6DSOX_ADDR);
     if (_imuFd == -1) {
-        Utils::LogFmt("IMU failed to init i2c communication");
+        Utils::LogFmt("LSM6DSOX IMU failed to init i2c communication");
     }
 
     setAccConfig(0);
     setGyroConfig(0);
 }
 
-int IMU::setAccConfig(int config_num) {
+int LSM6DSOX::setAccConfig(int config_num) {
     int status;
 
     switch(config_num){
@@ -40,7 +54,7 @@ int IMU::setAccConfig(int config_num) {
     return status;
 }
 
-int IMU::setGyroConfig(int config_num){
+int LSM6DSOX::setGyroConfig(int config_num){
     int status;
 
     switch(config_num){
@@ -67,46 +81,28 @@ int IMU::setGyroConfig(int config_num){
     return status;
 }
 
-void IMU::Update(double dt) {
+void LSM6DSOX::Update(double dt) {
 
     int16_t x, y, z;
     x = wiringPiI2CReadReg16(_imuFd, GYRO_X_LOW);
     y = wiringPiI2CReadReg16(_imuFd, GYRO_Y_LOW);
     z = wiringPiI2CReadReg16(_imuFd, GYRO_Z_LOW);
 
-    _gyroRates.x = ((float)x) * _gyro_lsb_to_degsec / 1000; // - gyroXoffset;
-    _gyroRates.y = ((float)y) * _gyro_lsb_to_degsec / 1000; // - gyroYoffset;
-    _gyroRates.z = ((float)z) * _gyro_lsb_to_degsec / 1000; // - gyroZoffset;
+    _gyroRates.x() = ((float)x) * _gyro_lsb_to_degsec / 1000; // - gyroXoffset;
+    _gyroRates.y() = ((float)y) * _gyro_lsb_to_degsec / 1000; // - gyroYoffset;
+    _gyroRates.z() = ((float)z) * _gyro_lsb_to_degsec / 1000; // - gyroZoffset;
     
     x = wiringPiI2CReadReg16(_imuFd, ACCEL_X_LOW);
     y = wiringPiI2CReadReg16(_imuFd, ACCEL_Y_LOW);
     z = wiringPiI2CReadReg16(_imuFd, ACCEL_Z_LOW);
 
-    _accelerations.x = ((float)x) * _acc_lsb_to_g / 1000; // - accXoffset;
-    _accelerations.y = ((float)y) * _acc_lsb_to_g / 1000; // - accYoffset;
-    _accelerations.z = ((float)z) * _acc_lsb_to_g / 1000; // - accZoffset;
+    _accelerations.x() = ((float)x) * _acc_lsb_to_g / 1000; // - accXoffset;
+    _accelerations.y() = ((float)y) * _acc_lsb_to_g / 1000; // - accYoffset;
+    _accelerations.z() = ((float)z) * _acc_lsb_to_g / 1000; // - accZoffset;
 
     float driftFactor = 0.0075;
-    _gyroAngles.x += _gyroRates.x * dt + driftFactor; // integrate angular rotation for angles
-    _gyroAngles.y += _gyroRates.y * dt + driftFactor; // integrate angular rotation for angles
-    _gyroAngles.z += _gyroRates.z * dt + driftFactor; // integrate angular rotation for angles
+    _gyroAngles.x() += _gyroRates.x() * dt + driftFactor; // integrate angular rotation for angles
+    _gyroAngles.y() += _gyroRates.y() * dt + driftFactor; // integrate angular rotation for angles
+    _gyroAngles.z() += _gyroRates.z() * dt + driftFactor; // integrate angular rotation for angles
 
  }
-
- void IMU::ReportState(std::string prefix) {
-    // StateReporter::GetInstance().UpdateKey(prefix + "roll", _gyroRates.x);
-    // StateReporter::GetInstance().UpdateKey(prefix + "pitch", _gyroRates.y);
-    StateReporter::GetInstance().UpdateKey(prefix + "yaw", _gyroAngles.z);
-}
-
- Utils::Vector3 IMU::getAccelerations() {
-    return _accelerations;
- }
-
- Utils::Vector3 IMU::getGyroRates() {
-    return _gyroRates;
- }
-
-float IMU::getYaw() {
-    return _gyroAngles.z * 1.3;
-}
