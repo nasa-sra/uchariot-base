@@ -8,7 +8,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_CXX_STANDARD 17)
 
 if(NOT ${CMAKE_CROSSCOMPILING})
-    add_compile_definitions(SIMULATION=true)
+    if (NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+        if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+            add_compile_definitions(SIMULATION=true)
+        endif()
+    endif()
 endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")

@@ -12,6 +12,7 @@
 #include "controllers/TeleopController.h"
 #include "StateReporter.h"
 #include "subsystems/IMU.h"
+#include "subsystems/GPS.h"
 
 // This structure is just a container for all the various
 // controllers to keep code organized.
@@ -47,8 +48,8 @@ private:
     
     DriveBase _driveBase;
     IMU _imu;
+    GPS _gps;
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;
-
 };

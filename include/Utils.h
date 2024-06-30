@@ -20,6 +20,7 @@ namespace Utils {
 
 struct Vector3 {
     float x, y, z;
+    Vector3(float x, float y, float z) : x(x), y(y), z(z) {};
 };
 
 void BufferAppendInt16(uint8_t* buffer, int16_t number, int32_t* index);

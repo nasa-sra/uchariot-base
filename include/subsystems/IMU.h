@@ -19,12 +19,13 @@
 #define ACCEL_Z_LOW 0x2C
 
 class IMU : SubsystemBase {
+
   public:
 
     IMU();
 
-    void Update(double dt);
-    void ReportState(std::string prefix = "/");
+    void Update(double dt) override;
+    void ReportState(std::string prefix = "/") override;
 
     Utils::Vector3 getAccelerations();
     Utils::Vector3 getGyroRates();
@@ -50,10 +51,12 @@ class IMU : SubsystemBase {
 class IMU : SubsystemBase {
   public:
 
+    #warning "SMILUATION!!!!"
+
     IMU() {}
 
-    void Update() {}
-    void ReportState(std::string prefix = "/") {}
+    void Update(double dt) override {}
+    void ReportState(std::string prefix = "/") override {}
 
     Utils::Vector3 getAccelerations() {return Utils::Vector3(0.0, 0.0, 0.0);}
     Utils::Vector3 getGyroRates() {return Utils::Vector3(0.0, 0.0, 0.0);}
