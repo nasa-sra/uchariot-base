@@ -17,6 +17,7 @@
 #else
 #include "subsystems/IMUBase.h"
 #endif
+#include "subsystems/GPS.h"
 
 // This structure is just a container for all the various
 // controllers to keep code organized.
@@ -57,8 +58,8 @@ private:
 #else
     SimIMU _imu;
 #endif
+    GPS _gps;
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;
-
 };
