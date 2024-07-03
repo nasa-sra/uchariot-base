@@ -33,6 +33,9 @@ void GPS::Update(double dt) {
 
 void GPS::ReportState(std::string prefix) {
     prefix += "gps/";
+    _sr->UpdateKey(prefix + "latitude", _info.lat);
+    _sr->UpdateKey(prefix + "longitude", _info.lon);
+    
 }
 
 GPS::~GPS() {

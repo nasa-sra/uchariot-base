@@ -15,8 +15,11 @@
 #include <sys/socket.h>
 
 #ifdef LINUX
+#warning "CAN CONNECTED"
 #include <linux/can.h>
 #include <linux/can/raw.h>
+#else
+#warning "CAN OT CONNECTED"
 #endif
 
 #include "Utils.h"
