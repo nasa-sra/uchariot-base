@@ -104,6 +104,9 @@ void NetworkManager::receivePacket(int fd) {
                 Utils::LogFmt("Switched commanding client to %i", _cmdClient);
             } else {
                 _cmdClient = -1;
+                rapidjson::Document document;
+                document.Parse("{\"speed\":0, \"fwd\":0.0, \"turn\": 0.0}");
+                _packetCallback("teleop_drive", document);
                 Utils::LogFmt("Lost commanding client");
             }
         }
