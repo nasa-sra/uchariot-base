@@ -5,6 +5,7 @@ CanConnection::CanConnection() {
     Utils::LogFmt("Setting up can0");
 
 #ifndef SIMULATION
+#warning "NOT SIM"
     
     system("sudo ip link set can0 type can bitrate 500000");
     system("sudo ifconfig can0 up");
@@ -35,7 +36,8 @@ CanConnection::CanConnection() {
     }
 
     setsockopt(_socket, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
-
+#else
+#warning "SIM"
 #endif
 
 }

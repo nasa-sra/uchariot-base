@@ -7,21 +7,7 @@ set(CMAKE_CXX_FLAGS "-O2 -pthread")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_CXX_STANDARD 17)
 
-if (NOT ${CMAKE_CROSSCOMPILING})
-    if (NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
-        if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-            set(SIMULATION true)
-        endif()
-    endif()
-endif()
-
-if (${SIMULATION})
-    add_compile_definitions(SIMULATION=true)
-endif()
-
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    add_compile_definitions(LINUX=true)
-endif()
+add_compile_definitions(LINUX=true)
 
 set(SRCS
     src/main.cpp
@@ -53,16 +39,14 @@ find_package(Eigen3 CONFIG REQUIRED)
 
 list(APPEND LIBS Eigen3::Eigen)
 
-if (NOT ${SIMULATION})
-    list(APPEND SRCS src/subsystems/LSM6DSOX.cpp)
-    list(APPEND SRCS src/subsystems/BNO055.cpp)
+list(APPEND SRCS src/subsystems/LSM6DSOX.cpp)
+list(APPEND SRCS src/subsystems/BNO055.cpp)
 
-    find_library(WIRING_PI_LIB libwiringPi.so )
-    find_library(WIRING_PI_DEV_LIB libwiringPiDev.so )
-    find_library(CRYPT_LIB libcrypt.so.1.1.0)
-    list(APPEND LIBS ${WIRING_PI_LIB} ${WIRING_PI_DEV_LIB} ${CRYPT_LIB})
+find_library(WIRING_PI_LIB libwiringPi.so )
+find_library(WIRING_PI_DEV_LIB libwiringPiDev.so )
+find_library(CRYPT_LIB libcrypt.so.1.1.0)
+list(APPEND LIBS ${WIRING_PI_LIB} ${WIRING_PI_DEV_LIB} ${CRYPT_LIB})
 
-endif()
 
 add_executable(uChariotBase ${SRCS})
 target_link_libraries( uChariotBase ${LIBS})

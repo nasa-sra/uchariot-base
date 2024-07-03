@@ -24,7 +24,6 @@ You can use the following command to copy the pi's lib and usr directories to th
 
 `rsync -vR --progress -rl --delete-after --safe-links USERNAME@RPI_IP:/{lib,usr,opt/vc/lib} $HOME/uchariot-sys/sysroot`
 
-
 ### Native Compiling (ARM-Linux or M-series Mac)
  
 >If you are using an M-series Mac, use a Linux VM (Ubuntu or Debian recomended) with UTM. This basically turns your computer into a ARM-Linux box so you can build without crosscompiling.
