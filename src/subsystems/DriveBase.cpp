@@ -17,8 +17,8 @@ DriveBase::DriveBase() :
     _right_back(3) {
         // RPM * 60 = RPS_r / 30 = wRPS * 2PI * r = in/s
         float gearRatio = 30.0; // Maybe?
-        float wheelRadius = 0.254; // in !definitely not!
-        float scale = gearRatio * 60 / (2 * M_PI * wheelRadius); // converts from in/s to motor RPM
+        float wheelRadius = 0.254; // m !definitely not!
+        float scale = (60 / (2 * M_PI * wheelRadius)) * gearRatio; // converts from m/s to motor RPM
         _left_front.SetScale(-scale);
         _right_front.SetScale(-scale);
         _left_back.SetScale(scale);

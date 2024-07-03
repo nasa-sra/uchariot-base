@@ -88,7 +88,7 @@ void StateReporter::deleteTree(TreeNode* node) {
         delete node;
         return;
     }
-    for (TreeNode* branch : node->branchs) {
+    for (TreeNode* branch : node->branches) {
         deleteTree(branch);
     }
     delete node;

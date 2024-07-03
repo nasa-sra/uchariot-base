@@ -27,7 +27,7 @@ private:
 
     struct TreeNode {
         std::string name;
-        std::vector<TreeNode*> branchs;
+        std::vector<TreeNode*> branches;
         bool fruit;
         double value;
         rapidjson::Value* json;
