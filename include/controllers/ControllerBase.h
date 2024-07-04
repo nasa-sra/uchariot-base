@@ -22,3 +22,11 @@ public:
 
     std::string name;
 };
+
+class DisabledController : public ControllerBase {
+public:
+    DisabledController() : ControllerBase("disabled") {}
+     void Load() {}
+     ControlCmds Run(void) {return ControlCmds();}
+     void Unload() {}
+};

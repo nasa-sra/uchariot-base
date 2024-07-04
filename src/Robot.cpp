@@ -9,9 +9,9 @@ void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
     }
 
     if (cmd == "teleop_drive") {
-        _teleopController->HandleNetworkInput(doc);
+        _teleopController.HandleNetworkInput(doc);
     } else if (cmd == "run_path") {
-        _pathingController->HandleNetworkInput(doc);
+        _pathingController.HandleNetworkInput(doc);
     }
 }
 
@@ -34,12 +34,12 @@ void Robot::Run(int rate, bool& running) {
                 cmds = ControlCmds();
                 break;
             case ControlMode::TELEOP:
-                cmds = _teleopController->Run();
+                cmds = _teleopController.Run();
                 break;
             case ControlMode::PATHING:
-                cmds = _pathingController->Run();
+                cmds = _pathingController.Run();
                 // Eventually will be somthing like
-                // cmds = _pathingController->Run(_imu.GetHeading(), _gps.GetPosition());
+                // cmds = _pathingController.Run(_imu.GetHeading(), _gps.GetPosition());
                 break;
             
             default:
@@ -69,20 +69,22 @@ void Robot::Run(int rate, bool& running) {
 
 void Robot::ManageController() {
     if (_newMode != _mode) {
-        modeToController(_mode)->Unload();
+        modeToController(_mode).Unload();
         _mode = _newMode;
-        modeToController(_mode)->Load();
-        Utils::LogFmt("Switching to active controller %s", modeToController(_mode)->name);
+        modeToController(_mode).Load();
+        Utils::LogFmt("Switching to active controller %s", modeToController(_mode).name);
     }
 }
 
 Robot::ControlMode Robot::nameToMode(std::string name) {
-    if (name == _teleopController->name) return ControlMode::TELEOP;
+    if (name == _teleopController.name) return ControlMode::TELEOP;
+    if (name == _pathingController.name) return ControlMode::PATHING;
     return ControlMode::DISABLED;
 }
 
-ControllerBase* Robot::modeToController(ControlMode mode) {
+ControllerBase& Robot::modeToController(ControlMode mode) {
+    static DisabledController dc;
     if (mode == TELEOP) return _teleopController;
     if (mode == PATHING) return _pathingController;
-    return nullptr;
+    return dc;
 }

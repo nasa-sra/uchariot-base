@@ -39,13 +39,13 @@ private:
 
     void ManageController();
     ControlMode nameToMode(std::string name);
-    ControllerBase* modeToController(ControlMode mode);
+    ControllerBase& modeToController(ControlMode mode);
 
     ControlMode _mode{DISABLED};
     ControlMode _newMode{DISABLED};
 
-    TeleopController* _teleopController{nullptr};
-    PathingController* _pathingController{nullptr};
+    TeleopController _teleopController;
+    PathingController _pathingController;
     
     DriveBase _driveBase;
 #ifndef SIMULATION

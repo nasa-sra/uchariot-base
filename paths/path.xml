@@ -1,9 +1,10 @@
 
+<?xml version="1.0" encoding="utf-8"?>
+
 <!-- This is a rudementary system, but 
 you can draw a path on Google earth, save it as a KMZ, convert that to a KML with an online tool,
  and copy the coordinates into an auto script like this. You can also use google maps and export a KML route.
  The idea is that this gives you the ability to set parameters and do other actions in paths -->
-<?xml version="1.0" encoding="utf-8"?>
 <path name="Bldg9ToRockyard" speed="0.5" >
   <coordinates>-95.0843718193092,29.5600787429242 -95.0842546575925,29.5600376016168 -95.0834013429945,29.5616269636643 -95.0816064243749,29.5609348954787 -95.0811776647514,29.5617733308445 -95.0819859991088,29.5621824507428 -95.0812278492064,29.5637624404162 -95.0812717475594,29.563880129572 -95.0813785841056,29.5639589260425 -95.0814048190464,29.5644391617627 -95.0814823147641,29.5645375700319 -95.0814272582387,29.5648023415548 -95.0814875013339,29.5649463289603</coordinates>
 </path>

@@ -108,10 +108,11 @@ template<typename T> long VectorIndexOf(const std::vector<T> v, const T x) {
 
 double ScheduleRate(int rate, std::chrono::high_resolution_clock::time_point start_time);
 
+#define EARTHS_RADIUS 6378137.0 // m
 struct GeoPoint {
 
 	double lat, lon, alt;
-    GeoPoint() : lat(0.0), lon(0.0), alt(0.0) {}
+    GeoPoint() : lat(0.0), lon(0.0), alt(EARTHS_RADIUS) {}
 
 };
 
