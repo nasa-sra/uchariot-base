@@ -20,10 +20,17 @@ ControlCmds PathingController::Run(Pose robotPose) {
     }
 
     if (_runningPath) {
-		cmds.drive.velocity = _path[_currentStep].speed;
-        Eigen::Vector2d diff = _path[_currentStep].pos.head<2>() - robotPose.pos;
+		_nextWaypoint = _path[_currentStep].pos.head<2>();
+        Eigen::Vector2d diff = _nextWaypoint - robotPose.pos;
+		double velocity = std::clamp((float) (diff.norm() * _velocityGain), -_path[_currentStep].speed, _path[_currentStep].speed);
 		double headingErr = atan2(diff.y(), diff.x()) - robotPose.heading;
-		cmds.drive.angularVelocity = headingErr * _headingGain;
+		double angularVelocity = headingErr * _headingGain;
+
+		if (_currentStep == _path.size() - 1 && diff.norm() < 1.0) {
+			angularVelocity = 0.0;
+		}
+
+		cmds.drive = DriveBaseCmds(angularVelocity, velocity);
 
 		if (diff.norm() < _path[_currentStep].tolerance) {
 			_currentStep++;
@@ -38,8 +45,8 @@ ControlCmds PathingController::Run(Pose robotPose) {
 
 void PathingController::ReportState(std::string prefix) {
 	prefix += "pathing_controller/";
-    StateReporter::GetInstance().UpdateKey(prefix + "waypointX", _path[_currentStep].pos.x());
-    StateReporter::GetInstance().UpdateKey(prefix + "waypointY", _path[_currentStep].pos.y());
+    StateReporter::GetInstance().UpdateKey(prefix + "waypointX", _nextWaypoint.x());
+    StateReporter::GetInstance().UpdateKey(prefix + "waypointY", _nextWaypoint.y());
 }
 
 void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
@@ -67,8 +74,10 @@ bool PathingController::loadPath(std::string filePath) {
 
     float pathSpeed = 0.5;
 	path->QueryFloatAttribute("speed", &pathSpeed);
-	_headingGain = 0.01;
-	path->QueryDoubleAttribute("kp", &_headingGain);
+	_velocityGain = 5.0;
+	path->QueryDoubleAttribute("velocitykp", &_velocityGain);
+	_headingGain = 1.0;
+	path->QueryDoubleAttribute("headingkp", &_headingGain);
 	float pathTolerance = 3.0;
 	path->QueryFloatAttribute("tolerance", &pathTolerance);
 	_endTolerance = 0.1;
@@ -106,7 +115,7 @@ bool PathingController::loadPath(std::string filePath) {
 
 			while (ss >> coord) {
 
-				Utils::GeoPoint point = parseCoordinates(coord, false, true);
+				Utils::GeoPoint point = parseGeoCoordinates(coord, false, true);
 				Utils::GeoPoint origin = _path.size() > 0 ? _path[0].geoPoint : point;
 				Eigen::Vector3d pos = geoToPathCoord(point, origin);
 
@@ -114,6 +123,31 @@ bool PathingController::loadPath(std::string filePath) {
 				step.pos = pos;
 				step.speed = speed;
 				step.geoPoint = point;
+				step.tolerance = tolerance;
+				_path.push_back(step);
+
+			}
+		} else if (std::strcmp(line->Name(), "points") == 0) {
+
+			double speed = 0.0;
+			line->QueryDoubleAttribute("speed", &speed);
+			float tolerance = 0.0;
+			path->QueryFloatAttribute("tolerance", &tolerance);
+
+			if (speed == 0.0) { speed = pathSpeed; }
+			if (tolerance == 0.0) { tolerance = pathTolerance; }
+
+			const char* coords = line->GetText();
+
+			std::string str(coords);
+			std::stringstream ss(str);
+			std::string coord;
+
+			while (ss >> coord) {
+
+                PathStep step;
+				step.pos = parseCoordinates(coord);;
+				step.speed = speed;
 				step.tolerance = tolerance;
 				_path.push_back(step);
 
@@ -127,7 +161,23 @@ bool PathingController::loadPath(std::string filePath) {
     return true;
 }
 
-Utils::GeoPoint PathingController::parseCoordinates(std::string coords, bool altitude, bool flipped) {
+Eigen::Vector3d PathingController::parseCoordinates(std::string coords) {
+
+	std::stringstream ss(coords);
+
+	Eigen::Vector3d point;
+	std::string x, y;
+
+	std::getline(ss, x, ',');
+	std::getline(ss, y, ',');
+
+	point.x() = std::stod(x);
+	point.y() = std::stod(y);
+
+	return point;
+}
+
+Utils::GeoPoint PathingController::parseGeoCoordinates(std::string coords, bool altitude, bool flipped) {
 
 	std::stringstream ss(coords);
 	Utils::GeoPoint point;

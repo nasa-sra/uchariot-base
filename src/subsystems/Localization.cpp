@@ -1,6 +1,4 @@
 
-#define ROBOT_WIDTH 1.0
-
 #include "subsystems/Localization.h"
 
 Localization::Localization() {}
