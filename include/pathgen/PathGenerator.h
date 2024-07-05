@@ -51,7 +51,7 @@ struct Point {
 
 class PathGenerator {
 public:
-    static void GeneratePath(vector<Vector> points, double speed_ms, double radius, double scale_factor, bool scaled);
+    static void GeneratePath(vector<Vector> points, double speed_ms, double radius_m, double scale_factor, bool scaled);
     static void SetPathSize(uint16_t size);
 
 private:

@@ -16,13 +16,13 @@ vector<Vector> PathGenerator::_ScaleVector(vector<Vector> points, double scale_f
 }
 
 
-void PathGenerator::GeneratePath(vector<Vector> points, double speed_ms, double _m, double scale_factor, bool scaled) {
+void PathGenerator::GeneratePath(vector<Vector> points, double speed_ms, double radius_m, double scale_factor, bool scaled) {
     vector<GenPoint> n_points;
 
-    points = scaled ? PathGenerator::_ScaleVector(points, scale_factor) : points;
+    points = PathGenerator::_ScaleVector(points, scale_factor);
 
     double speed_lat = scaled ? (speed_ms * 2.23693629) / 60 * scale_factor : speed_ms;
-    double  = scaled ? (_m / 1609.344) / 60 * scale_factor : ;
+    double radius_lat = scaled ? (radius_m / 1609.344) / 60 * scale_factor : radius_m;
 
     ofstream ptFile;
     ptFile.open ("Points.txt");
@@ -37,8 +37,8 @@ void PathGenerator::GeneratePath(vector<Vector> points, double speed_ms, double 
             continue;
         }
 
-        Vector prevVector = points[i] - (points[i] - points[i - 1]).normalize() * ;
-        Vector postVector = points[i] + (points[i + 1] - points[i]).normalize() * ;
+        Vector prevVector = points[i] - (points[i] - points[i - 1]).normalize() * radius_m;
+        Vector postVector = points[i] + (points[i + 1] - points[i]).normalize() * radius_m;
 
         n_points.push_back(GenPoint(prevVector, false));
         n_points.push_back(GenPoint(points[i], true));

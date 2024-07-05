@@ -63,7 +63,7 @@ int main() {
 
     PathGenerator::SetPathSize(1000);
 
-    PathGenerator::GeneratePath(points, 1, 10, 1000, true);
+    PathGenerator::GeneratePath(points, 1, 10, 111000, false);
 
     // ofstream Bob("Bob.txt");
     // std::cout << Bob.is_open();
