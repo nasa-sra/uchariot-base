@@ -36,6 +36,12 @@ ControlCmds PathingController::Run(Pose robotPose) {
     return cmds;
 }
 
+void PathingController::ReportState(std::string prefix) {
+	prefix += "pathing_controller/";
+    StateReporter::GetInstance().UpdateKey(prefix + "waypointX", _path[_currentStep].pos.x());
+    StateReporter::GetInstance().UpdateKey(prefix + "waypointY", _path[_currentStep].pos.y());
+}
+
 void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
     _pathName = doc["name"].GetString();
 }

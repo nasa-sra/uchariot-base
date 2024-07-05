@@ -54,7 +54,9 @@ void Robot::Run(int rate, bool& running) {
 
         // Report state
         cmds.ReportState();
+        _pathingController.ReportState();
         _driveBase.ReportState();
+        _localization.ReportState();
         _imu.ReportState();
         StateReporter::GetInstance().PushState();
 

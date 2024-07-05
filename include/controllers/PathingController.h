@@ -20,6 +20,7 @@ public:
     void Unload() override;
     ControlCmds Run(Pose robotPose);
 
+    void ReportState(std::string prefix = "/");
     void HandleNetworkInput(rapidjson::Document& doc);
 
 private:
