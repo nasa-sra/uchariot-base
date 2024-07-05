@@ -9,6 +9,8 @@ set (CMAKE_CXX_STANDARD 17)
 
 add_compile_definitions(LINUX=true)
 
+add_compile_definitions(PATH_TEST=true)
+
 set(SRCS
     src/main.cpp
     src/CanConnection.cpp
@@ -21,6 +23,11 @@ set(SRCS
     src/subsystems/DriveBase.cpp
     src/subsystems/GPS.cpp
     src/Serial.cpp
+    src/pathgen/Bezier.cpp
+    src/pathgen/BSpline.cpp
+    src/pathgen/Curve.cpp
+    src/pathgen/Vector.cpp
+    src/pathgen/PathGenerator.cpp
     src/nmea/context.c
     src/nmea/generate.c
     src/nmea/generator.c
@@ -46,6 +53,8 @@ find_library(WIRING_PI_LIB libwiringPi.so )
 find_library(WIRING_PI_DEV_LIB libwiringPiDev.so )
 find_library(CRYPT_LIB libcrypt.so.1.1.0)
 list(APPEND LIBS ${WIRING_PI_LIB} ${WIRING_PI_DEV_LIB} ${CRYPT_LIB})
+
+
 
 
 add_executable(uChariotBase ${SRCS})
