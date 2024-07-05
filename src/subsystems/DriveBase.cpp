@@ -59,3 +59,23 @@ void DriveBase::ReportState(std::string prefix) {
     _left_back.ReportState(prefix + "left_back/");
     _right_back.ReportState(prefix + "right_back/");
 }
+
+DriveBaseCmds NewDriveBaseCmds::Drive() {
+    float _fwd =  _driveController;
+    float _turn = ;
+
+    const double deadband = 0.05, min = 0.125;
+
+    if (std::abs(_fwd) < deadband) _fwd = 0;
+    if (std::abs(_turn) < deadband) _turn = 0;
+    double left, right;
+
+    if (_turn >= 0) {    // handle right
+        left = _speed * _fwd;
+        right = left - (_turn * (left - min * left));
+    }
+    else {  // handle left 
+        right = _speed * _fwd;
+        left = right + (_turn * (right - min * right));
+    }
+}
