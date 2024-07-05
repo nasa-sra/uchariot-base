@@ -4,10 +4,10 @@
 #include "subsystems/DriveBase.h"
 
 void DriveBaseCmds::ReportState(std::string prefix) {
-    StateReporter::GetInstance().UpdateKey(prefix + "lf_velocity", _lf_speed);
-    StateReporter::GetInstance().UpdateKey(prefix + "rf_velocity", _rf_speed);
-    StateReporter::GetInstance().UpdateKey(prefix + "lb_velocity", _lb_speed);
-    StateReporter::GetInstance().UpdateKey(prefix + "rb_velocity", _rb_speed);
+    // StateReporter::GetInstance().UpdateKey(prefix + "lf_velocity", _lf_speed);
+    // StateReporter::GetInstance().UpdateKey(prefix + "rf_velocity", _rf_speed);
+    // StateReporter::GetInstance().UpdateKey(prefix + "lb_velocity", _lb_speed);
+    // StateReporter::GetInstance().UpdateKey(prefix + "rb_velocity", _rb_speed);
 }
 
 DriveBase::DriveBase() : 
@@ -36,10 +36,10 @@ void DriveBase::Update(double dt) {
 
     // Utils::LogFmt("Drivebase Speeds: lb %f  lf %f  rb %f  sb %f", _output._lb_speed, _output._lf_speed, _output._rb_speed, _output._rf_speed);
 
-    _left_front.SetCmd(_cmds._lf_speed);
-    _right_front.SetCmd(_cmds._rf_speed);
-    _left_back.SetCmd(_cmds._lb_speed);
-    _right_back.SetCmd(_cmds._rb_speed);
+    // _left_front.SetCmd(_cmds._lf_speed);
+    // _right_front.SetCmd(_cmds._rf_speed);
+    // _left_back.SetCmd(_cmds._lb_speed);
+    // _right_back.SetCmd(_cmds._rb_speed);
     _cmds = DriveBaseCmds(); // reset to 0
 
     _left_front.Update();
@@ -58,4 +58,8 @@ void DriveBase::ReportState(std::string prefix) {
     _right_front.ReportState(prefix + "right_front/");
     _left_back.ReportState(prefix + "left_back/");
     _right_back.ReportState(prefix + "right_back/");
+}
+
+DriveBaseFeedback DriveBase::GetVelocities() {
+    return {_left_front.GetVelocity(), _right_front.GetVelocity(), _left_back.GetVelocity(), _right_back.GetVelocity()};
 }

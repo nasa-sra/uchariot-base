@@ -23,6 +23,7 @@ public:
     void SetScale(float scale) {_scale = scale;}
 
     double GetVoltage() {return _voltageIn;}
+    double GetVelocity() {return _velocity;}
 
     void packetHandler(CanFrame frame);
     void ReportState(std::string prefix = "/");

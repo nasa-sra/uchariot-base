@@ -5,17 +5,31 @@
 #include "subsystems/SubsystemBase.h"
 #include "StateReporter.h"
 
-struct DriveBaseCmds {
-    float _lf_speed;
-    float _rf_speed;
-    float _lb_speed;
-    float _rb_speed;
+// struct DriveBaseCmds {
+//     float _lf_speed;
+//     float _rf_speed;
+//     float _lb_speed;
+//     float _rb_speed;
 
-    DriveBaseCmds() : _lf_speed(0), _rf_speed(0), _lb_speed(0), _rb_speed(0) {};
-    DriveBaseCmds(float left, float right) : _lf_speed(left), _rf_speed(right), _lb_speed(left), _rb_speed(right) {};
-    DriveBaseCmds(float lf, float rf, float lb, float rb) : _lf_speed(lf), _rf_speed(rf), _lb_speed(lb), _rb_speed(rb) {};
+//     DriveBaseCmds() : _lf_speed(0), _rf_speed(0), _lb_speed(0), _rb_speed(0) {};
+//     DriveBaseCmds(float left, float right) : _lf_speed(left), _rf_speed(right), _lb_speed(left), _rb_speed(right) {};
+//     DriveBaseCmds(float lf, float rf, float lb, float rb) : _lf_speed(lf), _rf_speed(rf), _lb_speed(lb), _rb_speed(rb) {};
+
+//     void ReportState(std::string prefix="/");
+// };
+
+struct DriveBaseCmds {
+    double velocity; // m/s
+    double angularVelocity; // rad/s
+
+    DriveBaseCmds() : velocity(0.0), angularVelocity(0.0) {};
+    DriveBaseCmds(double _velocity, double _angularVelocity) : velocity(_velocity), angularVelocity(_angularVelocity) {};
 
     void ReportState(std::string prefix="/");
+};
+
+struct DriveBaseFeedback {
+    double lf, rf, lb, rb;
 };
 
 class DriveBase : public SubsystemBase {
@@ -25,6 +39,7 @@ public:
 
     void Update(double dt) override;
     void ReportState(std::string prefix = "/") override;
+    DriveBaseFeedback GetVelocities();
 
     inline void SetCmds(DriveBaseCmds cmds) { _cmds = cmds; }
    
