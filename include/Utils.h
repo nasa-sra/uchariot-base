@@ -10,6 +10,7 @@
 #include <vector>
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <sys/time.h>
 
 #include <Eigen/Core>
 
@@ -20,7 +21,10 @@
 #define _snprintf std::snprintf
 #endif
 
+
+
 namespace Utils {
+typedef int64_t msec_t;
 
 void BufferAppendInt16(uint8_t* buffer, int16_t number, int32_t* index);
 void BufferAppendInt32(uint8_t* buffer, int32_t number, int32_t* index);
@@ -62,6 +66,15 @@ template<typename... A> std::string _strfmt(const std::string& fmt, A&&... args)
     _snprintf(buf.get(), size, fmt.c_str(), args...);
     return std::string(buf.get(), buf.get() + size - 1);
 }
+
+
+// Gets the time in ms
+// msec_t time_ms(void)
+// {
+//     struct timeval tv;
+//     gettimeofday(&tv, NULL);
+//     return (msec_t)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+// }
 
 // Formats a string the same way C snprintf does it,
 // returning the formatted string. This method can take

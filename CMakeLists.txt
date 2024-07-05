@@ -26,6 +26,7 @@ set(SRCS
     src/StateReporter.cpp
     src/controllers/TeleopController.cpp
     src/controllers/PathingController.cpp
+    src/controllers/PIDController.cpp
     src/subsystems/DriveBase.cpp
     src/subsystems/Localization.cpp
     src/tinyxml2.cpp
