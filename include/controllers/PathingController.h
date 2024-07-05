@@ -23,7 +23,8 @@ public:
 private:
 
     bool loadPath(std::string filePath);
-    Utils::GeoPoint parseCoordinates(std::string coords, bool altitude);
+    Utils::GeoPoint parseCoordinates(std::string coords, bool altitude, bool flipped=false);
+    Eigen::Vector3d geoToPathCoord(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin);
 
     std::string _pathName{""};
     bool _runningPath{false};

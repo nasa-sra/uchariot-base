@@ -1,5 +1,7 @@
 
 #include "tinyxml2.h"
+#include <Eigen/Geometry>
+
 #include "controllers/PathingController.h"
 
 void PathingController::Load() {
@@ -12,35 +14,31 @@ ControlCmds PathingController::Run() {
 
     if (!_runningPath && _pathName != "") {
         _runningPath = loadPath(_pathName);
-        /*
-        TODO
-            Path needs to get shifted by starting point 
-            then projected into the plane normal to the starting point vector from the center of the earth
-            (this would ignore the effects effects of the curvature of the earth)
-        */
+		if (!_runningPath)
+			_pathName = "";
     }
 
     if (_runningPath) {
-        // run path with peer pursuit
-		
+        // run path
     }
 
     return cmds;
 }
 
 void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
-    _pathName = doc["path"].GetString();
+    _pathName = doc["name"].GetString();
 }
 
 bool PathingController::loadPath(std::string filePath) {
 
     _path.clear();
 
-    printf("Loading Auton... \n");
+    Utils::LogFmt("Loading Auton... ");
 
     tinyxml2::XMLDocument doc;
-	if (doc.LoadFile(filePath.c_str()) != tinyxml2::XML_SUCCESS) {
-		Utils::LogFmt("PathingContoller::loadPath - Could not load file %s", filePath);
+	int res = doc.LoadFile(filePath.c_str());
+	if (res != tinyxml2::XML_SUCCESS) {
+		Utils::LogFmt("PathingContoller::loadPath - Could not load file %s, Err Code: %i", filePath, res);
 		return false;
 	}
 
@@ -52,6 +50,8 @@ bool PathingController::loadPath(std::string filePath) {
 
     float pathSpeed = 0.5;
 	path->QueryFloatAttribute("speed", &pathSpeed);
+
+	Utils::GeoPoint origin;
 
     tinyxml2::XMLElement* line = nullptr;
 	while (true) {
@@ -82,8 +82,9 @@ bool PathingController::loadPath(std::string filePath) {
 
 			while (ss >> coord) {
 
-				Utils::GeoPoint point = parseCoordinates(coord, false);
-				Eigen::Vector3d pos = Utils::geoToEarthCoord(point);
+				Utils::GeoPoint point = parseCoordinates(coord, false, true);
+				Utils::GeoPoint origin = _path.size() > 0 ? _path[0].geoPoint : point;
+				Eigen::Vector3d pos = geoToPathCoord(point, origin);
 
                 PathStep step;
 				step.pos = pos;
@@ -96,18 +97,24 @@ bool PathingController::loadPath(std::string filePath) {
             Utils::LogFmt("PathingContoller::loadPath - Could not read line in XML path");
 		}
 	}
+    Utils::LogFmt("Loaded Auton");
     return true;
 }
 
-Utils::GeoPoint PathingController::parseCoordinates(std::string coords, bool altitude) {
+Utils::GeoPoint PathingController::parseCoordinates(std::string coords, bool altitude, bool flipped) {
 
 	std::stringstream ss(coords);
 	Utils::GeoPoint point;
 
 	std::string lat, lon, alt;
 
-    std::getline(ss, lat, ',');
-    std::getline(ss, lon, ',');
+	if (flipped) {
+    	std::getline(ss, lon, ',');
+		std::getline(ss, lat, ',');
+	} else {
+		std::getline(ss, lat, ',');
+		std::getline(ss, lon, ',');
+	}
 
 	point.lat = std::stod(lat);
 	point.lon = std::stod(lon);
@@ -118,4 +125,27 @@ Utils::GeoPoint PathingController::parseCoordinates(std::string coords, bool alt
     }
 	
 	return point;
+}
+
+Eigen::Vector3d PathingController::geoToPathCoord(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin) {
+
+	Eigen::Vector3d pos = Utils::geoToEarthCoord(geo);
+	Eigen::Vector3d origin = Utils::geoToEarthCoord(geoOrigin);
+	
+	// This is the solution to the intersection of each step pos vector with a plane normal to and thru the starting point
+	double t = origin.dot(origin) / origin.dot(pos);
+	// This rescale step.pos to be on the plane, then transforms its origin to be from the starting point
+	pos = t * pos - origin;
+
+	// This should all be cached
+	Eigen::Vector3d planeNormal = origin.normalized();
+	Eigen::Matrix3d planeBasis;
+	planeBasis.col(2) = planeNormal; // up
+	planeBasis.col(1) = planeNormal.cross(Eigen::Vector3d(0, 0, 1)); // west
+	planeBasis.col(0) = planeBasis.col(1).cross(planeNormal); // north
+
+	Eigen::Matrix3d rotation = planeBasis.inverse(); // used identity for target basis
+	// Rotate from the plane basis to a standard one, x=north, y=west, z=up
+	return rotation * pos;
+
 }

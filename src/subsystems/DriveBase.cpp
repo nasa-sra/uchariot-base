@@ -2,6 +2,7 @@
 #include <cmath>
 
 #include "subsystems/DriveBase.h"
+#define ROBOT_WIDTH 5.0
 
 void DriveBaseCmds::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "lf_velocity", _lf_speed);
@@ -16,8 +17,8 @@ DriveBase::DriveBase() :
     _left_back(2),
     _right_back(3) {
 
-        float gearRatio = 6.0; // Maybe?
-        float wheelRadius = 0.5; // m !definitely not!
+        float gearRatio = 160;
+        float wheelRadius = 0.254; // m
         float scale = gearRatio * 60 / (2 * M_PI * wheelRadius); // converts from m/s to motor RPM
         _left_front.SetScale(-scale);
         _right_front.SetScale(-scale);
@@ -61,21 +62,17 @@ void DriveBase::ReportState(std::string prefix) {
 }
 
 DriveBaseCmds NewDriveBaseCmds::Drive() {
-    float _fwd =  _driveController;
-    float _turn = ;
+    // float _fwd =  _driveController;
+    // float _turn = ;
 
     const double deadband = 0.05, min = 0.125;
 
-    if (std::abs(_fwd) < deadband) _fwd = 0;
-    if (std::abs(_turn) < deadband) _turn = 0;
-    double left, right;
+    double maxAng = _speed / ROBOT_WIDTH;
 
-    if (_turn >= 0) {    // handle right
-        left = _speed * _fwd;
-        right = left - (_turn * (left - min * left));
-    }
-    else {  // handle left 
-        right = _speed * _fwd;
-        left = right + (_turn * (right - min * right));
-    }
+    double _omega = std::clamp(angularVelocity, -maxAng, maxAng);
+
+    double vr = std::clamp((_omega / (2 * ROBOT_WIDTH)) + std::clamp(driveVelocity, -_speed, _speed), -_speed, _speed);
+    double vl = std::clamp(std::clamp(driveVelocity, -_speed, _speed) - (_omega / (2 * ROBOT_WIDTH)), -_speed, _speed);
+
+    return DriveBaseCmds(vl, vr);
 }

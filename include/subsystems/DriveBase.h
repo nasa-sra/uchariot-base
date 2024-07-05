@@ -22,9 +22,9 @@ struct DriveBaseCmds {
 
 class NewDriveBaseCmds {
 public:
-    float angularVelocity{0};
-    float driveVelocity{0};
-    float _speed{2500};
+    double angularVelocity{0};
+    double driveVelocity{0};
+    double _speed{2500};
 private:
     float _lf_speed{0};
     float _rf_speed{0};
