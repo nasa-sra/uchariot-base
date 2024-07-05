@@ -2,7 +2,6 @@
 #include <cmath>
 
 #include "subsystems/DriveBase.h"
-#define ROBOT_WIDTH 5.0
 
 void DriveBaseCmds::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "lf_velocity", _lf_speed);
@@ -61,18 +60,18 @@ void DriveBase::ReportState(std::string prefix) {
     _right_back.ReportState(prefix + "right_back/");
 }
 
-DriveBaseCmds NewDriveBaseCmds::Drive() {
-    // float _fwd =  _driveController;
-    // float _turn = ;
+// DriveBaseCmds DriveBaseCmds::Drive() {
+//     // float _fwd =  _driveController;
+//     // float _turn = ;
 
-    const double deadband = 0.05, min = 0.125;
+//     const double deadband = 0.05, min = 0.125;
 
-    double maxAng = _speed / ROBOT_WIDTH;
+//     double maxAng = _speed / ROBOT_WIDTH;
 
-    double _omega = std::clamp(angularVelocity, -maxAng, maxAng);
+//     double _omega = std::clamp(angularVelocity, -maxAng, maxAng);
 
-    double vr = std::clamp((_omega / (2 * ROBOT_WIDTH)) + std::clamp(driveVelocity, -_speed, _speed), -_speed, _speed);
-    double vl = std::clamp(std::clamp(driveVelocity, -_speed, _speed) - (_omega / (2 * ROBOT_WIDTH)), -_speed, _speed);
+//     double vr = std::clamp((_omega / (2 * ROBOT_WIDTH)) + std::clamp(driveVelocity, -_speed, _speed), -_speed, _speed);
+//     double vl = std::clamp(std::clamp(driveVelocity, -_speed, _speed) - (_omega / (2 * ROBOT_WIDTH)), -_speed, _speed);
 
-    return DriveBaseCmds(vl, vr);
-}
+//     return DriveBaseCmds(vl, vr);
+// }
