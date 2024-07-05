@@ -11,6 +11,8 @@
 
 #include "StateReporter.h"
 
+#include "subsystems/DriveBase.h"
+#include "subsystems/Localization.h"
 #ifndef SIMULATION
 #include "subsystems/BNO055.h"
 #else
@@ -48,6 +50,7 @@ private:
     PathingController _pathingController;
     
     DriveBase _driveBase;
+    Localization _localization;
 #ifndef SIMULATION
     BNO055 _imu;
 #else

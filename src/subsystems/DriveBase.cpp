@@ -60,6 +60,9 @@ void DriveBase::ReportState(std::string prefix) {
     _right_back.ReportState(prefix + "right_back/");
 }
 
+DriveBaseFeedback DriveBase::GetVelocities() {
+    return {_left_front.GetVelocity(), _right_front.GetVelocity(), _left_back.GetVelocity(), _right_back.GetVelocity()};
+}
 // DriveBaseCmds DriveBaseCmds::Drive() {
 //     // float _fwd =  _driveController;
 //     // float _turn = ;

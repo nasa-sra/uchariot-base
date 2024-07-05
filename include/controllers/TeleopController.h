@@ -21,7 +21,7 @@ public:
         Load();
     }
 
-    ControlCmds Run() override;
+    ControlCmds Run();
 
     void HandleNetworkInput(rapidjson::Document& doc);
 

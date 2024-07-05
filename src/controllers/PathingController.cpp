@@ -6,10 +6,11 @@
 
 void PathingController::Load() {
     _runningPath = false;
+	_currentStep = 0;
 }
 void PathingController::Unload() {};
 
-ControlCmds PathingController::Run() {
+ControlCmds PathingController::Run(Pose robotPose) {
     ControlCmds cmds;
 
     if (!_runningPath && _pathName != "") {
@@ -19,7 +20,17 @@ ControlCmds PathingController::Run() {
     }
 
     if (_runningPath) {
-        // run path
+		cmds.drive.velocity = _path[_currentStep].speed;
+        Eigen::Vector2d diff = _path[_currentStep].pos.head<2>() - robotPose.pos;
+		double headingErr = atan2(diff.y(), diff.x()) - robotPose.heading;
+		cmds.drive.angularVelocity = headingErr * _headingGain;
+
+		if (diff.norm() < _path[_currentStep].tolerance) {
+			_currentStep++;
+			if (_currentStep == _path.size()) {
+				_runningPath = false;
+			}
+		}
     }
 
     return cmds;
@@ -50,6 +61,12 @@ bool PathingController::loadPath(std::string filePath) {
 
     float pathSpeed = 0.5;
 	path->QueryFloatAttribute("speed", &pathSpeed);
+	_headingGain = 0.01;
+	path->QueryDoubleAttribute("kp", &_headingGain);
+	float pathTolerance = 3.0;
+	path->QueryFloatAttribute("tolerance", &pathTolerance);
+	_endTolerance = 0.1;
+	path->QueryFloatAttribute("endTolerance", &_endTolerance);
 
 	Utils::GeoPoint origin;
 
@@ -69,10 +86,11 @@ bool PathingController::loadPath(std::string filePath) {
 
 			double speed = 0.0;
 			line->QueryDoubleAttribute("speed", &speed);
+			float tolerance = 0.0;
+			path->QueryFloatAttribute("tolerance", &tolerance);
 
-			if (speed == 0.0) {
-				speed = pathSpeed;
-			}
+			if (speed == 0.0) { speed = pathSpeed; }
+			if (tolerance == 0.0) { tolerance = pathTolerance; }
 
 			const char* coords = line->GetText();
 
@@ -90,6 +108,7 @@ bool PathingController::loadPath(std::string filePath) {
 				step.pos = pos;
 				step.speed = speed;
 				step.geoPoint = point;
+				step.tolerance = tolerance;
 				_path.push_back(step);
 
 			}
@@ -97,6 +116,7 @@ bool PathingController::loadPath(std::string filePath) {
             Utils::LogFmt("PathingContoller::loadPath - Could not read line in XML path");
 		}
 	}
+	_path.back().tolerance = _endTolerance;
     Utils::LogFmt("Loaded Auton");
     return true;
 }

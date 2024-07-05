@@ -28,6 +28,7 @@ set(SRCS
     src/controllers/PathingController.cpp
     src/controllers/PIDController.cpp
     src/subsystems/DriveBase.cpp
+    src/subsystems/Localization.cpp
     src/tinyxml2.cpp
 )
 

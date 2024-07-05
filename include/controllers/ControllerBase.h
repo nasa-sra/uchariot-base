@@ -17,7 +17,7 @@ class ControllerBase {
 public:
     ControllerBase(std::string _name) : name(_name) {}
     virtual void Load() = 0;
-    virtual ControlCmds Run(void) = 0;
+    // virtual ControlCmds Run(void) = 0;
     virtual void Unload() = 0;
 
     std::string name;

@@ -37,9 +37,7 @@ void Robot::Run(int rate, bool& running) {
                 cmds = _teleopController.Run();
                 break;
             case ControlMode::PATHING:
-                cmds = _pathingController.Run();
-                // Eventually will be somthing like
-                // cmds = _pathingController.Run(_imu.GetHeading(), _gps.GetPosition());
+                cmds = _pathingController.Run(_localization.getPose());
                 break;
             
             default:
@@ -52,6 +50,7 @@ void Robot::Run(int rate, bool& running) {
         // Update subsystems
         _driveBase.Update(dt);
         _imu.Update(dt);
+        _localization.Update(dt, _driveBase.GetVelocities());
 
         // Report state
         cmds.ReportState();

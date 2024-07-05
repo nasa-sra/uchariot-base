@@ -47,12 +47,17 @@ struct DriveBaseCmds {
     DriveBaseCmds(){}
 };
 
+struct DriveBaseFeedback {
+    double lf, rf, lb, rb;
+};
+
 class DriveBase : public SubsystemBase {
 public:
     DriveBase();
 
     void Update(double dt) override;
     void ReportState(std::string prefix = "/") override;
+    DriveBaseFeedback GetVelocities();
 
     inline void SetCmds(DriveBaseCmds cmds) {
         _cmds = cmds;
