@@ -12,6 +12,7 @@
 
 #ifndef SIMULATION
 #include "subsystems/BNO055.h"
+#include "subsystems/LSM6DSOX.h"
 #else
 #include "subsystems/IMUBase.h"
 #endif

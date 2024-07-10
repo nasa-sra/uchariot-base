@@ -19,7 +19,7 @@
 LSM6DSOX::LSM6DSOX() : IMUBase() {
 
     _imuFd = wiringPiI2CSetup(LSM6DSOX_ADDR);
-    if (_imuFd == -1) {
+    if (_imuFd < 0) {
         Utils::LogFmt("LSM6DSOX IMU failed to init i2c communication");
     }
 

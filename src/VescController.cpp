@@ -16,8 +16,13 @@ void VescController::Update() {
     _disconnectTimer++;
 
 #ifndef SIMULATION
-    if (!_connected)
-        Utils::LogFmt("Warning: Vesc Controller Id %i is not connected", _can_id);
+    if (!_connected) {
+        _warningCounter++;
+        if (_warningCounter == 10) {
+            Utils::LogFmt("Warning: Vesc Controller Id %i is not connected", _can_id);
+            _warningCounter = 0;
+        }
+    }
 #endif
 }
 
