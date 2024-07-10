@@ -42,16 +42,22 @@ struct Point {
     Point(double x, double y, double dist, double speed) : x(x), y(y), distFromStart(dist), time(dist / speed) {};
     Point(Vector vector, double dist, double speed) : x(vector.x), y(vector.y), distFromStart(dist), time(dist / speed) {};
 
-    std::string toString() {
+    std::string ToString() {
         std::ostringstream oss;
         oss << "[" << x << ", " << y << "]" << " - " << distFromStart << "m - " << time << "s";
+        return oss.str();
+    }
+
+    std::string ToPointString() {
+        std::ostringstream oss;
+        oss << x << "," << y;
         return oss.str();
     }
 };
 
 class PathGenerator {
 public:
-    static void GeneratePath(vector<Vector> points, double speed_ms, double radius_m, double scale_factor, bool scaled);
+    static void GeneratePath(double speed_ms, double radius_m, double scale_factor, bool scaled, std::string filename);
     static void SetPathSize(uint16_t size);
 
 private:

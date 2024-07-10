@@ -1,5 +1,9 @@
 #include "pathgen/PathGenerator.h"
 
+#include "tinyxml2.h"
+
+using namespace tinyxml2;
+
 uint16_t PathGenerator::_pathgenSize = 50;
 vector<Point> PathGenerator::_pathPointsRaw = {};
 
@@ -8,28 +12,61 @@ void PathGenerator::SetPathSize(uint16_t size) {
 }
 
 vector<Vector> PathGenerator::_ScaleVector(vector<Vector> points, double scale_factor) {
-    for (int i = 0; i < points.size(); ++i) {
-        points[i] = (points[i] - points[i].TruncateDouble()) * scale_factor;
-    }
+    for (int i = 0; i < points.size(); ++i) { points[i] = (points[i] - points[i].TruncateDouble()) * scale_factor; }
 
     return points;
 }
 
-
-void PathGenerator::GeneratePath(vector<Vector> points, double speed_ms, double radius_m, double scale_factor, bool scaled) {
+void PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_factor, bool scaled,
+                                 std::string filename) {
     vector<GenPoint> n_points;
 
-    points = PathGenerator::_ScaleVector(points, scale_factor);
+    // points = PathGenerator::_ScaleVector(points, scale_factor);
+
+    XMLDocument doc;
+    int res = doc.LoadFile(("paths/" + filename + ".kml").c_str());
+
+    if (res != tinyxml2::XML_SUCCESS) {
+        Utils::LogFmt("PathingContoller::loadPath - Could not load file %s, Err Code: %i", filename, res);
+        return;
+    }
+
+    XMLElement* path = doc.FirstChildElement("kml")
+                               ->FirstChildElement("Document")
+                               ->FirstChildElement("Folder")
+                               ->FirstChildElement("Placemark")
+                               ->FirstChildElement("LineString")
+                               ->FirstChildElement("coordinates");
+
+    if (path == nullptr) {
+        Utils::LogFmt("PathingContoller::loadPath - Could not load data, Err Code: %i", res);
+        return;
+    }
+
+    std::string pText = std::string(path->GetText());
+    std::stringstream pStream(pText);
+    std::string coord;
+
+    vector<Vector> points;
+
+    while (pStream >> coord) {
+        std::stringstream ss(coord);
+        std::string lat, long_g;
+        std::getline(ss, lat, ',');
+        std::getline(ss, long_g, ',');
+
+        points.push_back(Vector(std::stod(lat), std::stod(long_g)));
+    }
 
     double speed_lat = scaled ? (speed_ms * 2.23693629) / 60 * scale_factor : speed_ms;
     double radius_lat = scaled ? (radius_m / 1609.344) / 60 * scale_factor : radius_m;
 
     ofstream ptFile;
-    ptFile.open ("Points.txt");
+    ptFile.open("Points.txt");
 
     print << ptFile.is_open() << " OPENSTATUS\n";
     ptFile << "x, y" << std::endl;
-    
+
     for (int i = 0; i < points.size(); ++i) {
         ptFile << points[i].x << ", " << points[i].y << std::endl;
         if (i == 0 || i == (points.size()) - 1) {
@@ -49,9 +86,7 @@ void PathGenerator::GeneratePath(vector<Vector> points, double speed_ms, double 
 
     vector<Vector> finPoints;
 
-    for (int i = 0; i < n_points.size(); ++i) {
-        print << n_points[i].toString() << std::endl;
-    }
+    for (int i = 0; i < n_points.size(); ++i) { print << n_points[i].toString() << std::endl; }
 
     for (int i = 0; i < n_points.size() - 1; ++i) {
         // std::cout << n_points[i].toString() << std::endl;
@@ -70,12 +105,10 @@ void PathGenerator::GeneratePath(vector<Vector> points, double speed_ms, double 
     //     std::cout << finPoints[i].toString() << std::endl;
     // }
 
-
     Curve* curve = new Bezier();
     curve->set_steps(_pathgenSize);
 
-    for (int i = 0; i < finPoints.size(); ++i) 
-    { 
+    for (int i = 0; i < finPoints.size(); ++i) {
         curve->add_way_point(finPoints[i]);
         Utils::PrintLnFmt("%s", finPoints[i].toString());
     }
@@ -84,30 +117,54 @@ void PathGenerator::GeneratePath(vector<Vector> points, double speed_ms, double 
     print << curve->total_length() << "\n";
 
     ofstream pathFile;
-    pathFile.open ("PathGenerated.txt");
+    pathFile.open("PathGenerated.txt");
 
     print << pathFile.is_open() << " OPENSTATUS\n";
 
     pathFile << "x, y" << std::endl;
 
-    for (int i = 0; i < curve->node_count(); ++i) {    
-        Point tempPoint = Point(Vector(0,0,0),0,0);
+    std::string pathFinalString;
+
+    for (int i = 0; i < curve->node_count(); ++i) {
+        Point tempPoint = Point(Vector(0, 0, 0), 0, 0);
 
         if (i == curve->node_count() - 1) {
             tempPoint = Point(finPoints[finPoints.size() - 1], curve->total_length(), speed_lat);
-        }
-        else {
+            pathFinalString.append(tempPoint.ToPointString());
+        } else {
             tempPoint = Point(curve->node(i), curve->length_from_starting_point(i), speed_lat);
+            pathFinalString.append(tempPoint.ToPointString() + " ");
         }
         PathGenerator::_pathPointsRaw.push_back(tempPoint);
 
         pathFile << tempPoint.x << ", " << tempPoint.y << ", " << tempPoint.time << std::endl;
+
         // std::cout << "node #" << i << ": " << tempPoint.toString() << std::endl;
     }
 
-    // for (int i = 0; i < finPoints.size(); ++i) {
-    //     pathFile << finPoints[i].x << ", " << finPoints[i].y << std::endl;
-    // }
+    FILE *fp = fopen(("paths/" + filename + ".xml").c_str(), "w");
+    if (fp == NULL) {
+        Utils::LogFmt("Write Failed");
+        return;
+    }
+    XMLPrinter printer(fp);
+
+    printer.OpenElement("path");
+    printer.PushAttribute("name", filename.c_str());
+    printer.PushAttribute("speed", std::to_string(speed_ms).c_str());
+    printer.PushAttribute("tolerance", "1.0");
+    printer.PushAttribute("endTolerance", "0.1");
+    printer.PushAttribute("velocitykp", "0.5");
+    printer.PushAttribute("headingkp", "1.0");
+
+    printer.OpenElement("geoCoordinates");
+    printer.PushText(pathFinalString.c_str());
+    printer.CloseElement();
+    printer.CloseElement();
+
+    for (int i = 0; i < finPoints.size(); ++i) {
+        pathFile << finPoints[i].x << ", " << finPoints[i].y << std::endl;
+    }
 
     pathFile.close();
 

@@ -61,9 +61,9 @@ int main() {
         Vector(29.562757, -95.080201, 0)
     };
 
-    PathGenerator::SetPathSize(1000);
+    PathGenerator::SetPathSize(3);
 
-    PathGenerator::GeneratePath(points, 1, 10, 111000, false);
+    PathGenerator::GeneratePath(1, 10, 1, true, "AutonPath");
 
     // ofstream Bob("Bob.txt");
     // std::cout << Bob.is_open();
