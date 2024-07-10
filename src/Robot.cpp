@@ -51,11 +51,12 @@ void Robot::Run(int rate, bool& running) {
         _driveBase.Update(dt);
         _imu.Update(dt);
         _localization.Update(dt, _driveBase.GetVelocities());
+        // _gps.Update(dt);
 
         // Report state
         cmds.ReportState();
         _driveBase.ReportState();
-        _imu.ReportState();
+        // _imu.ReportState();
         StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling 

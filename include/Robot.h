@@ -5,6 +5,8 @@
 #include <cstdio>
 
 #include "rapidjson/document.h"
+#include "subsystems/DriveBase.h"
+#include "subsystems/GPS.h"
 
 #include "controllers/TeleopController.h"
 #include "controllers/PathingController.h"
@@ -18,6 +20,7 @@
 #else
 #include "subsystems/IMUBase.h"
 #endif
+#include "subsystems/GPS.h"
 
 // The main robot class is resonsible for:
 // - timing update loops
@@ -56,5 +59,8 @@ private:
 #else
     SimIMU _imu;
 #endif
+    GPS _gps;
 
+    std::string _active_controller_name, _last_controller_name;
+    ControllerBase* _active_controller;
 };
