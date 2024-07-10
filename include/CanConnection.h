@@ -26,9 +26,8 @@
 
 #include "Utils.h"
 
-    CanFrame(uint32_t arb_id, uint8_t* data, size_t len) : arb_id(arb_id), data(data), len(len) {};
-    // CanFrame(struct can_frame frame) : arb_id(frame.can_id), data(frame.data), len(frame.len) {};
-};
+typedef struct can_frame CanFrame;
+CanFrame NewCanFrame(uint32_t can_id, uint8_t* data, size_t len);
 
 class CanConnection {
 public:
