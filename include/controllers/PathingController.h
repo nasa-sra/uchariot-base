@@ -20,12 +20,14 @@ public:
     void Unload() override;
     ControlCmds Run(Pose robotPose);
 
+    void ReportState(std::string prefix = "/");
     void HandleNetworkInput(rapidjson::Document& doc);
 
 private:
 
     bool loadPath(std::string filePath);
-    Utils::GeoPoint parseCoordinates(std::string coords, bool altitude, bool flipped=false);
+    Eigen::Vector3d parseCoordinates(std::string coords);
+    Utils::GeoPoint parseGeoCoordinates(std::string coords, bool altitude, bool flipped=false);
     Eigen::Vector3d geoToPathCoord(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin);
 
     std::string _pathName{""};
@@ -34,7 +36,10 @@ private:
     std::vector<PathStep> _path;
     int _currentStep{0};
 
-    double _headingGain{0.01};
+    double _velocityGain{5.0};
+    double _headingGain{1.0};
     float _endTolerance{0.1};
+
+    Eigen::Vector2d _nextWaypoint{0.0, 0.0};
 
 };

@@ -25,6 +25,9 @@ ControlCmds TeleopController::Run() {
         left = right + (_turn * (right - min * right));
     }
  
-    cmds.drive = DriveBaseCmds(left, right);
+    cmds.drive._lb_speed = left;
+    cmds.drive._lf_speed = left;
+    cmds.drive._rb_speed = right;
+    cmds.drive._rf_speed = right;
     return cmds;
 }
