@@ -12,8 +12,10 @@
 #include "controllers/TeleopController.h"
 #include "StateReporter.h"
 
-#ifndef SIMULATION
 #include "subsystems/BNO055.h"
+#ifndef SIMULATION
+
+#include "subsystems/LSM6DSOX.h"
 #else
 #include "subsystems/IMUBase.h"
 #endif
@@ -53,12 +55,18 @@ private:
     
     DriveBase _driveBase;
 
-#ifndef SIMULATION
+// #ifndef SIMULATION
     BNO055 _imu;
+<<<<<<< HEAD
 #else
     SimIMU _imu;
 #endif
     GPS _gps;
+=======
+// #else
+//     SimIMU _imu;
+// #endif
+>>>>>>> 52640bcc6517ec5c3bf88438f58ad7fe5814741f
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;

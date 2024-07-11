@@ -20,9 +20,8 @@
 #include <linux/can/raw.h>
 
 #define len can_dlc
-// #else
-// #warning "CAN OT CONNECTED"
-// #endif
+
+#include "Utils.h"
 
 #include "Utils.h"
 

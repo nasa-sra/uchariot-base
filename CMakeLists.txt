@@ -7,7 +7,17 @@ set(CMAKE_CXX_FLAGS "-O2 -pthread")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_CXX_STANDARD 17)
 
-add_compile_definitions(LINUX=true)
+# if(NOT ${CMAKE_CROSSCOMPILING})
+#     add_compile_definitions(SIMULATION=true)
+#     message("Compiling for simulation")
+# endif()
+
+add_compile_definitions(SIMULATION=false)
+
+
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    add_compile_definitions(LINUX=true)
+endif()
 
 set(SRCS
     src/main.cpp
@@ -19,18 +29,7 @@ set(SRCS
     src/StateReporter.cpp
     src/controllers/TeleopController.cpp
     src/subsystems/DriveBase.cpp
-    src/subsystems/GPS.cpp
-    src/Serial.cpp
-    src/nmea/context.c
-    src/nmea/generate.c
-    src/nmea/generator.c
-    src/nmea/gmath.c
-    src/nmea/info.c
-    src/nmea/parse.c
-    src/nmea/parser.c
-    src/nmea/sentence.c
-    src/nmea/time.c
-    src/nmea/tok.c
+    src/subsystems/BNO055.cpp
 )
 
 set(LIBS)
@@ -38,9 +37,11 @@ set(LIBS)
 find_package(Eigen3 CONFIG REQUIRED)
 
 list(APPEND LIBS Eigen3::Eigen)
+list(APPEND LIBS i2c)
 
-list(APPEND SRCS src/subsystems/LSM6DSOX.cpp)
-list(APPEND SRCS src/subsystems/BNO055.cpp)
+if (${CMAKE_CROSSCOMPILING})
+    list(APPEND SRCS src/subsystems/LSM6DSOX.cpp)
+    # list(APPEND SRCS src/subsystems/BNO055.cpp)
 
 find_library(WIRING_PI_LIB libwiringPi.so )
 find_library(WIRING_PI_DEV_LIB libwiringPiDev.so )
