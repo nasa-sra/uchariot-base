@@ -55,12 +55,12 @@ void Robot::Run(int rate, bool& running) {
 
         // Update subsystems
         _driveBase.Update(dt);
-        _imu.Update(dt);
+        // _imu.Update(dt);
 
         // Report state
         cmds.ReportState();
         _driveBase.ReportState();
-        _imu.ReportState();
+        // _imu.ReportState();
         StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling 
