@@ -61,7 +61,7 @@ void Robot::Run(int rate, bool& running) {
         // Report state
         cmds.ReportState();
         _driveBase.ReportState();
-        // _imu.ReportState();
+        _imu.ReportState();
         StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling 
