@@ -30,4 +30,5 @@ void Localization::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "x", _pose.pos.x());
     StateReporter::GetInstance().UpdateKey(prefix + "y", _pose.pos.y());
     StateReporter::GetInstance().UpdateKey(prefix + "heading", _pose.heading);
+    StateReporter::GetInstance().UpdateKey(prefix + "slipCoefficient", _slipCoefficient);
 }
