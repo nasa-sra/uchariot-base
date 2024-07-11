@@ -7,7 +7,7 @@ Then just ssh onto the pi and run the executable in ~/uchariot-base/build/ with 
 
 ## Libraries
 
-| Name | Desc | Install |
+| Name | Description | Install |
 | --- | --- | --- |
 | libeigen3 | linear algebra | sudo apt install libeigen3-dev | 
 | libi2c | i2c interface | sudo apt install libi2c-dev |

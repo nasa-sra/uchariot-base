@@ -13,12 +13,6 @@
 #include "StateReporter.h"
 
 #include "subsystems/BNO055.h"
-#ifndef SIMULATION
-
-#include "subsystems/LSM6DSOX.h"
-#else
-#include "subsystems/IMUBase.h"
-#endif
 #include "subsystems/GPS.h"
 
 // This structure is just a container for all the various
