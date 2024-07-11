@@ -52,7 +52,7 @@ void PathingController::ReportState(std::string prefix) {
 
 void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
     _pathName = doc["name"].GetString();
-	_pathResolution = doc["resolution"].GetInt(); 
+	_pathResolution = doc["res"].GetInt(); 
 }
 
 bool PathingController::loadPath(std::string filePath) {

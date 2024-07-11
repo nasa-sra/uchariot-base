@@ -42,6 +42,11 @@ template<typename K, typename V> V MapGetOrDefault(const std::map<K, V> map, con
     return it == map.end() ? default_val : it->second;
 }
 
+// A function to clamp a given value between an upper and lower bound
+template <typename T> T Clamp(T val, T upperBound, T lowerBound) {
+    return std::min(std::max(val, lowerBound), upperBound);
+}
+
 // A constant expression function that converts std::string
 // types to char* C strings in variatic argument lists. The
 // function works by evaulating if a given type is of the
