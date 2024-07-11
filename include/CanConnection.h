@@ -19,6 +19,8 @@
 #include <linux/can/raw.h>
 #endif
 
+#define len can_dlc
+
 #include "Utils.h"
 
 struct CanFrame {
