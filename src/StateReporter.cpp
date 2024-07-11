@@ -128,7 +128,7 @@ void StateReporter::sendState() {
     rapidjson::Document::AllocatorType& allocator = _doc.GetAllocator();
     buildDoc(_doc, _treeRoot, allocator); // Build JSON document from data tree
 
-    // Set JSON document value pointers in data tree
+    // Set JSON document value pointers in data tree.
     for (auto i = _state.begin(); i != _state.end(); i++) {
         i->second->json = &climbDoc(_doc.FindMember("robot")->value, i->first.substr(1))->value;
     }
