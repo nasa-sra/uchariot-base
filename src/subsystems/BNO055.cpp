@@ -38,8 +38,8 @@ BNO055::BNO055() : IMUBase() {
 void BNO055::Update(double dt) {
     int16_t x, y, z;
     x = readDataRegister(EUL_X_LOW_REG);
-    y = readDataRegister(EUL_Y_LOW_REG);;
-    z = readDataRegister(EUL_Z_LOW_REG);;
+    y = readDataRegister(EUL_Y_LOW_REG);
+    z = readDataRegister(EUL_Z_LOW_REG);
 
     _gyroAngles.x() = ((float)x) / 16.0;
     _gyroAngles.y() = ((float)y) / 16.0;
@@ -52,33 +52,14 @@ int BNO055::readRegister(uint8_t register_add) {
     res = i2c_smbus_read_word_data(_imuFd, register_add);
     if (res < 0) {
         Utils::ErrFmt("Read from I2C address %d failed", BNO055_ADDR);
-        return -1; // Do I need this?
+        return -1;
     } else {
         return res;
     }
 }
 
-int BNO055::readDataRegister(uint8_t register_add) {
-    int32_t res;
-    int32_t res2;
-
-    res = i2c_smbus_read_word_data(_imuFd, register_add);
-    if (res < 0) {
-        Utils::ErrFmt("Read from I2C address %d failed", BNO055_ADDR);
-        return -1; // Do I need this?
-    } else {
-        return res;
-    }
-
-    res2 = i2c_smbus_read_word_data(_imuFd, register_add + 0x01);
-    if (res < 0) {
-        Utils::ErrFmt("Read from I2C address %d failed", BNO055_ADDR);
-        return -1; // Do I need this?
-    } else {
-        return res;
-    }
-
-    return res2 << 8 | res;
+int BNO055::readDataRegister(uint8_t lsb_register_add) {
+    return readRegister(lsb_register_add + 0x01) << 8 | readRegister(lsb_register_add);
 }
 
 int BNO055::writeRegister(uint8_t register_addr, uint8_t value) {

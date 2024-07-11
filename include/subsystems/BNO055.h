@@ -25,7 +25,7 @@ class BNO055 : public IMUBase {
 
     void Update(double dt) override;
     int readRegister(uint8_t register_add);
-    int readDataRegister(uint8_t register_add);
+    int readDataRegister(uint8_t lsb_register_add);
     int writeRegister(uint8_t register_addr, uint8_t value);
 
   private:

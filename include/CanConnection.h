@@ -23,8 +23,6 @@
 
 #include "Utils.h"
 
-#include "Utils.h"
-
 typedef struct can_frame CanFrame;
 CanFrame NewCanFrame(uint32_t can_id, uint8_t* data, size_t len);
 
