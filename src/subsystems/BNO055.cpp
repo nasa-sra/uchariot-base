@@ -36,32 +36,14 @@ BNO055::BNO055() : IMUBase() {
 }
 
 void BNO055::Update(double dt) {
-
     int16_t x, y, z;
-    x = readRegister(0x1F) << 8 | readRegister(EUL_X_LOW_REG);
-    y = readRegister(0x1D) << 8 | readRegister(EUL_Y_LOW_REG);;
-    z = readRegister(0x1B) << 8 | readRegister(EUL_Z_LOW_REG);;
+    x = readDataRegister(EUL_X_LOW_REG);
+    y = readDataRegister(EUL_Y_LOW_REG);;
+    z = readDataRegister(EUL_Z_LOW_REG);;
 
     _gyroAngles.x() = ((float)x) / 16.0;
     _gyroAngles.y() = ((float)y) / 16.0;
     _gyroAngles.z() = ((float)z) / 16.0;
-
-    uint8_t status = readRegister(STATUS_REG);
-    uint8_t calib_status = readRegister(CALIB_STATUS_REG);
-
-    Utils::LogFmt("Yaw: %f, Roll: %f, Pitch %f - STAT %d, CSTAT %d", _gyroAngles.z(), _gyroAngles.y(), _gyroAngles.x(), status, calib_status);
-
-    
-    // Utils::LogFmt("Connected to BNO055 IMU Status %i, Calibration %i", status, (calib_status & 0b11000000) >> 6);
-
-    // static int count = 0;
-    // count++;
-    // if (count % 10 == 0) {
-    //     uint8_t status = wiringPiI2CReadReg8(_imuFd, STATUS_REG);
-    //     uint8_t calib_status = wiringPiI2CReadReg8(_imuFd, CALIB_STATUS_REG);
-    //     Utils::LogFmt("Connected to BNO055 IMU Status %i, Calibration %i", status, (calib_status & 0b11000000) >> 6);
-    //     Utils::LogFmt("Roll: %f Pitch: %f Yaw: %f", _gyroAngles.x(), _gyroAngles.y(), _gyroAngles.z());
-    // }
 }
 
 int BNO055::readRegister(uint8_t register_add) {
@@ -78,7 +60,6 @@ int BNO055::readRegister(uint8_t register_add) {
 
 int BNO055::readDataRegister(uint8_t register_add) {
     int32_t res;
-
     int32_t res2;
 
     res = i2c_smbus_read_word_data(_imuFd, register_add);
@@ -101,11 +82,11 @@ int BNO055::readDataRegister(uint8_t register_add) {
 }
 
 int BNO055::writeRegister(uint8_t register_addr, uint8_t value) {
-    int toReturn = i2c_smbus_write_word_data(_imuFd, register_addr, value);
-    if (toReturn < 0) {
+    int res = i2c_smbus_write_word_data(_imuFd, register_addr, value);
+    if (res < 0) {
         Utils::ErrFmt("Write to I2C address %d failed", BNO055_ADDR);
         return -1;
     }
 
-    return toReturn;
+    return res;
 }

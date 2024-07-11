@@ -29,7 +29,7 @@ class BNO055 : public IMUBase {
     int writeRegister(uint8_t register_addr, uint8_t value);
 
   private:
-
+    
     int _imuFd;
     int _adapter_nr {1};
 };
