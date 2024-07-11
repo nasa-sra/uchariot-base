@@ -7,13 +7,10 @@ set(CMAKE_CXX_FLAGS "-O2 -pthread")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_CXX_STANDARD 17)
 
-# if(NOT ${CMAKE_CROSSCOMPILING})
-#     add_compile_definitions(SIMULATION=true)
-#     message("Compiling for simulation")
-# endif()
-
-add_compile_definitions(SIMULATION=false)
-
+if(NOT ${CMAKE_CROSSCOMPILING})
+    add_compile_definitions(SIMULATION=true)
+    message("Compiling for simulation")
+endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     add_compile_definitions(LINUX=true)

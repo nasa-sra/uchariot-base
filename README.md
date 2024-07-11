@@ -59,6 +59,6 @@ The only difference is the inclusion of `-DCMAKE_TOOLCHAIN_FILE=../piToolchain.c
 
 ### Deploy
 
-Now you schould have produced a binary called ` uChariotBase`. Deploy this using `../deploy.sh`.
+Now you schould have produced a binary called `uChariotBase`. Deploy this using `../deploy.sh`.
 
 ### Simulation

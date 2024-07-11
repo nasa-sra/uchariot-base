@@ -12,7 +12,11 @@
 #include "controllers/TeleopController.h"
 #include "StateReporter.h"
 
+#ifndef SIMULATION
 #include "subsystems/BNO055.h"
+#else
+#include "subsystems/IMUBase.h"
+#endif
 #include "subsystems/GPS.h"
 
 // This structure is just a container for all the various
@@ -49,11 +53,11 @@ private:
     
     DriveBase _driveBase;
 
-// #ifndef SIMULATION
+#ifndef SIMULATION
     BNO055 _imu;
-// #else
-//     SimIMU _imu;
-// #endif
+#else
+    SimIMU _imu;
+#endif
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;
