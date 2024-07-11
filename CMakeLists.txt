@@ -39,15 +39,6 @@ find_package(Eigen3 CONFIG REQUIRED)
 list(APPEND LIBS Eigen3::Eigen)
 list(APPEND LIBS i2c)
 
-if (${CMAKE_CROSSCOMPILING})
-    list(APPEND SRCS src/subsystems/LSM6DSOX.cpp)
-    # list(APPEND SRCS src/subsystems/BNO055.cpp)
-
-find_library(WIRING_PI_LIB libwiringPi.so )
-find_library(WIRING_PI_DEV_LIB libwiringPiDev.so )
-find_library(CRYPT_LIB libcrypt.so.1.1.0)
-list(APPEND LIBS ${WIRING_PI_LIB} ${WIRING_PI_DEV_LIB} ${CRYPT_LIB})
-
 
 add_executable(uChariotBase ${SRCS})
 target_link_libraries( uChariotBase ${LIBS})

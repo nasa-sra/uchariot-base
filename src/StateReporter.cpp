@@ -65,7 +65,7 @@ void StateReporter::addKey(std::string key, double val) {
         }
     }
     TreeNode* node = new TreeNode(valueName, val);
-    branch->branchs.push_back(node);
+    branch->branches.push_back(node);
     _state[key] = node;
 }
 
@@ -75,10 +75,10 @@ StateReporter::TreeNode* StateReporter::climbTree(TreeNode* current, std::string
         return current;
     }
     std::string nextBranch = key.substr(0, delim);
-    auto it = std::find_if(current->branchs.begin(), current->branchs.end(), [&nextBranch](TreeNode* n){return n->name == nextBranch;});
-    if (it == current->branchs.end()) {
-        current->branchs.push_back(new TreeNode(nextBranch));
-        it = current->branchs.end() - 1;
+    auto it = std::find_if(current->branches.begin(), current->branches.end(), [&nextBranch](TreeNode* n){return n->name == nextBranch;});
+    if (it == current->branches.end()) {
+        current->branches.push_back(new TreeNode(nextBranch));
+        it = current->branches.end() - 1;
     }
     return climbTree(*it, key.substr(delim + 1));
 }
@@ -101,7 +101,7 @@ void StateReporter::buildDoc(rapidjson::Value& doc, TreeNode* current, rapidjson
         return;
     }
     rapidjson::Value docBranch(rapidjson::kObjectType);
-    for (TreeNode* treeBranch : current->branchs) {
+    for (TreeNode* treeBranch : current->branches) {
         buildDoc(docBranch, treeBranch, allocator);
     }
     doc.AddMember(name, docBranch, allocator);

@@ -57,16 +57,9 @@ private:
 
 // #ifndef SIMULATION
     BNO055 _imu;
-<<<<<<< HEAD
-#else
-    SimIMU _imu;
-#endif
-    GPS _gps;
-=======
 // #else
 //     SimIMU _imu;
 // #endif
->>>>>>> 52640bcc6517ec5c3bf88438f58ad7fe5814741f
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;
