@@ -35,10 +35,8 @@ set(SRCS
 set(LIBS)
 
 find_package(Eigen3 CONFIG REQUIRED)
-
-list(APPEND LIBS Eigen3::Eigen)
-list(APPEND LIBS i2c)
-
+find_library(I2C_LIB libi2c.so)
+list(APPEND LIBS Eigen3::Eigen ${I2C_LIB})
 
 add_executable(uChariotBase ${SRCS})
 target_link_libraries( uChariotBase ${LIBS})
