@@ -1,6 +1,7 @@
 
 #include "tinyxml2.h"
 #include <Eigen/Geometry>
+#include "pathgen/PathGenerator.h"
 
 #include "controllers/PathingController.h"
 
@@ -51,16 +52,28 @@ void PathingController::ReportState(std::string prefix) {
 
 void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
     _pathName = doc["name"].GetString();
+	_pathResolution = doc["resolution"].GetInt(); 
 }
 
 bool PathingController::loadPath(std::string filePath) {
 
     _path.clear();
 
+	tinyxml2::XMLDocument doc;
+
+	Utils::LogFmt("Generating Auton...");
+	PathGenerator::SetPathSize(_pathResolution);
+	int res = PathGenerator::GeneratePath(2.0, 3.5, 1, true, filePath);
+
+	if (res < 0) {
+		Utils::LogFmt("Unable to locate correctly formatted .kml file.");
+		return -1;
+	}
+
     Utils::LogFmt("Loading Auton... ");
 
-    tinyxml2::XMLDocument doc;
-	int res = doc.LoadFile(filePath.c_str());
+    
+	res = doc.LoadFile(("paths/" + filePath + ".xml").c_str());
 	if (res != tinyxml2::XML_SUCCESS) {
 		Utils::LogFmt("PathingContoller::loadPath - Could not load file %s, Err Code: %i", filePath, res);
 		return false;

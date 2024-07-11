@@ -33,6 +33,8 @@ private:
     std::string _pathName{""};
     bool _runningPath{false};
 
+    int _pathResolution{1};
+
     std::vector<PathStep> _path;
     int _currentStep{0};
 

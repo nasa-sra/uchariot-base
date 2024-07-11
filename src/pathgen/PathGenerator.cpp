@@ -17,7 +17,7 @@ vector<Vector> PathGenerator::_ScaleVector(vector<Vector> points, double scale_f
     return points;
 }
 
-void PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_factor, bool scaled,
+int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_factor, bool scaled,
                                  std::string filename) {
     vector<GenPoint> n_points;
 
@@ -28,7 +28,7 @@ void PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_
 
     if (res != tinyxml2::XML_SUCCESS) {
         Utils::LogFmt("PathingContoller::loadPath - Could not load file %s, Err Code: %i", filename, res);
-        return;
+        return -1;
     }
 
     XMLElement* path = doc.FirstChildElement("kml")
@@ -40,7 +40,7 @@ void PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_
 
     if (path == nullptr) {
         Utils::LogFmt("PathingContoller::loadPath - Could not load data, Err Code: %i", res);
-        return;
+        return -2;
     }
 
     std::string pText = std::string(path->GetText());
@@ -145,7 +145,7 @@ void PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_
     FILE *fp = fopen(("paths/" + filename + ".xml").c_str(), "w");
     if (fp == NULL) {
         Utils::LogFmt("Write Failed");
-        return;
+        return -3;
     }
     XMLPrinter printer(fp);
 
