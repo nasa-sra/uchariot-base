@@ -7,9 +7,6 @@ set(CMAKE_CXX_FLAGS "-O2 -pthread -Werror=return-type")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_CXX_STANDARD 17)
 
-add_compile_definitions(LINUX=true)
-add_compile_definitions(PATH_TEST=true)
-
 set(SRCS
     src/main.cpp
     src/CanConnection.cpp
@@ -20,25 +17,12 @@ set(SRCS
     src/StateReporter.cpp
     src/controllers/TeleopController.cpp
     src/controllers/PathingController.cpp
-    src/controllers/PIDController.cpp
     src/subsystems/DriveBase.cpp
     src/subsystems/Localization.cpp
     src/tinyxml2.cpp
-    src/subsystems/GPS.cpp
-    src/Serial.cpp
     src/pathgen/Bezier.cpp
     src/pathgen/Curve.cpp
     src/pathgen/PathGenerator.cpp
-    src/nmea/context.c
-    src/nmea/generate.c
-    src/nmea/generator.c
-    src/nmea/gmath.c
-    src/nmea/info.c
-    src/nmea/parse.c
-    src/nmea/parser.c
-    src/nmea/sentence.c
-    src/nmea/time.c
-    src/nmea/tok.c
 )
 
 set(LIBS)

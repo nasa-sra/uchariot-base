@@ -51,3 +51,7 @@ Eigen::Vector3d Utils::geoToEarthCoord(GeoPoint point) {
 	double distance = point.alt + EARTHS_RADIUS;
 	return Eigen::Vector3d(cos(point.lon) * distance * cos(point.lat), sin(point.lon) * distance * cos(point.lat), distance * sin(point.lat));
 }
+
+double Utils::PIDController::Calculate(double current, double target) {
+    return _p * (target - current);
+}
