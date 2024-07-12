@@ -65,6 +65,7 @@ private:
     int _disconnectTimer{0};
 
     bool _connected{false};
+    int _warningCounter{0};
     Mode _mode {DUTY_CYCLE};
     double _cmdDutyCycle{0.0};
     double _cmdVelocity{0.0};
