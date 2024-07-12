@@ -20,13 +20,13 @@ using std::ios;
 #if PATH_TEST
 
 int main() {
-    std::vector<Vector> points {
-        Vector(29.560013, -95.084279, 0),
-        Vector(29.560461, -95.084150,0),
-        Vector(29.561629, -95.083475,0),
-        Vector(29.562560, -95.082183,0),
-        Vector(29.562488, -95.080737,0),
-        Vector(29.562757, -95.080201, 0)
+    std::vector<Eigen::Vector3d> points {
+        Eigen::Vector3d(29.560013, -95.084279, 0),
+        Eigen::Vector3d(29.560461, -95.084150,0),
+        Eigen::Vector3d(29.561629, -95.083475,0),
+        Eigen::Vector3d(29.562560, -95.082183,0),
+        Eigen::Vector3d(29.562488, -95.080737,0),
+        Eigen::Vector3d(29.562757, -95.080201, 0)
     };
 
     PathGenerator::SetPathSize(3);
