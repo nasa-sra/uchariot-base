@@ -164,7 +164,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
     printer.PushAttribute("velocitykp", "0.5");
     printer.PushAttribute("headingkp", "1.0");
 
-    printer.OpenElement("geoCoordinates");
+    printer.OpenElement("coordinates");
     printer.PushText(pathFinalString.c_str());
     printer.CloseElement();
     printer.CloseElement();
