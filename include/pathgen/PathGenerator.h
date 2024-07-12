@@ -58,6 +58,4 @@ public:
 private:
     static uint16_t _pathgenSize;
     static std::vector<Point> _pathPointsRaw;
-
-    static std::vector<Eigen::Vector3d> _ScaleVector(std::vector<Eigen::Vector3d> points, double scale_factor);
 };

@@ -12,8 +12,8 @@ void PathGenerator::SetPathSize(uint16_t size) {
     PathGenerator::_pathgenSize = size;
 }
 
-vector<Utils::GeoPoint> PathGenerator::GetRawPoints() {
-    vector<Utils::GeoPoint> bob;
+std::vector<Utils::GeoPoint> PathGenerator::GetRawPoints() {
+    std::vector<Utils::GeoPoint> bob;
 
     for (int i = 0; i < _pathPointsRaw.size(); i++) {
         bob.push_back(Utils::GeoPoint(_pathPointsRaw[i].x, _pathPointsRaw[i].y));
@@ -21,16 +21,9 @@ vector<Utils::GeoPoint> PathGenerator::GetRawPoints() {
 
     return bob;
 }
-vector<Vector> PathGenerator::_ScaleVector(vector<Vector> points, double scale_factor) {
-    for (int i = 0; i < points.size(); ++i) { points[i] = (points[i] - points[i].TruncateDouble()) * scale_factor; }
-
-    return points;
-}
 
 int PathGenerator::GeneratePath(std::string filename, double speed_ms, double radius_m) {
-    vector<GenPoint> n_points;
-
-    // points = PathGenerator::_ScaleVector(points, scale_factor);
+    std::vector<GenPoint> n_points;
 
     XMLDocument doc;
     int res = doc.LoadFile(("paths/" + filename + ".kml").c_str());
