@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 3.18)
 project(UChariot-Base)
 
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "-O2 -pthread")
+set(CMAKE_CXX_FLAGS "-O2 -pthread -Werror=return-type")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_CXX_STANDARD 17)
 
 add_compile_definitions(LINUX=true)
 
-add_compile_definitions(PATH_TEST=true)
+add_compile_definitions(PATH_TEST=false)
 
 set(SRCS
     src/main.cpp

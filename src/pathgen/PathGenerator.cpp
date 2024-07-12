@@ -17,8 +17,7 @@ vector<Vector> PathGenerator::_ScaleVector(vector<Vector> points, double scale_f
     return points;
 }
 
-int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_factor, bool scaled,
-                                 std::string filename) {
+int PathGenerator::GeneratePath(std::string filename, double speed_ms, double radius_m) {
     vector<GenPoint> n_points;
 
     // points = PathGenerator::_ScaleVector(points, scale_factor);
@@ -58,8 +57,8 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_f
         points.push_back(Vector(std::stod(lat), std::stod(long_g)));
     }
 
-    double speed_lat = scaled ? (speed_ms * 2.23693629) / 60 * scale_factor : speed_ms;
-    double radius_lat = scaled ? (radius_m / 1609.344) / 60 * scale_factor : radius_m;
+    double speed_lat = (speed_ms * 2.23693629) / 60;
+    double radius_lat = (radius_m / 1609.344) / 60;
 
     ofstream ptFile;
     ptFile.open("Points.txt");
@@ -123,12 +122,14 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_f
 
     pathFile << "x, y" << std::endl;
 
-    std::string pathFinalString;
+    std::string pathFinalString = "";
 
-    for (int i = 0; i < curve->node_count(); ++i) {
+    for (int i = 0; i < curve->node_count(); i++) {
         Point tempPoint = Point(Vector(0, 0, 0), 0, 0);
 
-        if (i == curve->node_count() - 1) {
+        // print << i << " " << curve->node_count() << std::endl;
+
+        if (i == (curve->node_count() - 1)) {
             tempPoint = Point(finPoints[finPoints.size() - 1], curve->total_length(), speed_lat);
             pathFinalString.append(tempPoint.ToPointString());
         } else {
@@ -142,12 +143,18 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_f
         // std::cout << "node #" << i << ": " << tempPoint.toString() << std::endl;
     }
 
+    delete curve;
+
     FILE *fp = fopen(("paths/" + filename + ".xml").c_str(), "w");
     if (fp == NULL) {
         Utils::LogFmt("Write Failed");
         return -3;
     }
+
     XMLPrinter printer(fp);
+
+    printer.PushHeader(true, true);
+    // printer.PushAttribute("encoding", "utf-8");
 
     printer.OpenElement("path");
     printer.PushAttribute("name", filename.c_str());
@@ -168,5 +175,5 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_f
 
     pathFile.close();
 
-    delete curve;
+    return 0;
 }

@@ -57,7 +57,7 @@ struct Point {
 
 class PathGenerator {
 public:
-    static int GeneratePath(double speed_ms, double radius_m, double scale_factor, bool scaled, std::string filename);
+    static int GeneratePath(std::string filename, double speed_ms, double radius_m);
     static void SetPathSize(uint16_t size);
 
 private:
