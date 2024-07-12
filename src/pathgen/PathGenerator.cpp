@@ -5,23 +5,14 @@
 using namespace tinyxml2;
 
 uint16_t PathGenerator::_pathgenSize = 50;
-vector<Point> PathGenerator::_pathPointsRaw = {};
+std::vector<Point> PathGenerator::_pathPointsRaw = {};
 
 void PathGenerator::SetPathSize(uint16_t size) {
     PathGenerator::_pathgenSize = size;
 }
 
-vector<Vector> PathGenerator::_ScaleVector(vector<Vector> points, double scale_factor) {
-    for (int i = 0; i < points.size(); ++i) { points[i] = (points[i] - points[i].TruncateDouble()) * scale_factor; }
-
-    return points;
-}
-
-int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_factor, bool scaled,
-                                 std::string filename) {
-    vector<GenPoint> n_points;
-
-    // points = PathGenerator::_ScaleVector(points, scale_factor);
+int PathGenerator::GeneratePath(double speed_ms, double radius_m, std::string filename) {
+    std::vector<GenPoint> n_points;
 
     XMLDocument doc;
     int res = doc.LoadFile(("paths/" + filename + ".kml").c_str());
@@ -47,7 +38,7 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_f
     std::stringstream pStream(pText);
     std::string coord;
 
-    vector<Vector> points;
+    std::vector<Eigen::Vector3d> points;
 
     while (pStream >> coord) {
         std::stringstream ss(coord);
@@ -55,27 +46,28 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_f
         std::getline(ss, lat, ',');
         std::getline(ss, long_g, ',');
 
-        points.push_back(Vector(std::stod(lat), std::stod(long_g)));
+        Eigen::Vector3d point(std::stod(lat), std::stod(long_g), 0);
+        points.push_back(point);
     }
 
-    double speed_lat = scaled ? (speed_ms * 2.23693629) / 60 * scale_factor : speed_ms;
-    double radius_lat = scaled ? (radius_m / 1609.344) / 60 * scale_factor : radius_m;
+    double speed_lat = (speed_ms * 2.23693629) / 60;
+    double radius_lat = (radius_m / 1609.344) / 60;
 
-    ofstream ptFile;
+    std::ofstream ptFile;
     ptFile.open("Points.txt");
 
-    print << ptFile.is_open() << " OPENSTATUS\n";
+    std::cout << ptFile.is_open() << " OPENSTATUS\n";
     ptFile << "x, y" << std::endl;
 
     for (int i = 0; i < points.size(); ++i) {
-        ptFile << points[i].x << ", " << points[i].y << std::endl;
+        ptFile << points[i].x() << ", " << points[i].y() << std::endl;
         if (i == 0 || i == (points.size()) - 1) {
             n_points.push_back(GenPoint(points[i], false));
             continue;
         }
 
-        Vector prevVector = points[i] - (points[i] - points[i - 1]).normalize() * radius_m;
-        Vector postVector = points[i] + (points[i + 1] - points[i]).normalize() * radius_m;
+        Eigen::Vector3d prevVector = points[i] - (points[i] - points[i - 1]).normalized() * radius_m;
+        Eigen::Vector3d postVector = points[i] + (points[i + 1] - points[i]).normalized() * radius_m;
 
         n_points.push_back(GenPoint(prevVector, false));
         n_points.push_back(GenPoint(points[i], true));
@@ -84,49 +76,44 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_f
 
     ptFile.close();
 
-    vector<Vector> finPoints;
+    std::vector<Eigen::Vector3d> finPoints;
 
-    for (int i = 0; i < n_points.size(); ++i) { print << n_points[i].toString() << std::endl; }
+    for (int i = 0; i < n_points.size(); ++i) { 
+        std::cout << n_points[i].toString() << std::endl; 
+    }
 
     for (int i = 0; i < n_points.size() - 1; ++i) {
-        // std::cout << n_points[i].toString() << std::endl;
         if (n_points[i + 1].control || n_points[i].control || i == (n_points.size() - 1)) {
             finPoints.push_back(n_points[i].toVector());
             continue;
         }
 
-        Vector halfway = n_points[i].toVector() + (n_points[i + 1].toVector() - n_points[i].toVector()) * 0.5;
+        Eigen::Vector3d halfway = n_points[i].toVector() + (n_points[i + 1].toVector() - n_points[i].toVector()) * 0.5;
         finPoints.push_back(n_points[i].toVector());
         finPoints.push_back(halfway);
-        // finPoints.push_back(n_points[i+1].toVector());
     }
-
-    // for (int i = 0; i < finPoints.size(); i++) {
-    //     std::cout << finPoints[i].toString() << std::endl;
-    // }
 
     Curve* curve = new Bezier();
     curve->set_steps(_pathgenSize);
 
     for (int i = 0; i < finPoints.size(); ++i) {
         curve->add_way_point(finPoints[i]);
-        Utils::PrintLnFmt("%s", finPoints[i].toString());
     }
 
     Utils::PrintLnFmt("Nodes: %i", curve->node_count());
-    print << curve->total_length() << "\n";
+    std::cout << curve->total_length() << "\n";
 
-    ofstream pathFile;
+    std::ofstream pathFile;
     pathFile.open("PathGenerated.txt");
 
-    print << pathFile.is_open() << " OPENSTATUS\n";
+    std::cout << pathFile.is_open() << " OPENSTATUS\n";
 
     pathFile << "x, y" << std::endl;
 
     std::string pathFinalString;
 
     for (int i = 0; i < curve->node_count(); ++i) {
-        Point tempPoint = Point(Vector(0, 0, 0), 0, 0);
+        Point tempPoint = Point(Eigen::Vector3d(0, 0, 0), 0, 0);
 
         if (i == curve->node_count() - 1) {
             tempPoint = Point(finPoints[finPoints.size() - 1], curve->total_length(), speed_lat);
@@ -138,8 +125,6 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_f
         PathGenerator::_pathPointsRaw.push_back(tempPoint);
 
         pathFile << tempPoint.x << ", " << tempPoint.y << ", " << tempPoint.time << std::endl;
-
-        // std::cout << "node #" << i << ": " << tempPoint.toString() << std::endl;
     }
 
     FILE *fp = fopen(("paths/" + filename + ".xml").c_str(), "w");
@@ -163,10 +148,11 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, double scale_f
     printer.CloseElement();
 
     for (int i = 0; i < finPoints.size(); ++i) {
-        pathFile << finPoints[i].x << ", " << finPoints[i].y << std::endl;
+        pathFile << finPoints[i].x() << ", " << finPoints[i].y() << std::endl;
     }
 
     pathFile.close();
 
     delete curve;
+    return 0;
 }

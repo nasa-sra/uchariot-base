@@ -1,7 +1,5 @@
 #include "Utils.h"
-#include "pathgen/BSpline.h"
 #include "pathgen/Bezier.h"
-#include "pathgen/Vector.h"
 
 #include <fstream>
 #include <iostream>
@@ -9,21 +7,16 @@
 #include <cstring>
 #include <math.h>
 
-using std::ofstream;
-using std::vector;
-
-#define print std::cout
-
 struct GenPoint {
     double x;
     double y;
     bool control;
 
-    GenPoint(Vector point, bool isControl) : x(point.x), y(point.y), control(isControl) {};
+    GenPoint(Eigen::Vector3d point, bool isControl) : x(point.x()), y(point.y()), control(isControl) {};
     GenPoint(double x, double y, bool isControl) : x(x), y(y), control(isControl) {};
 
-    Vector toVector() {
-        return Vector(x, y, 0);
+    Eigen::Vector3d toVector() {
+        return Eigen::Vector3d(x, y, 0);
     };
 
     std::string toString() {
@@ -40,7 +33,7 @@ struct Point {
     double time;
 
     Point(double x, double y, double dist, double speed) : x(x), y(y), distFromStart(dist), time(dist / speed) {};
-    Point(Vector vector, double dist, double speed) : x(vector.x), y(vector.y), distFromStart(dist), time(dist / speed) {};
+    Point(Eigen::Vector3d vector, double dist, double speed) : x(vector.x()), y(vector.y()), distFromStart(dist), time(dist / speed) {};
 
     std::string ToString() {
         std::ostringstream oss;
@@ -57,12 +50,12 @@ struct Point {
 
 class PathGenerator {
 public:
-    static int GeneratePath(double speed_ms, double radius_m, double scale_factor, bool scaled, std::string filename);
+    static int GeneratePath(double speed_ms, double radius_m, std::string filename);
     static void SetPathSize(uint16_t size);
 
 private:
     static uint16_t _pathgenSize;
-    static vector<Point> _pathPointsRaw;
+    static std::vector<Point> _pathPointsRaw;
 
-    static vector<Vector> _ScaleVector(vector<Vector> points, double scale_factor);
+    static std::vector<Eigen::Vector3d> _ScaleVector(std::vector<Eigen::Vector3d> points, double scale_factor);
 };

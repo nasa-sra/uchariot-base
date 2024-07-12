@@ -63,7 +63,7 @@ bool PathingController::loadPath(std::string filePath) {
 
 	Utils::LogFmt("Generating Auton...");
 	PathGenerator::SetPathSize(_pathResolution);
-	int res = PathGenerator::GeneratePath(2.0, 3.5, 1, true, filePath);
+	int res = PathGenerator::GeneratePath(2.0, 3.5, filePath);
 
 	if (res < 0) {
 		Utils::LogFmt("Unable to locate correctly formatted .kml file.");
