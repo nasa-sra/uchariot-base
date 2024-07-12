@@ -1,4 +1,6 @@
 
+#include <filesystem>
+
 #include "tinyxml2.h"
 #include <Eigen/Geometry>
 #include "pathgen/PathGenerator.h"
@@ -58,32 +60,30 @@ void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
 }
 
 bool PathingController::loadPath(std::string filePath) {
+	std::filesystem::path p(filePath);
+	if (p.extension() == ".xml") {
+		return loadXMLPath(filePath);
+	} else if (p.extension() == ".kml") {
+		return loadKMLPath(filePath);
+	}
+}
+
+bool PathingController::loadXMLPath(std::string filePath) {
+
+    Utils::LogFmt("Loading XML Auton... ");
 
     _path.clear();
-
 	tinyxml2::XMLDocument doc;
 
-	Utils::LogFmt("Generating Auton...");
-	PathGenerator::SetPathSize(_pathResolution);
-	int res = PathGenerator::GeneratePath(filePath, _pathSpeed, _pathRadius);
-
-	if (res < 0) {
-		Utils::LogFmt("Unable to locate correctly formatted .kml file.");
-		return -1;
-	}
-
-    Utils::LogFmt("Loading Auton... ");
-
-    print << std::filesystem::exists("paths/AutonPath.xml") << std::endl;
-	res = doc.LoadFile(("paths/" + filePath + ".xml").c_str());
+	int res = doc.LoadFile(filePath.c_str());
 	if (res != tinyxml2::XML_SUCCESS) {
-		Utils::LogFmt("PathingContoller::loadPath - Could not load file %s, Err Code: %i", ("paths/" + filePath + ".xml").c_str(), res);
+		Utils::LogFmt("PathingContoller::loadXMLPath - Could not load file %s, Err Code: %i", filePath.c_str(), res);
 		return false;
 	}
 
 	tinyxml2::XMLElement* path = doc.FirstChildElement("path");
 	if (path == nullptr) {
-        Utils::LogFmt("PathingContoller::loadPath - No path element found");
+        Utils::LogFmt("PathingContoller::loadXMLPath - No path element found");
 		return false;
 	}
 
@@ -168,12 +168,32 @@ bool PathingController::loadPath(std::string filePath) {
 
 			}
 		} else {
-            Utils::LogFmt("PathingContoller::loadPath - Could not read line in XML path");
+            Utils::LogFmt("PathingContoller::loadXMLPath - Could not read line in XML path");
 		}
 	}
 	_path.back().tolerance = _endTolerance;
     Utils::LogFmt("Loaded Auton");
     return true;
+}
+
+bool PathingController::loadKMLPath(std::string filePath) {
+
+	if (PathGenerator::GeneratePath(filePath, _pathSpeed, _pathRadius) != 0) return false;
+	std::vector<Utils::GeoPoint> points = PathGenerator::GetRawPoints();
+
+    _path.clear();
+	for (Utils::GeoPoint& point : points) {
+		Utils::GeoPoint origin = _path.size() > 0 ? _path[0].geoPoint : point;
+		Eigen::Vector3d pos = geoToPathCoord(point, origin);
+
+		PathStep step;
+		step.pos = pos;
+		step.speed = _pathSpeed;
+		step.geoPoint = point;
+		step.tolerance = 1.0;
+		_path.push_back(step);
+	}
+	return true;
 }
 
 Eigen::Vector3d PathingController::parseCoordinates(std::string coords) {

@@ -26,6 +26,8 @@ public:
 private:
 
     bool loadPath(std::string filePath);
+    bool loadXMLPath(std::string filePath);
+    bool loadKMLPath(std::string filePath);
     Eigen::Vector3d parseCoordinates(std::string coords);
     Utils::GeoPoint parseGeoCoordinates(std::string coords, bool altitude, bool flipped=false);
     Eigen::Vector3d geoToPathCoord(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin);
