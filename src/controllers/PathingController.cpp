@@ -18,8 +18,11 @@ ControlCmds PathingController::Run(Pose robotPose) {
 
     if (!_runningPath && _pathName != "") {
         _runningPath = loadPath(_pathName);
-		if (!_runningPath)
+		if (!_runningPath) {
 			_pathName = "";
+		 } else {
+			Utils::LogFmt("Running Path ...");
+		 }
     }
 
     if (_runningPath) {
