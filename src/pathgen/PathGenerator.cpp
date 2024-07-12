@@ -1,6 +1,7 @@
 #include "pathgen/PathGenerator.h"
 
 #include "tinyxml2.h"
+#include "PathGenerator.h"
 
 using namespace tinyxml2;
 
@@ -11,8 +12,25 @@ void PathGenerator::SetPathSize(uint16_t size) {
     PathGenerator::_pathgenSize = size;
 }
 
-int PathGenerator::GeneratePath(double speed_ms, double radius_m, std::string filename) {
-    std::vector<GenPoint> n_points;
+vector<Utils::GeoPoint> PathGenerator::GetRawPoints() {
+    vector<Utils::GeoPoint> bob;
+
+    for (int i = 0; i < _pathPointsRaw.size(); i++) {
+        bob.push_back(Utils::GeoPoint(_pathPointsRaw[i].x, _pathPointsRaw[i].y));
+    }
+
+    return bob;
+}
+vector<Vector> PathGenerator::_ScaleVector(vector<Vector> points, double scale_factor) {
+    for (int i = 0; i < points.size(); ++i) { points[i] = (points[i] - points[i].TruncateDouble()) * scale_factor; }
+
+    return points;
+}
+
+int PathGenerator::GeneratePath(std::string filename, double speed_ms, double radius_m) {
+    vector<GenPoint> n_points;
+
+    // points = PathGenerator::_ScaleVector(points, scale_factor);
 
     XMLDocument doc;
     int res = doc.LoadFile(("paths/" + filename + ".kml").c_str());
@@ -110,12 +128,14 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, std::string fi
 
     pathFile << "x, y" << std::endl;
 
-    std::string pathFinalString;
+    std::string pathFinalString = "";
 
-    for (int i = 0; i < curve->node_count(); ++i) {
+    for (int i = 0; i < curve->node_count(); i++) {
         Point tempPoint = Point(Eigen::Vector3d(0, 0, 0), 0, 0);
 
-        if (i == curve->node_count() - 1) {
+        // print << i << " " << curve->node_count() << std::endl;
+
+        if (i == (curve->node_count() - 1)) {
             tempPoint = Point(finPoints[finPoints.size() - 1], curve->total_length(), speed_lat);
             pathFinalString.append(tempPoint.ToPointString());
         } else {
@@ -127,12 +147,18 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, std::string fi
         pathFile << tempPoint.x << ", " << tempPoint.y << ", " << tempPoint.time << std::endl;
     }
 
+    delete curve;
+
     FILE *fp = fopen(("paths/" + filename + ".xml").c_str(), "w");
     if (fp == NULL) {
         Utils::LogFmt("Write Failed");
         return -3;
     }
+
     XMLPrinter printer(fp);
+
+    printer.PushHeader(false, true);
+    // printer.PushAttribute("encoding", "utf-8");
 
     printer.OpenElement("path");
     printer.PushAttribute("name", filename.c_str());
@@ -142,7 +168,7 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, std::string fi
     printer.PushAttribute("velocitykp", "0.5");
     printer.PushAttribute("headingkp", "1.0");
 
-    printer.OpenElement("geoCoordinates");
+    printer.OpenElement("coordinates");
     printer.PushText(pathFinalString.c_str());
     printer.CloseElement();
     printer.CloseElement();
@@ -153,6 +179,5 @@ int PathGenerator::GeneratePath(double speed_ms, double radius_m, std::string fi
 
     pathFile.close();
 
-    delete curve;
     return 0;
 }

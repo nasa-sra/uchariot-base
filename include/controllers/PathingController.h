@@ -34,6 +34,8 @@ private:
     bool _runningPath{false};
 
     int _pathResolution{1};
+    float _pathSpeed{2};
+    float _pathRadius{3};
 
     std::vector<PathStep> _path;
     int _currentStep{0};

@@ -52,7 +52,9 @@ void PathingController::ReportState(std::string prefix) {
 
 void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
     _pathName = doc["name"].GetString();
-	_pathResolution = doc["res"].GetInt(); 
+	_pathResolution = std::stoi(doc["res"].GetString()); 
+	_pathSpeed = std::stof(doc["speed"].GetString());
+	_pathRadius = std::stof(doc["rad"].GetString());
 }
 
 bool PathingController::loadPath(std::string filePath) {
@@ -63,7 +65,7 @@ bool PathingController::loadPath(std::string filePath) {
 
 	Utils::LogFmt("Generating Auton...");
 	PathGenerator::SetPathSize(_pathResolution);
-	int res = PathGenerator::GeneratePath(2.0, 3.5, filePath);
+	int res = PathGenerator::GeneratePath(filePath, _pathSpeed, _pathRadius);
 
 	if (res < 0) {
 		Utils::LogFmt("Unable to locate correctly formatted .kml file.");
@@ -72,10 +74,10 @@ bool PathingController::loadPath(std::string filePath) {
 
     Utils::LogFmt("Loading Auton... ");
 
-    
+    std::cout << std::filesystem::exists("paths/AutonPath.xml") << std::endl;
 	res = doc.LoadFile(("paths/" + filePath + ".xml").c_str());
 	if (res != tinyxml2::XML_SUCCESS) {
-		Utils::LogFmt("PathingContoller::loadPath - Could not load file %s, Err Code: %i", filePath, res);
+		Utils::LogFmt("PathingContoller::loadPath - Could not load file %s, Err Code: %i", ("paths/" + filePath + ".xml").c_str(), res);
 		return false;
 	}
 

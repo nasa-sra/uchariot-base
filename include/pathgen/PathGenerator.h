@@ -50,8 +50,10 @@ struct Point {
 
 class PathGenerator {
 public:
-    static int GeneratePath(double speed_ms, double radius_m, std::string filename);
+    static int GeneratePath(std::string filename, double speed_ms, double radius_m);
     static void SetPathSize(uint16_t size);
+
+    static std::vector<Utils::GeoPoint> GetRawPoints();
 
 private:
     static uint16_t _pathgenSize;

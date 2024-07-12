@@ -131,6 +131,7 @@ struct GeoPoint {
 
 	double lat, lon, alt;
     GeoPoint() : lat(0.0), lon(0.0), alt(EARTHS_RADIUS) {}
+    GeoPoint(double _lat, double _long) : lat(_lat), lon(_long), alt(EARTHS_RADIUS) {}
 
 };
 
