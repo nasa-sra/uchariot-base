@@ -7,7 +7,6 @@
 #include <fstream>
 #include <iostream>
 
-#include "pathgen/Vector.h"
 #include "pathgen/PathGenerator.h"
 #include "CanConnection.h"
 #include "Robot.h"

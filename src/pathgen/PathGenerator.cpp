@@ -1,26 +1,29 @@
 #include "pathgen/PathGenerator.h"
 
 #include "tinyxml2.h"
+#include "PathGenerator.h"
 
 using namespace tinyxml2;
 
 uint16_t PathGenerator::_pathgenSize = 50;
-vector<Point> PathGenerator::_pathPointsRaw = {};
+std::vector<Point> PathGenerator::_pathPointsRaw = {};
 
 void PathGenerator::SetPathSize(uint16_t size) {
     PathGenerator::_pathgenSize = size;
 }
 
-vector<Vector> PathGenerator::_ScaleVector(vector<Vector> points, double scale_factor) {
-    for (int i = 0; i < points.size(); ++i) { points[i] = (points[i] - points[i].TruncateDouble()) * scale_factor; }
+std::vector<Utils::GeoPoint> PathGenerator::GetRawPoints() {
+    std::vector<Utils::GeoPoint> bob;
 
-    return points;
+    for (int i = 0; i < _pathPointsRaw.size(); i++) {
+        bob.push_back(Utils::GeoPoint(_pathPointsRaw[i].x, _pathPointsRaw[i].y));
+    }
+
+    return bob;
 }
 
 int PathGenerator::GeneratePath(std::string filename, double speed_ms, double radius_m) {
-    vector<GenPoint> n_points;
-
-    // points = PathGenerator::_ScaleVector(points, scale_factor);
+    std::vector<GenPoint> n_points;
 
     XMLDocument doc;
     int res = doc.LoadFile(("paths/" + filename + ".kml").c_str());
@@ -46,7 +49,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
     std::stringstream pStream(pText);
     std::string coord;
 
-    vector<Vector> points;
+    std::vector<Eigen::Vector3d> points;
 
     while (pStream >> coord) {
         std::stringstream ss(coord);
@@ -54,27 +57,28 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
         std::getline(ss, lat, ',');
         std::getline(ss, long_g, ',');
 
-        points.push_back(Vector(std::stod(lat), std::stod(long_g)));
+        Eigen::Vector3d point(std::stod(lat), std::stod(long_g), 0);
+        points.push_back(point);
     }
 
     double speed_lat = (speed_ms * 2.23693629) / 60;
     double radius_lat = (radius_m / 1609.344) / 60;
 
-    ofstream ptFile;
+    std::ofstream ptFile;
     ptFile.open("Points.txt");
 
-    print << ptFile.is_open() << " OPENSTATUS\n";
+    std::cout << ptFile.is_open() << " OPENSTATUS\n";
     ptFile << "x, y" << std::endl;
 
     for (int i = 0; i < points.size(); ++i) {
-        ptFile << points[i].x << ", " << points[i].y << std::endl;
+        ptFile << points[i].x() << ", " << points[i].y() << std::endl;
         if (i == 0 || i == (points.size()) - 1) {
             n_points.push_back(GenPoint(points[i], false));
             continue;
         }
 
-        Vector prevVector = points[i] - (points[i] - points[i - 1]).normalize() * radius_m;
-        Vector postVector = points[i] + (points[i + 1] - points[i]).normalize() * radius_m;
+        Eigen::Vector3d prevVector = points[i] - (points[i] - points[i - 1]).normalized() * radius_m;
+        Eigen::Vector3d postVector = points[i] + (points[i + 1] - points[i]).normalized() * radius_m;
 
         n_points.push_back(GenPoint(prevVector, false));
         n_points.push_back(GenPoint(points[i], true));
@@ -83,49 +87,44 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
 
     ptFile.close();
 
-    vector<Vector> finPoints;
+    std::vector<Eigen::Vector3d> finPoints;
 
-    for (int i = 0; i < n_points.size(); ++i) { print << n_points[i].toString() << std::endl; }
+    for (int i = 0; i < n_points.size(); ++i) { 
+        std::cout << n_points[i].toString() << std::endl; 
+    }
 
     for (int i = 0; i < n_points.size() - 1; ++i) {
-        // std::cout << n_points[i].toString() << std::endl;
         if (n_points[i + 1].control || n_points[i].control || i == (n_points.size() - 1)) {
             finPoints.push_back(n_points[i].toVector());
             continue;
         }
 
-        Vector halfway = n_points[i].toVector() + (n_points[i + 1].toVector() - n_points[i].toVector()) * 0.5;
+        Eigen::Vector3d halfway = n_points[i].toVector() + (n_points[i + 1].toVector() - n_points[i].toVector()) * 0.5;
         finPoints.push_back(n_points[i].toVector());
         finPoints.push_back(halfway);
-        // finPoints.push_back(n_points[i+1].toVector());
     }
-
-    // for (int i = 0; i < finPoints.size(); i++) {
-    //     std::cout << finPoints[i].toString() << std::endl;
-    // }
 
     Curve* curve = new Bezier();
     curve->set_steps(_pathgenSize);
 
     for (int i = 0; i < finPoints.size(); ++i) {
         curve->add_way_point(finPoints[i]);
-        Utils::PrintLnFmt("%s", finPoints[i].toString());
     }
 
     Utils::PrintLnFmt("Nodes: %i", curve->node_count());
-    print << curve->total_length() << "\n";
+    std::cout << curve->total_length() << "\n";
 
-    ofstream pathFile;
+    std::ofstream pathFile;
     pathFile.open("PathGenerated.txt");
 
-    print << pathFile.is_open() << " OPENSTATUS\n";
+    std::cout << pathFile.is_open() << " OPENSTATUS\n";
 
     pathFile << "x, y" << std::endl;
 
     std::string pathFinalString = "";
 
     for (int i = 0; i < curve->node_count(); i++) {
-        Point tempPoint = Point(Vector(0, 0, 0), 0, 0);
+        Point tempPoint = Point(Eigen::Vector3d(0, 0, 0), 0, 0);
 
         // print << i << " " << curve->node_count() << std::endl;
 
@@ -139,8 +138,6 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
         PathGenerator::_pathPointsRaw.push_back(tempPoint);
 
         pathFile << tempPoint.x << ", " << tempPoint.y << ", " << tempPoint.time << std::endl;
-
-        // std::cout << "node #" << i << ": " << tempPoint.toString() << std::endl;
     }
 
     delete curve;
@@ -153,7 +150,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
 
     XMLPrinter printer(fp);
 
-    printer.PushHeader(true, true);
+    printer.PushHeader(false, true);
     // printer.PushAttribute("encoding", "utf-8");
 
     printer.OpenElement("path");
@@ -164,13 +161,13 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
     printer.PushAttribute("velocitykp", "0.5");
     printer.PushAttribute("headingkp", "1.0");
 
-    printer.OpenElement("geoCoordinates");
+    printer.OpenElement("coordinates");
     printer.PushText(pathFinalString.c_str());
     printer.CloseElement();
     printer.CloseElement();
 
     for (int i = 0; i < finPoints.size(); ++i) {
-        pathFile << finPoints[i].x << ", " << finPoints[i].y << std::endl;
+        pathFile << finPoints[i].x() << ", " << finPoints[i].y() << std::endl;
     }
 
     pathFile.close();
