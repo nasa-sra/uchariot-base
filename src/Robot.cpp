@@ -56,11 +56,13 @@ void Robot::Run(int rate, bool& running) {
         // Update subsystems
         _driveBase.Update(dt);
         _imu.Update(dt);
+        _gps.Update(dt);
 
         // Report state
         cmds.ReportState();
         _driveBase.ReportState();
         _imu.ReportState();
+        _gps.ReportState();
         StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling 
@@ -69,4 +71,8 @@ void Robot::Run(int rate, bool& running) {
             Utils::LogFmt("Robot Run overran by %f s", dt);
         }
     }
+}
+
+void Robot::Shutdown() {
+    _gps.Disconnect();
 }

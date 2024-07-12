@@ -29,6 +29,7 @@ int main() {
 
     robot.Run(50, running);
     
+    robot.Shutdown();
     can->CloseConnection();
     NetworkManager::GetInstance().CloseConnections();
     StateReporter::GetInstance().Close();

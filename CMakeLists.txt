@@ -26,12 +26,21 @@ set(SRCS
     src/StateReporter.cpp
     src/controllers/TeleopController.cpp
     src/subsystems/DriveBase.cpp
+    src/subsystems/GPS.cpp
 )
 
 set(LIBS)
-
 find_package(Eigen3 CONFIG REQUIRED)
-list(APPEND LIBS Eigen3::Eigen)
+find_library(GPS_LIB libgps.so)
+find_library(DBUS_LIB libdbus-1.so.3)
+find_library(SYSTEMD_LIB libsystemd.so.0)
+find_library(CAP_LIB libcap.so.2)
+find_library(GCRYPT_LIB libgcrypt.so.20)
+find_library(LZMA_LIB liblzma.so.5)
+find_library(ZSTD_LIB libzstd.so.1)
+find_library(LZ4_LIB liblz4.so.1)
+find_library(GPG_ERROR_LIB libgpg-error.so.0)
+list(APPEND LIBS Eigen3::Eigen ${GPS_LIB} ${DBUS_LIB} ${SYSTEMD_LIB} ${CAP_LIB} ${GCRYPT_LIB} ${LZMA_LIB} ${ZSTD_LIB} ${LZ4_LIB} ${GPG_ERROR_LIB})
 
 if (${CMAKE_CROSSCOMPILING})
     list(APPEND SRCS src/subsystems/LSM6DSOX.cpp)

@@ -10,6 +10,8 @@
 #include "controllers/TeleopController.h"
 #include "StateReporter.h"
 
+#include "subsystems/DriveBase.h"
+#include "subsystems/GPS.h"
 #ifndef SIMULATION
 #include "subsystems/BNO055.h"
 #include "subsystems/LSM6DSOX.h"
@@ -40,6 +42,7 @@ public:
     Robot();
 
     void Run(int rate, bool& running);
+    void Shutdown();
 
     void HandleNetCmd(const std::string& cmd, rapidjson::Document& doc);
 
@@ -50,6 +53,7 @@ private:
     Controllers* _controllers;
     
     DriveBase _driveBase;
+    GPS _gps;
 
 #ifndef SIMULATION
     BNO055 _imu;
