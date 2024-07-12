@@ -1,6 +1,7 @@
 #include "pathgen/PathGenerator.h"
 
 #include "tinyxml2.h"
+#include "PathGenerator.h"
 
 using namespace tinyxml2;
 
@@ -11,6 +12,15 @@ void PathGenerator::SetPathSize(uint16_t size) {
     PathGenerator::_pathgenSize = size;
 }
 
+vector<Utils::GeoPoint> PathGenerator::GetRawPoints() {
+    vector<Utils::GeoPoint> bob;
+
+    for (int i = 0; i < _pathPointsRaw.size(); i++) {
+        bob.push_back(Utils::GeoPoint(_pathPointsRaw[i].x, _pathPointsRaw[i].y));
+    }
+
+    return bob;
+}
 vector<Vector> PathGenerator::_ScaleVector(vector<Vector> points, double scale_factor) {
     for (int i = 0; i < points.size(); ++i) { points[i] = (points[i] - points[i].TruncateDouble()) * scale_factor; }
 

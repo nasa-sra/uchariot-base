@@ -60,6 +60,8 @@ public:
     static int GeneratePath(std::string filename, double speed_ms, double radius_m);
     static void SetPathSize(uint16_t size);
 
+    static vector<Utils::GeoPoint> GetRawPoints();
+
 private:
     static uint16_t _pathgenSize;
     static vector<Point> _pathPointsRaw;
