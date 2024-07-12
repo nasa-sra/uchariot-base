@@ -153,7 +153,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
 
     XMLPrinter printer(fp);
 
-    printer.PushHeader(true, true);
+    printer.PushHeader(false, true);
     // printer.PushAttribute("encoding", "utf-8");
 
     printer.OpenElement("path");
