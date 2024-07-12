@@ -66,6 +66,7 @@ bool PathingController::loadPath(std::string filePath) {
 	} else if (p.extension() == ".kml") {
 		return loadKMLPath(filePath);
 	}
+	return false;
 }
 
 bool PathingController::loadXMLPath(std::string filePath) {
