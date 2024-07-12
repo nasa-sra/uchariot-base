@@ -47,7 +47,6 @@ find_package(Eigen3 CONFIG REQUIRED)
 
 list(APPEND LIBS Eigen3::Eigen)
 
-list(APPEND SRCS src/subsystems/LSM6DSOX.cpp)
 list(APPEND SRCS src/subsystems/BNO055.cpp)
 
 find_library(WIRING_PI_LIB libwiringPi.so )

@@ -1,7 +1,6 @@
 #include "pathgen/PathGenerator.h"
 
 #include "tinyxml2.h"
-#include "PathGenerator.h"
 
 using namespace tinyxml2;
 
