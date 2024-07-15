@@ -3,6 +3,9 @@
 #include <csignal>
 #include <thread>
 #include <cstdlib>
+#include <vector>
+#include <fstream>
+#include <iostream>
 
 #include "CanConnection.h"
 #include "Robot.h"

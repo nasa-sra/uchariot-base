@@ -14,17 +14,22 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 
-// #ifdef LINUX
-#warning "CAN CONNECTED"
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
 #define len can_dlc
 
 #include "Utils.h"
+struct CanFrame {
+    uint32_t arb_id;
+    uint8_t* data;
+    size_t len;
+    canid_t can_id;
 
-typedef struct can_frame CanFrame;
-CanFrame NewCanFrame(uint32_t can_id, uint8_t* data, size_t len);
+    CanFrame() {}
+    CanFrame(uint32_t arb_id, uint8_t* data, size_t len) : arb_id(arb_id), data(data), len(len) {};
+    CanFrame(struct can_frame frame) : arb_id(frame.can_id), data(frame.data), len(frame.len) {};
+};
 
 class CanConnection {
 public:

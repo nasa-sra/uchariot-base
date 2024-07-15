@@ -10,6 +10,6 @@ protected:
     StateReporter* _sr = &StateReporter::GetInstance();
 
 public:
-    virtual void Update(double dt) = 0;
+    virtual void Update(double dt) {};
     virtual void ReportState(std::string prefix = "/") = 0;
 };

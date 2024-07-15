@@ -12,10 +12,6 @@ if(NOT ${CMAKE_CROSSCOMPILING})
     message("Compiling for simulation")
 endif()
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    add_compile_definitions(LINUX=true)
-endif()
-
 set(SRCS
     src/main.cpp
     src/CanConnection.cpp
@@ -25,12 +21,17 @@ set(SRCS
     src/NetworkManager.cpp
     src/StateReporter.cpp
     src/controllers/TeleopController.cpp
+    src/controllers/PathingController.cpp
     src/subsystems/DriveBase.cpp
+    src/subsystems/Localization.cpp
+    src/tinyxml2.cpp
+    src/pathgen/Bezier.cpp
+    src/pathgen/Curve.cpp
+    src/pathgen/PathGenerator.cpp
     src/subsystems/BNO055.cpp
 )
 
 set(LIBS)
-
 find_package(Eigen3 CONFIG REQUIRED)
 find_library(I2C_LIB libi2c.so)
 list(APPEND LIBS Eigen3::Eigen ${I2C_LIB})

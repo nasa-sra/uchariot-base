@@ -1,5 +1,6 @@
 
 #include <sys/stat.h>
+#include <cmath>
 
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
@@ -15,13 +16,15 @@ StateReporter::StateReporter() {
 }
 
 void StateReporter::UpdateKey(std::string key, double val) {
-    auto it = _state.find(key);
-    if (it == _state.end()) {
-        addKey(key, val);
-    } else {
-        it->second->value = val;
-        if (it->second->json != nullptr)
-            it->second->json->SetDouble(val);
+    if (std::isfinite(val)) {
+        auto it = _state.find(key);
+        if (it == _state.end()) {
+            addKey(key, val);
+        } else {
+            it->second->value = val;
+            if (it->second->json != nullptr)
+                it->second->json->SetDouble(val);
+        }
     }
 }
 

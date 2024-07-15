@@ -104,7 +104,7 @@ void VescController::sendDutyCycle(float dc) {
     int32_t send_index = 0;
 	uint8_t buffer[4];
 	Utils::BufferAppendInt32(buffer, (int32_t)(dc * 100000.0), &send_index);
-    _can->Send(NewCanFrame(arbId, buffer, send_index));
+    _can->Send(CanFrame(arbId, buffer, send_index));
 }
 
 void VescController::sendRPM(float rpm) {
@@ -112,7 +112,7 @@ void VescController::sendRPM(float rpm) {
 	int32_t send_index = 0;
 	uint8_t buffer[4];
 	Utils::BufferAppendInt32(buffer, (int32_t) rpm, &send_index);
-    _can->Send(NewCanFrame(arbId, buffer, send_index));
+    _can->Send(CanFrame(arbId, buffer, send_index));
 }
 
 void VescController::sendPosition(float deg) {
@@ -120,7 +120,7 @@ void VescController::sendPosition(float deg) {
 	int32_t send_index = 0;
 	uint8_t buffer[4];
 	Utils::BufferAppendInt32(buffer, (int32_t)(deg * 1000000.0), &send_index);
-    _can->Send(NewCanFrame(arbId, buffer, send_index));
+    _can->Send(CanFrame(arbId, buffer, send_index));
 }
 
 void VescController::sendCurrent(float amps) {
@@ -128,7 +128,7 @@ void VescController::sendCurrent(float amps) {
 	int32_t send_index = 0;
 	uint8_t buffer[4];
 	Utils::BufferAppendInt32(buffer, (int32_t) (amps * 1000.0), &send_index);
-    _can->Send(NewCanFrame(arbId, buffer, send_index));
+    _can->Send(CanFrame(arbId, buffer, send_index));
 }
 
 void VescController::ReportState(std::string prefix) {
