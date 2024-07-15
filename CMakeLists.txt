@@ -24,6 +24,7 @@ set(SRCS
     src/controllers/PathingController.cpp
     src/subsystems/DriveBase.cpp
     src/subsystems/Localization.cpp
+    src/subsystems/Vision.cpp
     src/tinyxml2.cpp
     src/pathgen/Bezier.cpp
     src/pathgen/Curve.cpp

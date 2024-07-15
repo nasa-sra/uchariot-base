@@ -51,6 +51,7 @@ void Robot::Run(int rate, bool& running) {
         _driveBase.Update(dt);
         _imu.Update(dt);
         _localization.Update(dt, _driveBase.GetVelocities());
+        _vis.Update(dt);
         // _gps.Update(dt);
 
         // Report state
@@ -59,6 +60,7 @@ void Robot::Run(int rate, bool& running) {
         _driveBase.ReportState();
         _localization.ReportState();
         _imu.ReportState();
+        _vis.ReportState();
         StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling 
