@@ -58,4 +58,4 @@ public:
 private:
     static uint16_t _pathgenSize;
     static std::vector<Point> _pathPointsRaw;
-};
+}; 

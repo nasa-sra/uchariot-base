@@ -21,11 +21,28 @@ std::vector<Utils::GeoPoint> PathGenerator::GetRawPoints() {
     return bob;
 }
 
+/**
+ * @brief Generates a path from a KML file, applies a specified speed and radius, and saves the result as an XML file.
+ *
+ * This function reads a KML file, processes the path data, applies a specified speed and radius, and generates a new path.
+ * The generated path is then saved as an XML file, along with additional attributes such as speed, tolerance, end tolerance,
+ * velocity kp, and heading kp.
+ *
+ * @param filename The name of the KML file to load.
+ * @param speed_ms The desired speed of the path in meters per second.
+ * @param radius_m The radius to apply to the path, in meters.
+ *
+ * @return An integer representing the success of the operation:
+ * - 0: The path was successfully generated and saved.
+ * - -1: An error occurred while loading the KML file.
+ * - -2: An error occurred while extracting the path data from the KML file.
+ * - -3: An error occurred while writing the XML file.
+ */
 int PathGenerator::GeneratePath(std::string filename, double speed_ms, double radius_m) {
     std::vector<GenPoint> n_points;
 
     XMLDocument doc;
-    int res = doc.LoadFile(("paths/" + filename + ".kml").c_str());
+    int res = doc.LoadFile(("paths/" + filename.substr(0,filename.size() - 4) + ".kml").c_str());
 
     if (res != tinyxml2::XML_SUCCESS) {
         Utils::LogFmt("PathingContoller::loadPath - Could not load file %s, Err Code: %i", filename, res);
@@ -141,7 +158,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
 
     delete curve;
 
-    FILE *fp = fopen(("paths/" + filename + ".xml").c_str(), "w");
+    FILE *fp = fopen(("paths/" + filename.substr(0,filename.size() - 4) + ".xml").c_str(), "w");
     if (fp == NULL) {
         Utils::LogFmt("Write Failed");
         return -3;

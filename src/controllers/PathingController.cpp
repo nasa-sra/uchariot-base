@@ -79,6 +79,8 @@ bool PathingController::loadXMLPath(std::string filePath) {
     _path.clear();
 	tinyxml2::XMLDocument doc;
 
+	filePath = "paths/" + filePath;
+
 	int res = doc.LoadFile(filePath.c_str());
 	if (res != tinyxml2::XML_SUCCESS) {
 		Utils::LogFmt("PathingContoller::loadXMLPath - Could not load file %s, Err Code: %i", filePath.c_str(), res);

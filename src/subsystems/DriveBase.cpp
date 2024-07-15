@@ -42,8 +42,8 @@ DriveBase::DriveBase() : _left_front(1), _right_front(4), _left_back(2), _right_
 
 void DriveBase::Update(double dt) {
 
-    // Utils::LogFmt("Drivebase Speeds: lb %f  lf %f  rb %f  sb %f", _cmds._lb_speed, _cmds._lf_speed, _cmds._rb_speed,
-    // _cmds._rf_speed);
+    Utils::LogFmt("Drivebase Speeds: lb %f  lf %f  rb %f  sb %f", _cmds._lb_speed, _cmds._lf_speed, _cmds._rb_speed,
+    _cmds._rf_speed);
 
     _left_front.SetCmd(_cmds._lf_speed);
     _right_front.SetCmd(_cmds._rf_speed);

@@ -135,7 +135,7 @@ struct GeoPoint {
 
 };
 
-// converts geopoint to a cartesian coordinates with the earth's center as the origin and the poles as the z axis
+// Converts geopoint to a cartesian coordinates with the earth's center as the origin and the poles as the z axis
 Eigen::Vector3d geoToEarthCoord(GeoPoint point);
 
 struct PIDValues {
