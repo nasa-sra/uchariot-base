@@ -50,7 +50,7 @@ private:
 
     CanConnection();
 
-    std::thread _recieveThread;
+    std::thread _receiveThread;
 
     int _socket;
     std::vector<struct can_filter> _filters;

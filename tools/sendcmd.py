@@ -12,7 +12,7 @@ if __name__ == '__main__':
     args = common.parse_args(parser)
     common.client_socket_from_args
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_sock.connect(('10.93.24.9', 8001))
+    client_sock.connect(('10.93.24.5', 8001))
 
     data = ''
     try:
