@@ -14,6 +14,9 @@ include_directories(${CMAKE_SYSROOT}/usr/include/c++/9)
 include_directories(${CMAKE_SYSROOT}/usr/include/c++/9/bits)
 include_directories(${CMAKE_SYSROOT}/usr/include/aarch64-linux-gnu/c++/9)
 include_directories(${CMAKE_SYSROOT}/usr/include/aarch64-linux-gnu/c++/9/bits)
+
+set(CMAKE_CXX_FLAGS "-isystem ${CMAKE_SYSROOT}/usr/include")
+
 set(CMAKE_C_COMPILER ${TOOLCHAIN_DIR}/aarch64-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/aarch64-linux-gnu-g++)
 

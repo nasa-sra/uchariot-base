@@ -6,8 +6,6 @@
 
 Vision::Vision() {
 
-
-
 }
 
 double Vision::GetEntry(const std::string& entry)
@@ -15,7 +13,7 @@ double Vision::GetEntry(const std::string& entry)
     // Grab the IMU message super easy
     key_t key = ftok(("tmp/" + entry).c_str(), 65);
     int msg_id = msgget(key, 0666 | IPC_CREAT);
-    msgrcv(msg_id, &_msg, sizeof(_msg), 1, 0);
+    msgrcv(msg_id, &_msg, sizeof(_msg), 1, IPC_NOWAIT);
     msgctl(msg_id, IPC_RMID, NULL);
 
     try {
