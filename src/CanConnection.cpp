@@ -1,13 +1,5 @@
 #include "CanConnection.h"
 
-CanFrame NewCanFrame(uint32_t can_id, uint8_t* data, size_t len) {
-    CanFrame frame;
-    frame.can_id = can_id;
-    memccpy(frame.data, data, 0, len);
-    frame.len = len;
-    return frame;
-}
-
 CanConnection::CanConnection() {
 
     Utils::LogFmt("Setting up can0");
@@ -68,7 +60,7 @@ void CanConnection::Send(CanFrame in_frame) {
 
 #ifndef SIMULATION
     struct can_frame frame;
-    frame.can_id = in_frame.can_id | CAN_EFF_FLAG;
+    frame.can_id = in_frame.arb_id | CAN_EFF_FLAG;
     frame.len = in_frame.len;
     memcpy(frame.data, in_frame.data, in_frame.len);
 
@@ -105,7 +97,7 @@ void CanConnection::Recieve(bool& running) {
 }
 
 void CanConnection::LogFrame(CanFrame frame) {
-    printf("CAN Frame id=%08x data=", frame.can_id);
+    printf("CAN Frame id=%08x data=", frame.arb_id);
     for (int i = 0; i < frame.len; i++) {
         printf("%02x ", frame.data[i]);
     }

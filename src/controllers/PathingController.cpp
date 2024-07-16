@@ -36,7 +36,7 @@ ControlCmds PathingController::Run(Pose robotPose) {
 			angularVelocity = 0.0;
 		}
 
-		cmds.drive = DriveBaseCmds(angularVelocity, velocity);
+		cmds.drive = {velocity, angularVelocity};
 
 		if (diff.norm() < _path[_currentStep].tolerance) {
 			_currentStep++;
