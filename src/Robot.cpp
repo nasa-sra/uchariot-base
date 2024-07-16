@@ -50,8 +50,8 @@ void Robot::Run(int rate, bool& running) {
         _pathingController.ReportState();
         _driveBase.ReportState();
         _localization.ReportState();
-        _imu.ReportState();
         _gps.ReportState();
+        _imu.ReportState();
         StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling

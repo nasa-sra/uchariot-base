@@ -5,15 +5,16 @@
 #include <thread>
 
 #include "rapidjson/document.h"
+#include "subsystems/DriveBase.h"
 
-#include "StateReporter.h"
 #include "controllers/PathingController.h"
 #include "controllers/TeleopController.h"
+
+#include "StateReporter.h"
 
 #include "subsystems/DriveBase.h"
 #include "subsystems/GPS.h"
 #include "subsystems/Localization.h"
-
 #ifndef SIMULATION
 #include "subsystems/BNO055.h"
 #else
@@ -30,9 +31,9 @@ public:
 
     Robot();
 
-    void Run(int rate, bool& running);
-    void Shutdown();
+    void Shutdown() {};
 
+    void Run(int rate, bool& running);
     void HandleNetCmd(const std::string& cmd, rapidjson::Document& doc);
 
 private:
@@ -43,11 +44,12 @@ private:
     ControlMode _mode{DISABLED};
     ControlMode _newMode{DISABLED};
 
-    Controllers* _controllers;
-
-    DriveBase _driveBase;
+    TeleopController _teleopController;
+    PathingController _pathingController;
     GPS _gps;
 
+    DriveBase _driveBase;
+    Localization _localization;
 #ifndef SIMULATION
     BNO055 _imu;
 #else
