@@ -22,6 +22,5 @@ class Localization : SubsystemBase {
 private:
 
     Pose _pose{{0.0, 0.0}, 0.0};
-    double _slipCoefficient{0.0};
 
 };
