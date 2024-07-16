@@ -1,14 +1,14 @@
 #pragma once
 
 #include <chrono>
-#include <thread>
 #include <cstdio>
+#include <thread>
 
 #include "rapidjson/document.h"
 
+#include "StateReporter.h"
 #include "controllers/EmptyController.h"
 #include "controllers/TeleopController.h"
-#include "StateReporter.h"
 
 #include "subsystems/DriveBase.h"
 #include "subsystems/GPS.h"
@@ -25,10 +25,8 @@ struct Controllers {
     EmptyController* empty;
     TeleopController* teleop;
 
-    Controllers() :
-        empty(&EmptyController::GetInstance()),
-        teleop(&TeleopController::GetInstance())
-        {}
+    Controllers() : empty(&EmptyController::GetInstance()), teleop(&TeleopController::GetInstance()) {
+    }
 
     ControllerBase* FromName(const std::string& name);
 };
@@ -47,21 +45,19 @@ public:
     void HandleNetCmd(const std::string& cmd, rapidjson::Document& doc);
 
 private:
-
     void ManageController();
 
     Controllers* _controllers;
-    
+
     DriveBase _driveBase;
     GPS _gps;
 
-#ifndef SIMULATION
-    BNO055 _imu;
-#else
+    // #ifndef SIMULATION
+    //     BNO055 _imu;
+    // #else
     SimIMU _imu;
-#endif
+    // #endif
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;
-
 };
