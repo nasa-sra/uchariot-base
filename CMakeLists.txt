@@ -12,6 +12,14 @@ set (CMAKE_CXX_STANDARD 17)
 #     message("Compiling for simulation")
 # endif()
 
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    add_compile_definitions(LINUX=true)
+endif()
+# if(NOT ${CMAKE_CROSSCOMPILING})
+#     add_compile_definitions(SIMULATION=true)
+#     message("Compiling for simulation")
+# endif()
+
 set(SRCS
     src/main.cpp
     src/CanConnection.cpp
@@ -29,12 +37,14 @@ set(SRCS
     src/pathgen/Curve.cpp
     src/pathgen/PathGenerator.cpp
     src/subsystems/BNO055.cpp
+    src/subsystems/GPS.cpp
 )
 
 set(LIBS)
 find_package(Eigen3 CONFIG REQUIRED)
+find_library(GPS_LIB libgps.so)
 find_library(I2C_LIB libi2c.so)
-list(APPEND LIBS Eigen3::Eigen ${I2C_LIB})
+list(APPEND LIBS Eigen3::Eigen ${I2C_LIB} ${GPS_LIB})
 
 add_executable(uChariotBase ${SRCS})
 target_link_libraries( uChariotBase ${LIBS})

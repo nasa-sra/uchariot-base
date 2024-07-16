@@ -1,12 +1,11 @@
 #include "Robot.h"
 
-Robot::Robot() {}
+Robot::Robot() {
+}
 
 // Recive a network command and handle it appropriately.
 void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
-    if (cmd == "set_controller") { 
-        _newMode = nameToMode(doc["name"].GetString());
-    }
+    if (cmd == "set_controller") { _newMode = nameToMode(doc["name"].GetString()); }
 
     if (cmd == "teleop_drive") {
         _teleopController.HandleNetworkInput(doc);
@@ -30,18 +29,11 @@ void Robot::Run(int rate, bool& running) {
         // Run the active controller
         ControlCmds cmds;
         switch (_mode) {
-            case ControlMode::DISABLED:
-                cmds = ControlCmds();
-                break;
-            case ControlMode::TELEOP:
-                cmds = _teleopController.Run();
-                break;
-            case ControlMode::PATHING:
-                cmds = _pathingController.Run(_localization.getPose());
-                break;
-            
-            default:
-                break;
+        case ControlMode::DISABLED: cmds = ControlCmds(); break;
+        case ControlMode::TELEOP: cmds = _teleopController.Run(); break;
+        case ControlMode::PATHING: cmds = _pathingController.Run(_localization.getPose()); break;
+
+        default: break;
         }
 
         // Commmand subsystems
@@ -51,7 +43,7 @@ void Robot::Run(int rate, bool& running) {
         _driveBase.Update(dt);
         _imu.Update(dt);
         _localization.Update(dt, _driveBase.GetVelocities());
-        // _gps.Update(dt);
+        _gps.Update(dt);
 
         // Report state
         cmds.ReportState();
@@ -59,13 +51,12 @@ void Robot::Run(int rate, bool& running) {
         _driveBase.ReportState();
         _localization.ReportState();
         _imu.ReportState();
+        _gps.ReportState();
         StateReporter::GetInstance().PushState();
 
-        // Handle periodic update scheduling 
+        // Handle periodic update scheduling
         dt = Utils::ScheduleRate(rate, start_time);
-        if (dt > 1.0 / rate) {
-            Utils::LogFmt("Robot Run overran by %f s", dt);
-        }
+        if (dt > 1.0 / rate) { Utils::LogFmt("Robot Run overran by %f s", dt); }
     }
 }
 

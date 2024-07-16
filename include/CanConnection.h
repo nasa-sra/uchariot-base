@@ -1,18 +1,16 @@
 #pragma once
 
-#include <stdint.h>
-#include <unistd.h>
-#include <functional>
-#include <thread>
 #include <cstdio>
 #include <cstdlib>
-#include <stdint.h>
 #include <cstring>
-#include <stdexcept>
-#include <unistd.h>
+#include <functional>
 #include <net/if.h>
+#include <stdexcept>
+#include <stdint.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <thread>
+#include <unistd.h>
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
@@ -26,9 +24,10 @@ struct CanFrame {
     size_t len;
     canid_t can_id;
 
-    CanFrame() {}
-    CanFrame(uint32_t arb_id, uint8_t* data, size_t len) : arb_id(arb_id), data(data), len(len) {};
-    CanFrame(struct can_frame frame) : arb_id(frame.can_id), data(frame.data), len(frame.len) {};
+    CanFrame() {
+    }
+    CanFrame(uint32_t arb_id, uint8_t* data, size_t len) : arb_id(arb_id), data(data), len(len){};
+    CanFrame(struct can_frame frame) : arb_id(frame.can_id), data(frame.data), len(frame.len){};
 };
 
 class CanConnection {
@@ -45,7 +44,6 @@ public:
     void CloseConnection();
 
 private:
-
     void LogFrame(CanFrame frame);
 
     CanConnection();

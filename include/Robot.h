@@ -1,19 +1,19 @@
 #pragma once
 
 #include <chrono>
-#include <thread>
 #include <cstdio>
+#include <thread>
 
 #include "rapidjson/document.h"
-#include "subsystems/DriveBase.h"
-
-#include "controllers/TeleopController.h"
-#include "controllers/PathingController.h"
 
 #include "StateReporter.h"
+#include "controllers/PathingController.h"
+#include "controllers/TeleopController.h"
 
 #include "subsystems/DriveBase.h"
+#include "subsystems/GPS.h"
 #include "subsystems/Localization.h"
+
 #ifndef SIMULATION
 #include "subsystems/BNO055.h"
 #else
@@ -26,20 +26,16 @@
 // - dispatching network handles
 class Robot {
 public:
-
-    enum ControlMode {
-        DISABLED,
-        TELEOP,
-        PATHING
-    };
+    enum ControlMode { DISABLED, TELEOP, PATHING };
 
     Robot();
 
     void Run(int rate, bool& running);
+    void Shutdown();
+
     void HandleNetCmd(const std::string& cmd, rapidjson::Document& doc);
 
 private:
-
     void ManageController();
     ControlMode nameToMode(std::string name);
     ControllerBase& modeToController(ControlMode mode);
@@ -47,11 +43,11 @@ private:
     ControlMode _mode{DISABLED};
     ControlMode _newMode{DISABLED};
 
-    TeleopController _teleopController;
-    PathingController _pathingController;
-    
+    Controllers* _controllers;
+
     DriveBase _driveBase;
-    Localization _localization;
+    GPS _gps;
+
 #ifndef SIMULATION
     BNO055 _imu;
 #else
