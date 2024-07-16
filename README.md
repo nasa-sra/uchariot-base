@@ -7,6 +7,8 @@ Then just ssh onto the pi and run the executable in ~/uchariot-base/build/ with 
 
 ## Libraries
 
+Minimum CMake version is 3.16.
+
 | Name | Description | Install |
 | --- | --- | --- |
 | libeigen3 | linear algebra | sudo apt install libeigen3-dev | 
