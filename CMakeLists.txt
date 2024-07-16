@@ -25,8 +25,15 @@ set(SRCS
     src/NetworkManager.cpp
     src/StateReporter.cpp
     src/controllers/TeleopController.cpp
+    src/controllers/PathingController.cpp
     src/subsystems/DriveBase.cpp
     src/subsystems/GPS.cpp
+    src/subsystems/Localization.cpp
+    src/tinyxml2.cpp
+    src/pathgen/Bezier.cpp
+    src/pathgen/Curve.cpp
+    src/pathgen/PathGenerator.cpp
+    src/subsystems/BNO055.cpp
 )
 
 set(LIBS)

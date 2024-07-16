@@ -1,33 +1,43 @@
 #pragma once
 
+#define ROBOT_WIDTH 1.0
+
 #include "VescController.h"
 
-#include "subsystems/SubsystemBase.h"
 #include "StateReporter.h"
+#include "subsystems/SubsystemBase.h"
+#include "controllers/PIDController.h"
 
 struct DriveBaseCmds {
-    float _lf_speed;
-    float _rf_speed;
-    float _lb_speed;
-    float _rb_speed;
 
-    DriveBaseCmds() : _lf_speed(0), _rf_speed(0), _lb_speed(0), _rb_speed(0) {};
-    DriveBaseCmds(float left, float right) : _lf_speed(left), _rf_speed(right), _lb_speed(left), _rb_speed(right) {};
-    DriveBaseCmds(float lf, float rf, float lb, float rb) : _lf_speed(lf), _rf_speed(rf), _lb_speed(lb), _rb_speed(rb) {};
+    float _lf_speed{0};
+    float _rf_speed{0};
+    float _lb_speed{0};
+    float _rb_speed{0};
 
-    void ReportState(std::string prefix="/");
+    DriveBaseCmds(){}
+    DriveBaseCmds(double angular, double drive);
+
+    void ReportState(std::string prefix = "/");
+
+};
+
+struct DriveBaseFeedback {
+    double lf, rf, lb, rb;
 };
 
 class DriveBase : public SubsystemBase {
 public:
-
     DriveBase();
 
     void Update(double dt) override;
     void ReportState(std::string prefix = "/") override;
+    DriveBaseFeedback GetVelocities();
 
-    inline void SetCmds(DriveBaseCmds cmds) { _cmds = cmds; }
-   
+    inline void SetCmds(DriveBaseCmds cmds) {
+        _cmds = cmds;
+    }
+
 private:
     DriveBaseCmds _cmds;
 

@@ -8,6 +8,11 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <sys/time.h>
+
+#include <Eigen/Core>
 
 #ifdef __GNUC__
 #define vsprintf_s vsnprintf
@@ -16,7 +21,10 @@
 #define _snprintf std::snprintf
 #endif
 
+
+
 namespace Utils {
+typedef int64_t msec_t;
 
 void BufferAppendInt16(uint8_t* buffer, int16_t number, int32_t* index);
 void BufferAppendInt32(uint8_t* buffer, int32_t number, int32_t* index);
@@ -32,6 +40,11 @@ std::string CurrentDateTimeStr(const char* fmt = "%Y-%m-%d %H:%M:%S");
 template<typename K, typename V> V MapGetOrDefault(const std::map<K, V> map, const K key, const V default_val) {
     auto it = map.find(key);
     return it == map.end() ? default_val : it->second;
+}
+
+// A function to clamp a given value between an upper and lower bound
+template <typename T> T Clamp(T val, T upperBound, T lowerBound) {
+    return std::min(std::max(val, lowerBound), upperBound);
 }
 
 // A constant expression function that converts std::string
@@ -58,6 +71,15 @@ template<typename... A> std::string _strfmt(const std::string& fmt, A&&... args)
     _snprintf(buf.get(), size, fmt.c_str(), args...);
     return std::string(buf.get(), buf.get() + size - 1);
 }
+
+
+// Gets the time in ms
+// msec_t time_ms(void)
+// {
+//     struct timeval tv;
+//     gettimeofday(&tv, NULL);
+//     return (msec_t)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+// }
 
 // Formats a string the same way C snprintf does it,
 // returning the formatted string. This method can take
@@ -103,5 +125,43 @@ template<typename T> long VectorIndexOf(const std::vector<T> v, const T x) {
 }
 
 double ScheduleRate(int rate, std::chrono::high_resolution_clock::time_point start_time);
+
+#define EARTHS_RADIUS 6378137.0 // m
+struct GeoPoint {
+
+	double lat, lon, alt;
+    GeoPoint() : lat(0.0), lon(0.0), alt(EARTHS_RADIUS) {}
+    GeoPoint(double _lat, double _long) : lat(_lat), lon(_long), alt(EARTHS_RADIUS) {}
+
+};
+
+// Converts geopoint to a cartesian coordinates with the earth's center as the origin and the poles as the z axis
+Eigen::Vector3d geoToEarthCoord(GeoPoint point);
+
+struct PIDValues {
+    float kP;
+    float kI;
+    float kD;
+
+    PIDValues() : kP(.1), kI(0), kD(0) {};
+    PIDValues(double p, double i, double d) : kP(p), kI(i), kD(d) {};
+    PIDValues(double p, double i) : kP(p), kI(i), kD(0) {};
+    PIDValues(double p) : kP(p), kI(0), kD(0) {};
+};
+
+class PIDController {
+public:
+    PIDController(PIDValues pid) : _p(pid.kP), _i(pid.kI), _d(pid.kD) {}
+    
+
+    double Calculate(double current, double target);
+private:
+    double _p{0};
+    double _i{0};
+    double _d{0};
+
+    double _lastError{0};
+    Utils::msec_t _lastTimestamp{0};
+};
 
 }; // namespace Utils

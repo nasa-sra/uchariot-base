@@ -12,12 +12,10 @@
 #include <thread>
 #include <unistd.h>
 
-#ifdef LINUX
 #include <linux/can.h>
 #include <linux/can/raw.h>
-#endif
 
-#include "Utils.h"
+#define len can_dlc
 
 #define len can_dlc
 
@@ -25,6 +23,7 @@ struct CanFrame {
     uint32_t arb_id;
     uint8_t* data;
     size_t len;
+    canid_t can_id;
 
     CanFrame(uint32_t arb_id, uint8_t* data, size_t len) : arb_id(arb_id), data(data), len(len){};
     CanFrame(struct can_frame frame) : arb_id(frame.can_id), data(frame.data), len(frame.len){};
@@ -39,7 +38,7 @@ public:
 
     void Start(bool& running);
     void RegisterPacketHandler(uint16_t id, std::function<void(CanFrame)> handler);
-    void Send(CanFrame* frame);
+    void Send(CanFrame frame);
     void Recieve(bool& running);
     void CloseConnection();
 
@@ -48,7 +47,7 @@ private:
 
     CanConnection();
 
-    std::thread _recieveThread;
+    std::thread _receiveThread;
 
     int _socket;
     std::vector<struct can_filter> _filters;

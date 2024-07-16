@@ -1,5 +1,6 @@
 
 #include <sys/stat.h>
+#include <cmath>
 
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
@@ -15,13 +16,15 @@ StateReporter::StateReporter() {
 }
 
 void StateReporter::UpdateKey(std::string key, double val) {
-    auto it = _state.find(key);
-    if (it == _state.end()) {
-        addKey(key, val);
-    } else {
-        it->second->value = val;
-        if (it->second->json != nullptr)
-            it->second->json->SetDouble(val);
+    if (std::isfinite(val)) {
+        auto it = _state.find(key);
+        if (it == _state.end()) {
+            addKey(key, val);
+        } else {
+            it->second->value = val;
+            if (it->second->json != nullptr)
+                it->second->json->SetDouble(val);
+        }
     }
 }
 
@@ -65,7 +68,7 @@ void StateReporter::addKey(std::string key, double val) {
         }
     }
     TreeNode* node = new TreeNode(valueName, val);
-    branch->branchs.push_back(node);
+    branch->branches.push_back(node);
     _state[key] = node;
 }
 
@@ -75,10 +78,10 @@ StateReporter::TreeNode* StateReporter::climbTree(TreeNode* current, std::string
         return current;
     }
     std::string nextBranch = key.substr(0, delim);
-    auto it = std::find_if(current->branchs.begin(), current->branchs.end(), [&nextBranch](TreeNode* n){return n->name == nextBranch;});
-    if (it == current->branchs.end()) {
-        current->branchs.push_back(new TreeNode(nextBranch));
-        it = current->branchs.end() - 1;
+    auto it = std::find_if(current->branches.begin(), current->branches.end(), [&nextBranch](TreeNode* n){return n->name == nextBranch;});
+    if (it == current->branches.end()) {
+        current->branches.push_back(new TreeNode(nextBranch));
+        it = current->branches.end() - 1;
     }
     return climbTree(*it, key.substr(delim + 1));
 }
@@ -88,7 +91,7 @@ void StateReporter::deleteTree(TreeNode* node) {
         delete node;
         return;
     }
-    for (TreeNode* branch : node->branchs) {
+    for (TreeNode* branch : node->branches) {
         deleteTree(branch);
     }
     delete node;
@@ -101,7 +104,7 @@ void StateReporter::buildDoc(rapidjson::Value& doc, TreeNode* current, rapidjson
         return;
     }
     rapidjson::Value docBranch(rapidjson::kObjectType);
-    for (TreeNode* treeBranch : current->branchs) {
+    for (TreeNode* treeBranch : current->branches) {
         buildDoc(docBranch, treeBranch, allocator);
     }
     doc.AddMember(name, docBranch, allocator);
@@ -128,7 +131,7 @@ void StateReporter::sendState() {
     rapidjson::Document::AllocatorType& allocator = _doc.GetAllocator();
     buildDoc(_doc, _treeRoot, allocator); // Build JSON document from data tree
 
-    // Set JSON document value pointers in data tree
+    // Set JSON document value pointers in data tree.
     for (auto i = _state.begin(); i != _state.end(); i++) {
         i->second->json = &climbDoc(_doc.FindMember("robot")->value, i->first.substr(1))->value;
     }

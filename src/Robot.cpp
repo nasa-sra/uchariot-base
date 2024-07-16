@@ -1,37 +1,16 @@
 #include "Robot.h"
 
-// Resolves a given controller from a name. If the controller
-// is not found by name it returns the empty controller.
-ControllerBase* Controllers::FromName(const std::string& name) {
-    if (name == "teleop") return teleop;
-    return empty;
+Robot::Robot() {
 }
-
-Robot::Robot() :
-    _controllers(new Controllers()),
-    _active_controller_name("teleop"),
-    _active_controller((ControllerBase*)_controllers->teleop) {}
 
 // Recive a network command and handle it appropriately.
 void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
-    // A set_controller command is handled directly by Robot, 
-    // swapping out the active controller
-    if (cmd == "set_controller") { 
-        _active_controller_name = doc["name"].GetString();
-    }
+    if (cmd == "set_controller") { _newMode = nameToMode(doc["name"].GetString()); }
 
     if (cmd == "teleop_drive") {
-        _controllers->teleop->HandleNetworkInput(doc);
-    }
-}
-
-void Robot::ManageController() {
-    if (_active_controller_name != _last_controller_name) {
-        _active_controller->Unload();
-        _active_controller = _controllers->FromName(_active_controller_name);
-        _active_controller->Load();
-        _last_controller_name = _active_controller_name;
-        Utils::LogFmt("Switching to active controller %s", _active_controller_name);
+        _teleopController.HandleNetworkInput(doc);
+    } else if (cmd == "run_path") {
+        _pathingController.HandleNetworkInput(doc);
     }
 }
 
@@ -48,7 +27,14 @@ void Robot::Run(int rate, bool& running) {
         ManageController();
 
         // Run the active controller
-        ControlCmds cmds = _active_controller->Run();
+        ControlCmds cmds;
+        switch (_mode) {
+        case ControlMode::DISABLED: cmds = ControlCmds(); break;
+        case ControlMode::TELEOP: cmds = _teleopController.Run(); break;
+        case ControlMode::PATHING: cmds = _pathingController.Run(_localization.getPose()); break;
+
+        default: break;
+        }
 
         // Commmand subsystems
         _driveBase.SetCmds(cmds.drive);
@@ -56,23 +42,18 @@ void Robot::Run(int rate, bool& running) {
         // Update subsystems
         _driveBase.Update(dt);
         _imu.Update(dt);
-        _gps.Update(dt);
 
         // Report state
         cmds.ReportState();
+        _pathingController.ReportState();
         _driveBase.ReportState();
+        _localization.ReportState();
         _imu.ReportState();
         _gps.ReportState();
         StateReporter::GetInstance().PushState();
 
-        // Handle periodic update scheduling 
+        // Handle periodic update scheduling
         dt = Utils::ScheduleRate(rate, start_time);
-        if (dt > 1.0 / rate) {
-            Utils::LogFmt("Robot Run overran by %f s", dt);
-        }
+        if (dt > 1.0 / rate) { Utils::LogFmt("Robot Run overran by %f s", dt); }
     }
-}
-
-void Robot::Shutdown() {
-    _gps.Disconnect();
 }

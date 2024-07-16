@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "rapidjson/document.h"
+#include "subsystems/DriveBase.h"
 
 #include "StateReporter.h"
 #include "controllers/EmptyController.h"
@@ -14,7 +15,6 @@
 #include "subsystems/GPS.h"
 #ifndef SIMULATION
 #include "subsystems/BNO055.h"
-#include "subsystems/LSM6DSOX.h"
 #else
 #include "subsystems/IMUBase.h"
 #endif
@@ -37,6 +37,8 @@ struct Controllers {
 // - dispatching network handles
 class Robot {
 public:
+    enum ControlMode { DISABLED, TELEOP, PATHING };
+
     Robot();
 
     void Run(int rate, bool& running);
@@ -46,6 +48,11 @@ public:
 
 private:
     void ManageController();
+    ControlMode nameToMode(std::string name);
+    ControllerBase& modeToController(ControlMode mode);
+
+    ControlMode _mode{DISABLED};
+    ControlMode _newMode{DISABLED};
 
     Controllers* _controllers;
 
