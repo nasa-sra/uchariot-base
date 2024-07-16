@@ -13,8 +13,10 @@ CanConnection::CanConnection() {
     Utils::LogFmt("Setting up can0");
 
 #ifndef SIMULATION
-    
-    system("sudo ip link set can0 type can bitrate 500000");
+    system("sudo modprobe can");
+    system("sudo modprobe can_raw");
+    system("sudo modprobe mttcan");
+    system("sudo ip link set can0 up type can bitrate 500000 berr-reporting on");
     system("sudo ifconfig can0 up");
 
     Utils::LogFmt("Connecting to can0");
@@ -49,7 +51,7 @@ CanConnection::CanConnection() {
 }
 
 void CanConnection::Start(bool& running) {
-    _recieveThread = std::thread(&CanConnection::Recieve, this, std::ref(running));
+    _receiveThread = std::thread(&CanConnection::Recieve, this, std::ref(running));
 }
 
 void CanConnection::RegisterPacketHandler(uint16_t id, std::function<void(CanFrame)> handler) {
@@ -112,7 +114,7 @@ void CanConnection::LogFrame(CanFrame frame) {
 
 void CanConnection::CloseConnection() {
     Utils::LogFmt("Closing can network");
-    _recieveThread.join();
+    _receiveThread.join();
 #ifndef SIMULATION
     close(_socket);
     system("sudo ifconfig can0 down");

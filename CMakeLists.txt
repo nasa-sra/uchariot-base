@@ -7,10 +7,10 @@ set(CMAKE_CXX_FLAGS "-O2 -pthread")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_CXX_STANDARD 17)
 
-if(NOT ${CMAKE_CROSSCOMPILING})
-    add_compile_definitions(SIMULATION=true)
-    message("Compiling for simulation")
-endif()
+# if(NOT ${CMAKE_CROSSCOMPILING})
+#     add_compile_definitions(SIMULATION=true)
+#     message("Compiling for simulation")
+# endif()
 
 set(SRCS
     src/main.cpp
