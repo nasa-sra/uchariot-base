@@ -34,22 +34,21 @@ void Robot::Run(int rate, bool& running) {
         // Run the active controller
         ControlCmds cmds;
         switch (_mode) {
-        case ControlMode::DISABLED: cmds = ControlCmds(); break;
-        case ControlMode::TELEOP: cmds = _teleopController.Run(); break;
-        case ControlMode::PATHING: cmds = _pathingController.Run(_localization.getPose()); break;
-
-        default: break;
+			case ControlMode::DISABLED: cmds = ControlCmds(); break;
+			case ControlMode::TELEOP: cmds = _teleopController.Run(); break;
+			case ControlMode::PATHING: cmds = _pathingController.Run(_localization.getPose()); break;
+        	default: break;
         }
 
         // Commmand subsystems
-        _driveBase.SetCmds(cmds.drive);
+        //_driveBase.SetCmds(cmds.drive);
 
         // Update subsystems
-        _driveBase.Update(dt);
+        //_driveBase.Update(dt);
         _imu.Update(dt);
-        _localization.Update(dt, _driveBase.GetVelocities());
         _gps.Update(dt);
         _vis.Update(dt);
+        _localization.Update(dt, _driveBase.GetVelocities(), _imu.getYaw(), _vis.GetHeading());
 
         // Report state
         std::string prefix = "/robot/";
