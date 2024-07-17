@@ -27,7 +27,7 @@ double Vision::GetEntry(const std::string& entry)
 
 void Vision::Update(double dt) {
     _heading = GetEntry("rs_heading");
-    Utils::LogFmt("Heading = %f", _heading);
+    //Utils::LogFmt("Heading = %f", _heading);
 }
 
 void Vision::ReportState(std::string prefix) {
