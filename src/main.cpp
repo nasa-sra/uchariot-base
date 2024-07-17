@@ -25,7 +25,7 @@ int main() {
     can->Start(running);
     
     Robot robot;
-    NetworkManager::GetInstance().Start(8000, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
+    NetworkManager::GetInstance().Start(8001, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
 
     StateReporter::GetInstance().EnableLogging();
     StateReporter::GetInstance().EnableTelemetry();

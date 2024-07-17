@@ -5,12 +5,17 @@ Robot::Robot() {
 
 // Recive a network command and handle it appropriately.
 void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
-    if (cmd == "set_controller") { _newMode = nameToMode(doc["name"].GetString()); }
-
-    if (cmd == "teleop_drive") {
-        _teleopController.HandleNetworkInput(doc);
-    } else if (cmd == "run_path") {
-        _pathingController.HandleNetworkInput(doc);
+    try {
+        if (cmd == "set_controller") { 
+            _newMode = nameToMode(doc["name"].GetString());
+        }
+        if (cmd == "teleop_drive") {
+            _teleopController.HandleNetworkInput(doc);
+        } else if (cmd == "run_path") {
+            _pathingController.HandleNetworkInput(doc);
+        }
+    } catch(...) {
+        Utils::LogFmt("Could not parse command"); // This still crashes
     }
 }
 
@@ -44,14 +49,19 @@ void Robot::Run(int rate, bool& running) {
         _imu.Update(dt);
         _localization.Update(dt, _driveBase.GetVelocities());
         _gps.Update(dt);
+        _vis.Update(dt);
 
         // Report state
+        std::string prefix = "/robot/";
+        StateReporter::GetInstance().UpdateKey(prefix + "mode", _mode);
+
         cmds.ReportState();
         _pathingController.ReportState();
         _driveBase.ReportState();
         _localization.ReportState();
         _gps.ReportState();
         _imu.ReportState();
+        _vis.ReportState();
         StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling

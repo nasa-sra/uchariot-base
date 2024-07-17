@@ -1,4 +1,3 @@
-
 #include <filesystem>
 
 #include "tinyxml2.h"
@@ -27,18 +26,20 @@ ControlCmds PathingController::Run(Pose robotPose) {
 
     if (_runningPath) {
 		_nextWaypoint = _path[_currentStep].pos.head<2>();
-        Eigen::Vector2d diff = _nextWaypoint - robotPose.pos;
-		double velocity = std::clamp((float) (diff.norm() * _velocityGain), -_path[_currentStep].speed, _path[_currentStep].speed);
-		double headingErr = atan2(diff.y(), diff.x()) - robotPose.heading;
+		Eigen::Vector2d diff = _nextWaypoint - robotPose.pos;
+        _distanceToWaypoint = diff.norm();
+		double velocity = std::clamp((float) (_distanceToWaypoint * _velocityGain), -_path[_currentStep].speed, _path[_currentStep].speed);
+		_targetHeading = atan2(diff.y(), diff.x());
+		double headingErr = _targetHeading - robotPose.heading;
 		double angularVelocity = headingErr * _headingGain;
 
-		if (_currentStep == _path.size() - 1 && diff.norm() < 1.0) {
+		if (_currentStep == _path.size() - 1 && _distanceToWaypoint < 1.0) {
 			angularVelocity = 0.0;
 		}
 
-		cmds.drive = DriveBaseCmds(angularVelocity, velocity);
+		cmds.drive = {velocity, angularVelocity};
 
-		if (diff.norm() < _path[_currentStep].tolerance) {
+		if (_distanceToWaypoint < _path[_currentStep].tolerance) {
 			_currentStep++;
 			if (_currentStep == _path.size()) {
 				_runningPath = false;
@@ -53,13 +54,16 @@ void PathingController::ReportState(std::string prefix) {
 	prefix += "pathing_controller/";
     StateReporter::GetInstance().UpdateKey(prefix + "waypointX", _nextWaypoint.x());
     StateReporter::GetInstance().UpdateKey(prefix + "waypointY", _nextWaypoint.y());
+    StateReporter::GetInstance().UpdateKey(prefix + "targetHeading", _targetHeading);
+    StateReporter::GetInstance().UpdateKey(prefix + "distanceToWaypoint", _distanceToWaypoint);
+    StateReporter::GetInstance().UpdateKey(prefix + "runningPath", _runningPath);
 }
 
 void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
     _pathName = doc["name"].GetString();
-	_pathResolution = std::stoi(doc["res"].GetString()); 
-	_pathSpeed = std::stof(doc["speed"].GetString());
-	_pathRadius = std::stof(doc["rad"].GetString());
+	// _pathResolution = std::stoi(doc["res"].GetString()); 
+	// _pathSpeed = std::stof(doc["speed"].GetString());
+	// _pathRadius = std::stof(doc["rad"].GetString());
 }
 
 bool PathingController::loadPath(std::string filePath) {
@@ -184,6 +188,8 @@ bool PathingController::loadXMLPath(std::string filePath) {
 
 bool PathingController::loadKMLPath(std::string filePath) {
 
+    Utils::LogFmt("Loading KML Auton... ");
+
 	if (PathGenerator::GeneratePath(filePath, _pathSpeed, _pathRadius) != 0) return false;
 	std::vector<Utils::GeoPoint> points = PathGenerator::GetRawPoints();
 
@@ -199,6 +205,7 @@ bool PathingController::loadKMLPath(std::string filePath) {
 		step.tolerance = 1.0;
 		_path.push_back(step);
 	}
+    Utils::LogFmt("Loaded Auton");
 	return true;
 }
 

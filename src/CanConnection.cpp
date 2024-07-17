@@ -1,13 +1,5 @@
 #include "CanConnection.h"
 
-CanFrame NewCanFrame(uint32_t can_id, uint8_t* data, size_t len) {
-    CanFrame frame;
-    frame.can_id = can_id;
-    memccpy(frame.data, data, 0, len);
-    frame.len = len;
-    return frame;
-}
-
 CanConnection::CanConnection() {
 
     Utils::LogFmt("Setting up can0");
@@ -16,8 +8,8 @@ CanConnection::CanConnection() {
     system("sudo modprobe can");
     system("sudo modprobe can_raw");
     system("sudo modprobe mttcan");
+    system("sudo ifconfig can0 txqueuelen 10");
     system("sudo ip link set can0 up type can bitrate 500000 berr-reporting on");
-    system("sudo ip link set can0 up");
 
     Utils::LogFmt("Connecting to can0");
 
@@ -61,7 +53,7 @@ void CanConnection::Send(CanFrame in_frame) {
 
 #ifndef SIMULATION
     struct can_frame frame;
-    frame.can_id = in_frame.can_id | CAN_EFF_FLAG;
+    frame.can_id = in_frame.arb_id | CAN_EFF_FLAG;
     frame.len = in_frame.len;
     memcpy(frame.data, in_frame.data, in_frame.len);
 
@@ -79,25 +71,42 @@ void CanConnection::Send(CanFrame in_frame) {
 void CanConnection::Recieve(bool& running) {
     int nbytes;
     struct can_frame frame;
+
+    fd_set fds;
+    struct timeval tv;
+
     while (running) {
 #ifndef SIMULATION
-        nbytes = read(_socket, &frame, sizeof(frame));
-        if (nbytes > 0) {
-            uint16_t id = frame.can_id & 0x000000FF;
-            auto callback = _callbacks.find(id);
-            if (callback != _callbacks.end()) { callback->second(CanFrame(frame)); }
-            // printf("can_id = 0x%X\r\ncan_dlc = %d \r\n", frame.can_id, frame.can_dlc);
-            // int i = 0;
-            // for(i = 0; i < 8; i++)
-            //     printf("data[%d] = %d\r\n", i, frame.data[i]);
+
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+        FD_ZERO(&fds);
+        FD_SET(_socket, &fds);
+        
+        if (select(_socket+1, &fds, NULL, NULL, &tv) == -1) {
+            Utils::ErrFmt("CanConnection:Recieve - Error on select");
+        }
+        if (FD_ISSET(_socket, &fds)) {
+            nbytes = read(_socket, &frame, sizeof(frame));
+            if (nbytes > 0) {
+                uint16_t id = frame.can_id & 0x000000FF;
+                auto callback = _callbacks.find(id);
+                if (callback != _callbacks.end()) { callback->second(CanFrame(frame)); }
+                // printf("can_id = 0x%X\r\ncan_dlc = %d \r\n", frame.can_id, frame.can_dlc);
+                // int i = 0;
+                // for(i = 0; i < 8; i++)
+                //     printf("data[%d] = %d\r\n", i, frame.data[i]);
+            }
         }
 #endif
     }
 }
 
 void CanConnection::LogFrame(CanFrame frame) {
-    printf("CAN Frame id=%08x data=", frame.can_id);
-    for (int i = 0; i < frame.len; i++) { printf("%02x ", frame.data[i]); }
+    printf("CAN Frame id=%08x data=", frame.arb_id);
+    for (int i = 0; i < frame.len; i++) {
+        printf("%02x ", frame.data[i]);
+    }
     printf("\r\n");
 }
 

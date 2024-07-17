@@ -130,7 +130,7 @@ void NetworkManager::handlePacket(char* buffer, int start, size_t len) {
     size_t delim_index = raw_input.find(']');
     std::string cmd = raw_input.substr(1, delim_index - 1);
     std::string data = raw_input.substr(delim_index + 1, std::string::npos);
-    Utils::LogFmt("CMD: %s DATA: %s", cmd.c_str(), data.c_str());
+    // Utils::LogFmt("CMD: %s DATA: %s", cmd.c_str(), data.c_str());
 
     rapidjson::Document document;
     document.Parse(data.c_str());

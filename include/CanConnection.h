@@ -22,7 +22,6 @@ struct CanFrame {
     uint32_t arb_id;
     uint8_t* data;
     size_t len;
-    canid_t can_id;
 
     CanFrame() {
     }

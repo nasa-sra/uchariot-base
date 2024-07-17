@@ -20,6 +20,7 @@
 #else
 #include "subsystems/IMUBase.h"
 #endif
+#include "subsystems/Vision.h"
 
 // The main robot class is resonsible for:
 // - timing update loops
@@ -55,6 +56,7 @@ private:
 #else
     SimIMU _imu;
 #endif
+    Vision _vis;
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;
