@@ -5,7 +5,7 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 set(CMAKE_GENERATOR "Unix Makefiles")
 
 set(TOOLCHAIN_DIR /usr/bin)
-set(CMAKE_SYSROOT ~/uchariot-sys/jetson-sysroot)
+set(CMAKE_SYSROOT ~/uchariot-sys/sysroot)
 link_directories(/usr/aarch64-linux-gnu/lib)
 # include_directories(/usr/aarch64-linux-gnu/include)
 include_directories(${CMAKE_SYSROOT}/usr/include)
