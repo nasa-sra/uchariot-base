@@ -58,6 +58,7 @@ void PathingController::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "targetHeading", _targetHeading);
     StateReporter::GetInstance().UpdateKey(prefix + "distanceToWaypoint", _distanceToWaypoint);
     StateReporter::GetInstance().UpdateKey(prefix + "runningPath", _runningPath);
+    StateReporter::GetInstance().UpdateKey(prefix + "currentStep", _currentStep);
 }
 
 void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
@@ -183,7 +184,7 @@ bool PathingController::loadXMLPath(std::string filePath) {
 		}
 	}
 	_path.back().tolerance = _endTolerance;
-    Utils::LogFmt("Loaded Auton");
+    Utils::LogFmt("Loaded Auton with %i points", _path.size());
     return true;
 }
 

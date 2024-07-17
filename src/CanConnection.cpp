@@ -9,7 +9,7 @@ CanConnection::CanConnection() {
     system("sudo modprobe can_raw");
     system("sudo modprobe mttcan");
     system("sudo ifconfig can0 txqueuelen 10");
-    system("sudo ip link set can0 up type can bitrate 500000 berr-reporting on");
+    system("sudo ip link set can0 up type can bitrate 500000");
 
     Utils::LogFmt("Connecting to can0");
 

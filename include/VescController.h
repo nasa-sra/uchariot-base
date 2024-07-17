@@ -24,6 +24,7 @@ public:
 
     double GetVoltage() {return _voltageIn;}
     double GetVelocity() {return _velocity;}
+    double GetCmdVelocity() {return _cmdVelocity;}
 
     void packetHandler(CanFrame frame);
     void ReportState(std::string prefix = "/");
