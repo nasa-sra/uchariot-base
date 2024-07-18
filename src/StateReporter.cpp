@@ -17,6 +17,7 @@ StateReporter::StateReporter() {
 
 void StateReporter::UpdateKey(std::string key, double val) {
     if (std::isfinite(val)) {
+        val = (int(val * 1000 + 0.5)) / 1000.0;
         auto it = _state.find(key);
         if (it == _state.end()) {
             addKey(key, val);

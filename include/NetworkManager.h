@@ -20,7 +20,7 @@ public:
         return _instance;
     }
 
-    void Start(int port, PacketCallback packetCallback);
+    bool Start(int port, PacketCallback packetCallback);
     void Send(int fd, const char* buffer, int len);
     void SendAll(const char* buffer, int len);
     void CloseConnections();

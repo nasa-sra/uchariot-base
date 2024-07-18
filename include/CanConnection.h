@@ -36,10 +36,10 @@ public:
         return _instance;
     }
 
-    void Start(bool& running);
+    void Start();
     void RegisterPacketHandler(uint16_t id, std::function<void(CanFrame)> handler);
     void Send(CanFrame frame);
-    void Recieve(bool& running);
+    void Recieve();
     void CloseConnection();
 
 private:
@@ -48,6 +48,7 @@ private:
     CanConnection();
 
     std::thread _receiveThread;
+    bool _running{true};
 
     int _socket;
     std::vector<struct can_filter> _filters;

@@ -56,7 +56,7 @@ private:
 #else
     SimIMU _imu;
 #endif
-    Vision _vis;
+    Vision _vision;
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase* _active_controller;

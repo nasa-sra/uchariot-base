@@ -8,8 +8,8 @@ CanConnection::CanConnection() {
     system("sudo modprobe can");
     system("sudo modprobe can_raw");
     system("sudo modprobe mttcan");
-    system("sudo ifconfig can0 txqueuelen 10");
-    system("sudo ip link set can0 up type can bitrate 500000");
+    system("sudo ip link set can0 up type can bitrate 500000 restart-ms 100");
+    system("sudo ifconfig can0 txqueuelen 1000");
 
     Utils::LogFmt("Connecting to can0");
 
@@ -35,8 +35,8 @@ CanConnection::CanConnection() {
 #endif
 }
 
-void CanConnection::Start(bool& running) {
-    _receiveThread = std::thread(&CanConnection::Recieve, this, std::ref(running));
+void CanConnection::Start() {
+    _receiveThread = std::thread(&CanConnection::Recieve, this);
 }
 
 void CanConnection::RegisterPacketHandler(uint16_t id, std::function<void(CanFrame)> handler) {
@@ -68,14 +68,14 @@ void CanConnection::Send(CanFrame in_frame) {
 #endif
 }
 
-void CanConnection::Recieve(bool& running) {
+void CanConnection::Recieve() {
     int nbytes;
     struct can_frame frame;
 
     fd_set fds;
     struct timeval tv;
 
-    while (running) {
+    while (_running) {
 #ifndef SIMULATION
 
         tv.tv_sec = 1;
@@ -112,6 +112,7 @@ void CanConnection::LogFrame(CanFrame frame) {
 
 void CanConnection::CloseConnection() {
     Utils::LogFmt("Closing can network");
+    _running = false;
     _receiveThread.join();
 #ifndef SIMULATION
     close(_socket);

@@ -20,13 +20,13 @@ double Vision::GetEntry(const std::string& entry)
         return std::stod(_msg._content);
     } catch (const std::exception& e) {
         // Log error and return default value
-        Utils::ErrFmt("Couldn't parse entry \"%s\" with value \"%s\".", entry, _msg._content);
+        // Utils::ErrFmt("Couldn't parse entry \"%s\" with value \"%s\".", entry, _msg._content);
         return 0.0;  // Return default value or throw an exception?
     }
 }
 
 void Vision::Update(double dt) {
-    _heading = GetEntry("rs_heading");
+    // _heading = GetEntry("rs_heading");
     //Utils::LogFmt("Heading = %f", _heading);
 }
 

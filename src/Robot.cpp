@@ -49,7 +49,7 @@ void Robot::Run(int rate, bool& running) {
         _imu.Update(dt);
         _localization.Update(dt, _driveBase.GetVelocities());
         _gps.Update(dt);
-        _vis.Update(dt);
+        _vision.Update(dt);
 
         // Report state
         std::string prefix = "/robot/";
@@ -61,7 +61,7 @@ void Robot::Run(int rate, bool& running) {
         _localization.ReportState();
         _gps.ReportState();
         _imu.ReportState();
-        _vis.ReportState();
+        _vision.ReportState();
         StateReporter::GetInstance().PushState();
 
         // Handle periodic update scheduling
