@@ -16,12 +16,13 @@ void Localization::Update(double dt, DriveBaseFeedback driveVels, double heading
 
     _pose.pos += vel * dt;
 
-	Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs, heading_imu - heading_rs); 
+	//Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs, heading_imu - heading_rs); 
 
 #ifdef USE_ODOM_ROT
     _heading_odom += omega * dt;
+#else
+    _pose.heading += heading_rs; // the real odom
 #endif
-    _pose.heading += 0; // the real odom
 }
 
 void Localization::ReportState(std::string prefix) {
