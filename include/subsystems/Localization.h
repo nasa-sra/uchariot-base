@@ -14,12 +14,14 @@ class Localization : SubsystemBase {
 
     Localization();
 
-    void Update(double dt, DriveBaseFeedback driveVels);
+    void Update(double dt, DriveBaseFeedback driveVels, double heading_imu, double heading_rs);
     void ReportState(std::string prefix = "/");
 
     Pose getPose() {return _pose;}
 
 private:
+
+	double _heading_odom;
 
     Pose _pose{{0.0, 0.0}, 0.0};
 

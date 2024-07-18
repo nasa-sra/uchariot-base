@@ -35,15 +35,17 @@ BNO055::BNO055() : IMUBase() {
     }
 }
 
+#define DEG2RAD (M_PI/180.0)
+
 void BNO055::Update(double dt) {
     int16_t x, y, z;
     x = readDataRegister(EUL_X_LOW_REG);
     y = readDataRegister(EUL_Y_LOW_REG);
     z = readDataRegister(EUL_Z_LOW_REG);
 
-    _gyroAngles.x() = ((float)x) / 16.0;
-    _gyroAngles.y() = ((float)y) / 16.0;
-    _gyroAngles.z() = ((float)z) / 16.0;
+    _gyroAngles.x() = (((float)x) / 16.0) * DEG2RAD;
+    _gyroAngles.y() = (((float)y) / 16.0) * DEG2RAD;
+    _gyroAngles.z() = (((float)z) / 16.0) * DEG2RAD;
 }
 
 int BNO055::readRegister(uint8_t register_add) {
