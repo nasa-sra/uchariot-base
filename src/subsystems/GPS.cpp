@@ -50,7 +50,9 @@ void GPS::Update(double dt) {
 	    	Utils::LogFmt("Time: %ld.%09ld ", _gps_data.fix.time.tv_sec, _gps_data.fix.time.tv_nsec);
 #endif
         } else {
+#ifdef VERBOSE
             Utils::LogFmt("Time: n/a");
+#endif
         }
         if (isfinite(_gps_data.fix.latitude) && isfinite(_gps_data.fix.longitude)) {
             // Display data from the GPS receiver if valid.
@@ -58,7 +60,9 @@ void GPS::Update(double dt) {
             Utils::LogFmt("Lat %.6f Lon %.6f\n", _gps_data.fix.latitude, _gps_data.fix.longitude);
 #endif
         } else {
+#ifdef VERBOSE
             Utils::LogFmt("Lat n/a Lon n/a\n");
+#endif
         }
     }
 }

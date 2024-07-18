@@ -41,10 +41,10 @@ void Robot::Run(int rate, bool& running) {
         }
 
         // Commmand subsystems
-        //_driveBase.SetCmds(cmds.drive);
+        _driveBase.SetCmds(cmds.drive);
 
         // Update subsystems
-        //_driveBase.Update(dt);
+        _driveBase.Update(dt);
         _imu.Update(dt);
         _gps.Update(dt);
         _vision.Update(dt);
