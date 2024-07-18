@@ -50,12 +50,12 @@ private:
     GPS _gps;
 
     DriveBase _driveBase;
-    Localization _localization;
 #ifndef SIMULATION
     BNO055 _imu;
 #else
     SimIMU _imu;
 #endif
+    Localization _localization;
     Vision _vision;
 
     std::string _active_controller_name, _last_controller_name;

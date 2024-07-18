@@ -18,9 +18,9 @@ class IMUBase : SubsystemBase {
       StateReporter::GetInstance().UpdateKey(prefix + "pitch", _gyroAngles.x());
     }
 
-    float getRoll() {return _gyroAngles.x();}
-    float getPitch() {return _gyroAngles.y();}
-    float getYaw() {return _gyroAngles.z();}
+    float GetRoll() {return _gyroAngles.x();}
+    float GetPitch() {return _gyroAngles.y();}
+    float GetYaw() {return _gyroAngles.z();}
 
 protected:
 

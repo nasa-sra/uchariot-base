@@ -2,6 +2,8 @@
 
 #include "Utils.h"
 #include "subsystems/DriveBase.h"
+#include "subsystems/IMUBase.h"
+#include "subsystems/Vision.h"
 #include "subsystems/SubsystemBase.h"
 
 struct Pose {
@@ -11,24 +13,25 @@ struct Pose {
 
 class Localization : SubsystemBase {
 public:
-    Localization();
+    Localization(DriveBase* driveBase, IMUBase* imu, Vision* vision);
 
-    void Update(double dt, DriveBaseFeedback driveVels, double heading_imu, double heading_rs);
+    void Update(double dt);
     void ReportState(std::string prefix = "/");
 
-    Pose getPose() {
-        return _pose;
-    }
+    void ResetHeading();
+    void ResetPose();
+    
+    Pose getPose() { return _pose; }
 
-    void ResetHeading() {
-        _pose(_pose.pos, 0.0);
-    }
+private:
 
-    void ResetPose() {
-        _pose({0.0, 0.0}, _pose.heading);
-    }
-
-    double _heading_odom;
+    DriveBase* _driveBase;
+    IMUBase* _imu;
+    Vision* _vision;
 
     Pose _pose{{0.0, 0.0}, 0.0};
+
+    double _imuOffset{0.0};
+    double _rsOffset{0.0};
+
 };

@@ -1,6 +1,6 @@
 #include "Robot.h"
 
-Robot::Robot() {
+Robot::Robot() : _localization(&_driveBase, &_imu, &_vision) {
 }
 
 // Recive a network command and handle it appropriately.
@@ -52,7 +52,7 @@ void Robot::Run(int rate, bool& running) {
         _imu.Update(dt);
         _gps.Update(dt);
         _vision.Update(dt);
-        _localization.Update(dt, _driveBase.GetVelocities(), _imu.getYaw(), _vision.GetHeading());
+        _localization.Update(dt);
 
         // Report state
         std::string prefix = "/robot/";
