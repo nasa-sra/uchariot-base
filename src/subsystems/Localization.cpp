@@ -1,10 +1,11 @@
 #include "subsystems/Localization.h"
 #include "Utils.h"
 
-Localization::Localization(DriveBase* driveBase, IMUBase* imu, Vision* vision) {
+Localization::Localization(DriveBase* driveBase, IMUBase* imu, Vision* vision, GPS* gps) {
     _driveBase = driveBase;
     _imu = imu;
     _vision = vision;
+    _gps = gps;
 }
 
 void Localization::Update(double dt) {
@@ -20,6 +21,12 @@ void Localization::Update(double dt) {
     Eigen::Vector2d vel(v * cos(_pose.heading), v * sin(_pose.heading));
 
     _pose.pos += vel * dt;
+
+    gps_fix_t fix = _gps->GetFix();
+    if (fix.time.tv_nsec != _lastGPSUpdate.tv_nsec && fix.time.tv_sec != _lastGPSUpdate.tv_sec) {
+        _pose.pos = Utils::geoToLTP(Utils::GeoPoint(fix), _origin).head<2>();
+        _lastGPSUpdate = fix.time;
+    }
 
 	//Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs, heading_imu - heading_rs); 
 

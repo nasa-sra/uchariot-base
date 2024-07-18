@@ -1,6 +1,8 @@
 #include "Robot.h"
 
-Robot::Robot() : _localization(&_driveBase, &_imu, &_vision) {
+Robot::Robot() : 
+    _localization(&_driveBase, &_imu, &_vision, &_gps),
+    _pathingController(&_localization) {
 }
 
 // Recive a network command and handle it appropriately.
@@ -40,7 +42,7 @@ void Robot::Run(int rate, bool& running) {
         switch (_mode) {
         case ControlMode::DISABLED: cmds = ControlCmds(); break;
         case ControlMode::TELEOP: cmds = _teleopController.Run(); break;
-        case ControlMode::PATHING: cmds = _pathingController.Run(_localization.getPose()); break;
+        case ControlMode::PATHING: cmds = _pathingController.Run(); break;
         default: break;
         }
 

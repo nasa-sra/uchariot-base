@@ -48,6 +48,7 @@ void GPS::Update(double dt) {
 #endif
         }
         if (isfinite(_gps_data.fix.latitude) && isfinite(_gps_data.fix.longitude)) {
+            _lastFix = _gps_data.fix;
             // Display data from the GPS receiver if valid.
 #ifdef VERBOSE // not an error condition
             Utils::LogFmt("Lat %.6f Lon %.6f\n", _gps_data.fix.latitude, _gps_data.fix.longitude);

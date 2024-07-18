@@ -14,17 +14,16 @@ struct PathStep {
 class PathingController : public ControllerBase {
 
 public:
-    PathingController() : ControllerBase("pathing") {
-    }
+    PathingController(Localization* localization);
 
     void Load() override;
     void Unload() override;
-    ControlCmds Run(Pose robotPose);
-
+    ControlCmds Run();
     void ReportState(std::string prefix = "/");
     void HandleNetworkInput(rapidjson::Document& doc);
-
     void Stop();
+
+    Utils::GeoPoint GetOrigin() {return _origin;}
 
 private:
     bool loadPath(std::string filePath);
@@ -33,6 +32,8 @@ private:
     Eigen::Vector3d parseCoordinates(std::string coords);
     Utils::GeoPoint parseGeoCoordinates(std::string coords, bool altitude, bool flipped = false);
     Eigen::Vector3d geoToPathCoord(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin);
+
+    Localization* _localization;
 
     std::string _pathName{""};
     bool _runningPath{false};
@@ -51,4 +52,6 @@ private:
     double _distanceToWaypoint{0.0};
 
     Eigen::Vector2d _nextWaypoint{0.0, 0.0};
+
+    Utils::GeoPoint _origin;
 };

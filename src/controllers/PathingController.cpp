@@ -2,9 +2,12 @@
 
 #include "pathgen/PathGenerator.h"
 #include "tinyxml2.h"
-#include <Eigen/Geometry>
 
 #include "controllers/PathingController.h"
+
+PathingController::PathingController(Localization* localization) : ControllerBase("pathing") {
+    _localization = localization;
+}
 
 void PathingController::Load() {
     _runningPath = false;
@@ -12,7 +15,7 @@ void PathingController::Load() {
 }
 void PathingController::Unload() {};
 
-ControlCmds PathingController::Run(Pose robotPose) {
+ControlCmds PathingController::Run() {
     ControlCmds cmds;
 
     if (!_runningPath && _pathName != "") {
@@ -21,10 +24,12 @@ ControlCmds PathingController::Run(Pose robotPose) {
             _pathName = "";
         } else {
             Utils::LogFmt("Running Path ...");
+            _localization->SetOrigin(_origin);
         }
     }
 
     if (_runningPath) {
+        Pose robotPose = _localization->GetPose();
         _nextWaypoint = _path[_currentStep].pos.head<2>();
         Eigen::Vector2d diff = _nextWaypoint - robotPose.pos;
         _distanceToWaypoint = diff.norm();
@@ -137,8 +142,8 @@ bool PathingController::loadXMLPath(std::string filePath) {
             while (ss >> coord) {
 
                 Utils::GeoPoint point = parseGeoCoordinates(coord, false, true);
-                Utils::GeoPoint origin = _path.size() > 0 ? _path[0].geoPoint : point;
-                Eigen::Vector3d pos = geoToPathCoord(point, origin);
+                if (_path.size() == 0) { _origin = point; }
+                Eigen::Vector3d pos = geoToLTP(point, _origin);
 
                 PathStep step;
                 step.pos = pos;
@@ -196,7 +201,7 @@ bool PathingController::loadKMLPath(std::string filePath) {
     _path.clear();
     for (Utils::GeoPoint& point : points) {
         Utils::GeoPoint origin = _path.size() > 0 ? _path[0].geoPoint : point;
-        Eigen::Vector3d pos = geoToPathCoord(point, origin);
+        Eigen::Vector3d pos = Utils::geoToLTP(point, origin);
 
         PathStep step;
         step.pos = pos;
@@ -249,27 +254,4 @@ Utils::GeoPoint PathingController::parseGeoCoordinates(std::string coords, bool 
     }
 
     return point;
-}
-
-Eigen::Vector3d PathingController::geoToPathCoord(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin) {
-
-    Eigen::Vector3d pos = Utils::geoToEarthCoord(geo);
-    Eigen::Vector3d origin = Utils::geoToEarthCoord(geoOrigin);
-
-    // This is the solution to the intersection of each step pos vector with a plane normal to and thru the starting
-    // point
-    double t = origin.dot(origin) / origin.dot(pos);
-    // This rescale step.pos to be on the plane, then transforms its origin to be from the starting point
-    pos = t * pos - origin;
-
-    // This should all be cached
-    Eigen::Vector3d planeNormal = origin.normalized();
-    Eigen::Matrix3d planeBasis;
-    planeBasis.col(2) = planeNormal;                                 // up
-    planeBasis.col(1) = planeNormal.cross(Eigen::Vector3d(0, 0, 1)); // west
-    planeBasis.col(0) = planeBasis.col(1).cross(planeNormal);        // north
-
-    Eigen::Matrix3d rotation = planeBasis.inverse(); // used identity for target basis
-    // Rotate from the plane basis to a standard one, x=north, y=west, z=up
-    return rotation * pos;
 }

@@ -47,7 +47,6 @@ private:
 
     TeleopController _teleopController;
     PathingController _pathingController;
-    GPS _gps;
 
     DriveBase _driveBase;
 #ifndef SIMULATION
@@ -55,6 +54,7 @@ private:
 #else
     SimIMU _imu;
 #endif
+    GPS _gps;
     Localization _localization;
     Vision _vision;
 

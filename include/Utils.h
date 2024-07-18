@@ -13,8 +13,10 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <sys/time.h>
+#include <gps.h>
 
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 #ifdef __GNUC__
 #define vsprintf_s vsnprintf
@@ -22,8 +24,6 @@
 #define _strdup strdup
 #define _snprintf std::snprintf
 #endif
-
-
 
 namespace Utils {
 typedef int64_t msec_t;
@@ -134,11 +134,16 @@ struct GeoPoint {
 	double lat, lon, alt;
     GeoPoint() : lat(0.0), lon(0.0), alt(EARTHS_RADIUS) {}
     GeoPoint(double _lat, double _long) : lat(_lat), lon(_long), alt(EARTHS_RADIUS) {}
+    GeoPoint(gps_fix_t fix) : lat(fix.latitude), lon(fix.longitude), alt(fix.altMSL) {}
 
 };
 
-// Converts geopoint to a cartesian coordinates with the earth's center as the origin and the poles as the z axis
-Eigen::Vector3d geoToEarthCoord(GeoPoint point);
+// Converts from latitude and longitude to Earth Centered, Earth Fixed coordinates
+// https://en.wikipedia.org/wiki/Earth-centered,_Earth-fixed_coordinate_system
+Eigen::Vector3d geoToECEF(GeoPoint point);
+// Converts to Local Tangent Plane Coordinates, except ignores the conventional directions and uses x - north, y - west, z - up
+// https://en.wikipedia.org/wiki/Local_tangent_plane_coordinates
+Eigen::Vector3d geoToLTP(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin);
 
 struct PIDValues {
     float kP;

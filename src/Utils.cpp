@@ -43,13 +43,37 @@ double Utils::ScheduleRate(int rate, std::chrono::high_resolution_clock::time_po
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count() / 1000.0;
 }
 
-Eigen::Vector3d Utils::geoToEarthCoord(GeoPoint point) {
+
+Eigen::Vector3d Utils::geoToECEF(GeoPoint point) {
 
 	point.lat *= M_PI / 180;
 	point.lon *= M_PI / 180;
 
 	double distance = point.alt + EARTHS_RADIUS;
 	return Eigen::Vector3d(cos(point.lon) * distance * cos(point.lat), sin(point.lon) * distance * cos(point.lat), distance * sin(point.lat));
+}
+
+Eigen::Vector3d Utils::geoToLTP(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin) {
+
+    Eigen::Vector3d pos = Utils::geoToECEF(geo);
+    Eigen::Vector3d origin = Utils::geoToECEF(geoOrigin);
+
+    // This is the solution to the intersection of each step pos vector with a plane normal to and thru the starting
+    // point
+    double t = origin.dot(origin) / origin.dot(pos);
+    // This rescale step.pos to be on the plane, then transforms its origin to be from the starting point
+    pos = t * pos - origin;
+
+    // This should all be cached
+    Eigen::Vector3d planeNormal = origin.normalized();
+    Eigen::Matrix3d planeBasis;
+    planeBasis.col(2) = planeNormal;                                 // up
+    planeBasis.col(1) = planeNormal.cross(Eigen::Vector3d(0, 0, 1)); // west
+    planeBasis.col(0) = planeBasis.col(1).cross(planeNormal);        // north
+
+    Eigen::Matrix3d rotation = planeBasis.inverse(); // used identity for target basis
+    // Rotate from the plane basis to a standard one, x=north, y=west, z=up
+    return rotation * pos;
 }
 
 double Utils::PIDController::Calculate(double current, double target) {

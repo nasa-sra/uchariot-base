@@ -14,7 +14,10 @@ public:
     void ReportState(std::string prefix = "/");
     void Disconnect();
 
+    gps_fix_t GetFix() { return _lastFix; }
+
 private:
     bool _connected{false};
-    struct gps_data_t _gps_data;
+    gps_data_t _gps_data;
+    gps_fix_t _lastFix;
 };
