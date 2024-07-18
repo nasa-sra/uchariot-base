@@ -20,8 +20,8 @@ public:
         return _pose;
     }
 
-    void ResetOdometry() {
-        _pose({0.0, 0.0}, 0.0);
+    void ResetHeading() {
+        _pose(_pose.pos, 0.0);
     }
 
     void ResetPose() {

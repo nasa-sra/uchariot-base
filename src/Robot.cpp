@@ -11,8 +11,8 @@ void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
             _teleopController.HandleNetworkInput(doc);
         } else if (cmd == "run_path") {
             _pathingController.HandleNetworkInput(doc);
-        } else if (cmd == "reset_odometry") {
-            _localization.ResetOdometry();
+        } else if (cmd == "reset_heading") {
+            _localization.ResetHeading();
         } else if (cmd == "reset_pose") {
             _localization.ResetPose();
         } else if (cmd == "stop_path") {
