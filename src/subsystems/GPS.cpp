@@ -2,7 +2,10 @@
 #include "subsystems/GPS.h"
 #include <math.h>
 
+// #define VERBOSE
+
 #define MODE_STR_NUM 4
+
 static std::string mode_str[MODE_STR_NUM] = {"n/a", "None", "2D", "3D"};
 
 GPS::GPS() {
@@ -25,22 +28,30 @@ void GPS::Update(double dt) {
             break;
         }
         if (MODE_SET != (MODE_SET & _gps_data.set)) {
-            // did not even get mode, nothing to see here
+#ifdef VERBOSE // not necessarily an error condition
+            Utils::LogFmt("GPS: Did not get a mode");
+#endif
             continue;
         }
         if (0 > _gps_data.fix.mode || MODE_STR_NUM <= _gps_data.fix.mode) { _gps_data.fix.mode = 0; }
-        printf("Fix mode: %s (%d) Time: ", mode_str[_gps_data.fix.mode].c_str(), _gps_data.fix.mode);
+#ifdef VERBOSE // not an error condition -- acceptable for normal operation
+        Utils::LogFmt("Fix mode: %s (%d)", mode_str[_gps_data.fix.mode].c_str(), _gps_data.fix.mode);
+#endif
         if (TIME_SET == (TIME_SET & _gps_data.set)) {
             // not 32 bit safe
-            printf("%ld.%09ld ", _gps_data.fix.time.tv_sec, _gps_data.fix.time.tv_nsec);
+#ifdef VERBOSE // not an error condition
+            Utils::LogFmt("Time: %ld.%09ld ", _gps_data.fix.time.tv_sec, _gps_data.fix.time.tv_nsec);
+#endif
         } else {
-            puts("n/a ");
+            Utils::LogFmt("Time: n/a");
         }
         if (isfinite(_gps_data.fix.latitude) && isfinite(_gps_data.fix.longitude)) {
             // Display data from the GPS receiver if valid.
-            printf("Lat %.6f Lon %.6f\n", _gps_data.fix.latitude, _gps_data.fix.longitude);
+#ifdef VERBOSE // not an error condition
+            Utils::LogFmt("Lat %.6f Lon %.6f\n", _gps_data.fix.latitude, _gps_data.fix.longitude);
+#endif
         } else {
-            printf("Lat n/a Lon n/a\n");
+            Utils::LogFmt("Lat n/a Lon n/a\n");
         }
     }
 }
@@ -52,5 +63,5 @@ void GPS::Disconnect() {
 
 void GPS::ReportState(std::string prefix) {
     prefix += "GPS/";
-    // StateReporter::GetInstance().UpdateKey(prefix + "yaw", _gyroAngles.z());
+    //   StateReporter::GetInstance().UpdateKey(prefix + "yaw", _gyroAngles.z());
 }

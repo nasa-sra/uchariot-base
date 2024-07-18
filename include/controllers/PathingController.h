@@ -45,6 +45,8 @@ private:
     double _velocityGain{5.0};
     double _headingGain{1.0};
     float _endTolerance{0.1};
+    double _targetHeading{0.0};
+    double _distanceToWaypoint{0.0};
 
     Eigen::Vector2d _nextWaypoint{0.0, 0.0};
 

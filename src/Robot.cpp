@@ -1,19 +1,21 @@
 #include "Robot.h"
 
-Robot::Robot() {}
+Robot::Robot() {
+}
 
 // Recive a network command and handle it appropriately.
 void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
-    if (cmd == "set_controller") { 
-        _newMode = nameToMode(doc["name"].GetString());
-    }
-
-    if (cmd == "teleop_drive") {
-        _teleopController.HandleNetworkInput(doc);
-    } else if (cmd == "run_path") {
-        _pathingController.HandleNetworkInput(doc);
-    } else if (cmd == 'reset_odometry') {
-        _localization.ResetOdometry();
+    try {
+        if (cmd == "set_controller") { 
+            _newMode = nameToMode(doc["name"].GetString());
+        }
+        if (cmd == "teleop_drive") {
+            _teleopController.HandleNetworkInput(doc);
+        } else if (cmd == "run_path") {
+            _pathingController.HandleNetworkInput(doc);
+        }
+    } catch(...) {
+        Utils::LogFmt("Could not parse command"); // This still crashes
     }
 }
 
@@ -32,42 +34,38 @@ void Robot::Run(int rate, bool& running) {
         // Run the active controller
         ControlCmds cmds;
         switch (_mode) {
-            case ControlMode::DISABLED:
-                cmds = ControlCmds();
-                break;
-            case ControlMode::TELEOP:
-                cmds = _teleopController.Run();
-                break;
-            case ControlMode::PATHING:
-                cmds = _pathingController.Run(_localization.getPose());
-                break;
-            
-            default:
-                break;
+			case ControlMode::DISABLED: cmds = ControlCmds(); break;
+			case ControlMode::TELEOP: cmds = _teleopController.Run(); break;
+			case ControlMode::PATHING: cmds = _pathingController.Run(_localization.getPose()); break;
+        	default: break;
         }
 
         // Commmand subsystems
-        _driveBase.SetCmds(cmds.drive);
+        //_driveBase.SetCmds(cmds.drive);
 
         // Update subsystems
-        _driveBase.Update(dt);
+        //_driveBase.Update(dt);
         _imu.Update(dt);
-        _localization.Update(dt, _driveBase.GetVelocities());
-        // _gps.Update(dt);
+        _gps.Update(dt);
+        _vision.Update(dt);
+        _localization.Update(dt, _driveBase.GetVelocities(), _imu.getYaw(), _vision.GetHeading());
 
         // Report state
+        std::string prefix = "/robot/";
+        StateReporter::GetInstance().UpdateKey(prefix + "mode", _mode);
+
         cmds.ReportState();
         _pathingController.ReportState();
         _driveBase.ReportState();
         _localization.ReportState();
+        _gps.ReportState();
         _imu.ReportState();
+        _vision.ReportState();
         StateReporter::GetInstance().PushState();
 
-        // Handle periodic update scheduling 
+        // Handle periodic update scheduling
         dt = Utils::ScheduleRate(rate, start_time);
-        if (dt > 1.0 / rate) {
-            Utils::LogFmt("Robot Run overran by %f s", dt);
-        }
+        if (dt > 1.0 / rate) { Utils::LogFmt("Robot Run overran by %f s", dt); }
     }
 }
 

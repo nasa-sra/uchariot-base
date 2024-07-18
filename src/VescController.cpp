@@ -37,12 +37,12 @@ void VescController::SetCmd(float cmd) {
             sendDutyCycle(_cmdDutyCycle);
             break;
         case VELOCITY:
-            _cmdVelocity = cmd * _scale;
-            sendRPM(_cmdVelocity);
+            _cmdVelocity = cmd;
+            sendRPM(_cmdVelocity * _scale);
             break;
         case POSITION:
-            _cmdPosition = cmd * _scale;
-            sendPosition(_cmdPosition);
+            _cmdPosition = cmd;
+            sendPosition(_cmdPosition * _scale);
             break;
         case CURRENT:
             _cmdCurrent = cmd;
@@ -63,7 +63,7 @@ static void print_buf(const char *title, const unsigned char *buf, size_t buf_le
 }
 
 void VescController::packetHandler(CanFrame frame) {
-    uint8_t statusID = (frame.can_id & 0x0000FF00) >> 8;
+    uint8_t statusID = (frame.arb_id & 0x0000FF00) >> 8;
     
     switch (statusID) {
         case CAN_PACKET_STATUS:

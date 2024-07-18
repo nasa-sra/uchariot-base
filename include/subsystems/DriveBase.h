@@ -1,25 +1,20 @@
 #pragma once
 
-#define ROBOT_WIDTH 1.0
-
 #include "VescController.h"
 
 #include "StateReporter.h"
 #include "subsystems/SubsystemBase.h"
 #include "controllers/PIDController.h"
 
+#define ROBOT_WIDTH 1.0 // m (yes really)
+#define MAX_DRIVE_SPEED 5.0 // m/s
+
 struct DriveBaseCmds {
 
-    float _lf_speed{0};
-    float _rf_speed{0};
-    float _lb_speed{0};
-    float _rb_speed{0};
-
-    DriveBaseCmds(){}
-    DriveBaseCmds(double angular, double drive);
+    double velocity;
+    double angularVelocity;
 
     void ReportState(std::string prefix = "/");
-
 };
 
 struct DriveBaseFeedback {
@@ -31,12 +26,11 @@ public:
     DriveBase();
 
     void Update(double dt) override;
+
     void ReportState(std::string prefix = "/") override;
     DriveBaseFeedback GetVelocities();
+    inline void SetCmds(DriveBaseCmds cmds) {_cmds = cmds;}
 
-    inline void SetCmds(DriveBaseCmds cmds) {
-        _cmds = cmds;
-    }
 
 private:
     DriveBaseCmds _cmds;

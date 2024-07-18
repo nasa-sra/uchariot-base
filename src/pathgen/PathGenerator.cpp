@@ -80,14 +80,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
     double speed_lat = (speed_ms * 2.23693629) / 60;
     double radius_lat = (radius_m / 1609.344) / 60;
 
-    std::ofstream ptFile;
-    ptFile.open("Points.txt");
-
-    std::cout << ptFile.is_open() << " OPENSTATUS\n";
-    ptFile << "x, y" << std::endl;
-
     for (int i = 0; i < points.size(); ++i) {
-        ptFile << points[i].x() << ", " << points[i].y() << std::endl;
         if (i == 0 || i == (points.size()) - 1) {
             n_points.push_back(GenPoint(points[i], false));
             continue;
@@ -100,8 +93,6 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
         n_points.push_back(GenPoint(points[i], true));
         n_points.push_back(GenPoint(postVector, false));
     }
-
-    ptFile.close();
 
     std::vector<Eigen::Vector3d> finPoints;
 
@@ -130,13 +121,6 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
     Utils::PrintLnFmt("Nodes: %i", curve->node_count());
     std::cout << curve->total_length() << "\n";
 
-    std::ofstream pathFile;
-    pathFile.open("PathGenerated.txt");
-
-    std::cout << pathFile.is_open() << " OPENSTATUS\n";
-
-    pathFile << "x, y" << std::endl;
-
     std::string pathFinalString = "";
 
     for (int i = 0; i < curve->node_count(); i++) {
@@ -153,7 +137,6 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
         }
         PathGenerator::_pathPointsRaw.push_back(tempPoint);
 
-        pathFile << tempPoint.x << ", " << tempPoint.y << ", " << tempPoint.time << std::endl;
     }
 
     delete curve;
@@ -181,12 +164,6 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
     printer.PushText(pathFinalString.c_str());
     printer.CloseElement();
     printer.CloseElement();
-
-    for (int i = 0; i < finPoints.size(); ++i) {
-        pathFile << finPoints[i].x() << ", " << finPoints[i].y() << std::endl;
-    }
-
-    pathFile.close();
 
     return 0;
 }

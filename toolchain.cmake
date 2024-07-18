@@ -7,8 +7,15 @@ set(CMAKE_GENERATOR "Unix Makefiles")
 set(TOOLCHAIN_DIR /usr/bin)
 set(CMAKE_SYSROOT ~/uchariot-sys/sysroot)
 link_directories(/usr/aarch64-linux-gnu/lib)
-include_directories(/usr/aarch64-linux-gnu/include)
+# include_directories(/usr/aarch64-linux-gnu/include)
 include_directories(${CMAKE_SYSROOT}/usr/include)
+include_directories(${CMAKE_SYSROOT}/usr/include/aarch64-linux-gnu)
+include_directories(${CMAKE_SYSROOT}/usr/include/c++/9)
+include_directories(${CMAKE_SYSROOT}/usr/include/c++/9/bits)
+include_directories(${CMAKE_SYSROOT}/usr/include/aarch64-linux-gnu/c++/9)
+include_directories(${CMAKE_SYSROOT}/usr/include/aarch64-linux-gnu/c++/9/bits)
+
+set(CMAKE_CXX_FLAGS "-isystem ${CMAKE_SYSROOT}/usr/include")
 
 set(CMAKE_C_COMPILER ${TOOLCHAIN_DIR}/aarch64-linux-gnu-gcc-9)
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/aarch64-linux-gnu-g++-9)
@@ -22,3 +29,4 @@ set(CMAKE_CROSSCOMPILING true)
 
 # set(OpenCV_DIR ${CMAKE_SYSROOT}/usr/local/lib/cmake/opencv4/)
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_SYSROOT}/usr/lib/aarch64-linux-gnu)
+

@@ -22,16 +22,21 @@ int main() {
     signal(SIGINT, HandleSigInt);
 
     CanConnection* can = &CanConnection::GetInstance();
-    can->Start(running);
+    can->Start();
     
     Robot robot;
-    NetworkManager::GetInstance().Start(8000, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);});
+
+    if (!NetworkManager::GetInstance().Start(8000, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);})) {
+        can->CloseConnection();
+        return 0;
+    }
 
     StateReporter::GetInstance().EnableLogging();
     StateReporter::GetInstance().EnableTelemetry();
 
     robot.Run(50, running);
     
+    robot.Shutdown();
     can->CloseConnection();
     NetworkManager::GetInstance().CloseConnections();
     StateReporter::GetInstance().Close();

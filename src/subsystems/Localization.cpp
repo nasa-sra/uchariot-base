@@ -4,7 +4,7 @@
 Localization::Localization() {
 }
 
-void Localization::Update(double dt, DriveBaseFeedback driveVels) {
+void Localization::Update(double dt, DriveBaseFeedback driveVels, double heading_imu, double heading_rs) {
 
     double vl = (driveVels.lf + driveVels.lb) / 2;
     double vr = (driveVels.rf + driveVels.rb) / 2;
@@ -15,7 +15,14 @@ void Localization::Update(double dt, DriveBaseFeedback driveVels) {
     Eigen::Vector2d vel(v * cos(_pose.heading), v * sin(_pose.heading));
 
     _pose.pos += vel * dt;
-    _pose.heading += omega * dt;
+
+	//Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs, heading_imu - heading_rs); 
+
+#ifdef USE_ODOM_ROT
+    _heading_odom += omega * dt;
+#else
+    _pose.heading += heading_rs; // the real odom
+#endif
 }
 
 void Localization::ReportState(std::string prefix) {
@@ -23,5 +30,4 @@ void Localization::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "x", _pose.pos.x());
     StateReporter::GetInstance().UpdateKey(prefix + "y", _pose.pos.y());
     StateReporter::GetInstance().UpdateKey(prefix + "heading", _pose.heading);
-    StateReporter::GetInstance().UpdateKey(prefix + "slipCoefficient", _slipCoefficient);
 }

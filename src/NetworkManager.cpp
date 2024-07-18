@@ -2,20 +2,25 @@
 
 NetworkManager::NetworkManager() {}
 
-void NetworkManager::Start(int port, PacketCallback packetCallback) {
+bool NetworkManager::Start(int port, PacketCallback packetCallback) {
 
     FD_ZERO(&_fds);
 
     _net_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (_net_socket == -1) {
-        Utils::LogFmt("NetworkManager failed to create socket");
+        Utils::LogFmt("NetworkManager failed to create socket. Error: %s", strerror(errno));
+        return false;
     }
     _net_addr.sin_family = AF_INET;
     _net_addr.sin_port = htons(port);
     _net_addr.sin_addr.s_addr = INADDR_ANY;
+    int option=1;
+    setsockopt(_net_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&option, sizeof(option));
 
     if (bind(_net_socket, (struct sockaddr*)&_net_addr, sizeof (_net_addr)) == -1) {
-        Utils::LogFmt("NetworkManager Socket Bind Failed");
+        Utils::LogFmt("NetworkManager Socket Bind Failed. Error: %s", strerror(errno));
+        close(_net_socket);
+        return false;
     }
 
     Utils::LogFmt("Listening on port %i", port);
@@ -25,6 +30,7 @@ void NetworkManager::Start(int port, PacketCallback packetCallback) {
 
     _packetCallback = packetCallback;
     _serverThread = std::thread(&NetworkManager::run, this);
+    return true;
 }
 
 // This is mostly from here https://beej.us/guide/bgnet/html/#select
@@ -130,7 +136,7 @@ void NetworkManager::handlePacket(char* buffer, int start, size_t len) {
     size_t delim_index = raw_input.find(']');
     std::string cmd = raw_input.substr(1, delim_index - 1);
     std::string data = raw_input.substr(delim_index + 1, std::string::npos);
-    Utils::LogFmt("CMD: %s DATA: %s", cmd.c_str(), data.c_str());
+    // Utils::LogFmt("CMD: %s DATA: %s", cmd.c_str(), data.c_str());
 
     rapidjson::Document document;
     document.Parse(data.c_str());
