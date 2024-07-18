@@ -21,11 +21,14 @@ public:
     }
 
     void ResetOdometry() {
-        return
+        _pose({0.0, 0.0}, 0.0);
     }
 
-	double _heading_odom;
+    void ResetPose() {
+        _pose({0.0, 0.0}, _pose.heading);
+    }
+
+    double _heading_odom;
 
     Pose _pose{{0.0, 0.0}, 0.0};
-
 };
