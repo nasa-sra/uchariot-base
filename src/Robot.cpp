@@ -6,15 +6,19 @@ Robot::Robot() {
 // Recive a network command and handle it appropriately.
 void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
     try {
-        if (cmd == "set_controller") { 
-            _newMode = nameToMode(doc["name"].GetString());
-        }
+        if (cmd == "set_controller") { _newMode = nameToMode(doc["name"].GetString()); }
         if (cmd == "teleop_drive") {
             _teleopController.HandleNetworkInput(doc);
         } else if (cmd == "run_path") {
             _pathingController.HandleNetworkInput(doc);
+        } else if (cmd == "reset_heading") {
+            _localization.ResetHeading();
+        } else if (cmd == "reset_pose") {
+            _localization.ResetPose();
+        } else if (cmd == "stop_path") {
+            _pathingController.Stop();
         }
-    } catch(...) {
+    } catch (...) {
         Utils::LogFmt("Could not parse command"); // This still crashes
     }
 }
@@ -34,10 +38,10 @@ void Robot::Run(int rate, bool& running) {
         // Run the active controller
         ControlCmds cmds;
         switch (_mode) {
-			case ControlMode::DISABLED: cmds = ControlCmds(); break;
-			case ControlMode::TELEOP: cmds = _teleopController.Run(); break;
-			case ControlMode::PATHING: cmds = _pathingController.Run(_localization.getPose()); break;
-        	default: break;
+        case ControlMode::DISABLED: cmds = ControlCmds(); break;
+        case ControlMode::TELEOP: cmds = _teleopController.Run(); break;
+        case ControlMode::PATHING: cmds = _pathingController.Run(_localization.getPose()); break;
+        default: break;
         }
 
         // Commmand subsystems
