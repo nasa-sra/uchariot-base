@@ -12,10 +12,9 @@ class IMUBase : SubsystemBase {
     virtual void Update(double dt) = 0;
     virtual void ReportState(std::string prefix = "/") {
       prefix += "imu/";
-      // StateReporter::GetInstance().UpdateKey(prefix + "roll", _gyroRates.x());
-      // StateReporter::GetInstance().UpdateKey(prefix + "pitch", _gyroRates.y());
       StateReporter::GetInstance().UpdateKey(prefix + "yaw", _gyroAngles.z());
-      StateReporter::GetInstance().UpdateKey(prefix + "pitch", _gyroAngles.x());
+      StateReporter::GetInstance().UpdateKey(prefix + "pitch", _gyroAngles.y());
+      StateReporter::GetInstance().UpdateKey(prefix + "roll", _gyroAngles.x());
     }
 
     float GetRoll() {return _gyroAngles.x();}
