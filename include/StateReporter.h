@@ -29,10 +29,17 @@ private:
         std::string name;
         std::vector<TreeNode*> branches;
         bool fruit;
-        double value;
         rapidjson::Value* json;
+
+        int value
+        bool boolValue;
+        int intValue;
+        double doubleValue;
+        std::string stringValue;
+
         TreeNode() : fruit(false), json(nullptr) {}
         TreeNode(std::string _name) : name(_name), fruit(false), json(nullptr){}
+        TreeNode(std::string _name, bool _value) : name(_name), fruit(true), boolValue(_value), json(nullptr) {}
         TreeNode(std::string _name, double _value) : name(_name), fruit(true), value(_value), json(nullptr) {}
     };
 

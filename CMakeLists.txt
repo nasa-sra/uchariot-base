@@ -9,10 +9,10 @@ set (CMAKE_CXX_STANDARD 17)
 
 # cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake ..
 
-# if(NOT ${CMAKE_CROSSCOMPILING})
-#     add_compile_definitions(SIMULATION=true)
-#     message("Compiling for simulation")
-# endif()
+if(NOT ${CMAKE_CROSSCOMPILING})
+    add_compile_definitions(SIMULATION=true)
+    message("Compiling for simulation")
+endif()
 
 set(SRCS
     src/main.cpp
