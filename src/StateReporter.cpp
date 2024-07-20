@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include <cmath>
 
+#define RAPIDJSON_HAS_STDSTRING 1
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
@@ -15,18 +16,23 @@ StateReporter::StateReporter() {
     _treeRoot = new TreeNode("robot");
 }
 
+void StateReporter::UpdateKey(std::string key, bool val) {
+    genericUpdateKey(key, ValueEntry(val));
+}
+
+void StateReporter::UpdateKey(std::string key, int val) {
+    genericUpdateKey(key, ValueEntry(val));
+}
+
 void StateReporter::UpdateKey(std::string key, double val) {
     if (std::isfinite(val)) {
         val = (int(val * 1000 + 0.5)) / 1000.0;
-        auto it = _state.find(key);
-        if (it == _state.end()) {
-            addKey(key, val);
-        } else {
-            it->second->value = val;
-            if (it->second->json != nullptr)
-                it->second->json->SetDouble(val);
-        }
+        genericUpdateKey(key, ValueEntry(val));
     }
+}
+
+void StateReporter::UpdateKey(std::string key, std::string val) {
+    genericUpdateKey(key, ValueEntry(val));
 }
 
 void StateReporter::PushState() {
@@ -59,7 +65,64 @@ void StateReporter::Close() {
         _logFile.close();
 }
 
-void StateReporter::addKey(std::string key, double val) {
+void StateReporter::ValueEntry::setJsonValue(rapidjson::Value* json, rapidjson::Document::AllocatorType& allocator) {
+    switch (valueType) {
+        case BOOL:
+            json->SetBool(boolValue);
+            break;
+        case INT:
+            json->SetInt(intValue);
+            break;
+        case DOUBLE:
+            json->SetDouble(doubleValue);
+            break;
+        case STRING:
+            json->SetString(stringValue.c_str(), stringValue.length(), allocator);
+            break;
+        default:
+            break;
+    }
+}
+
+rapidjson::Value StateReporter::ValueEntry::getGenericValue(rapidjson::Document::AllocatorType& allocator) {
+    switch (valueType) {
+        case BOOL: return rapidjson::Value(boolValue); break;
+        case INT: return rapidjson::Value(intValue); break;
+        case DOUBLE: return rapidjson::Value(doubleValue); break;
+        case STRING: return rapidjson::Value(stringValue, allocator); break;
+        default: break;
+    }
+    return rapidjson::Value(0);
+}
+
+std::string StateReporter::ValueEntry::toString() {
+        switch (valueType) {
+        case BOOL:
+            return boolValue ? "true" : "false";
+        case INT:
+            return std::to_string(intValue);
+        case DOUBLE:
+            return std::to_string(doubleValue);
+        case STRING:
+            return stringValue;
+        default:
+            break;
+    }
+    return "";
+}
+
+void StateReporter::genericUpdateKey(std::string key, StateReporter::ValueEntry val) {
+    auto it = _state.find(key);
+    if (it == _state.end()) {
+        addKey(key, val);
+    } else {
+        it->second->value = val;
+        if (it->second->json != nullptr)
+            val.setJsonValue(it->second->json, _doc.GetAllocator());
+    }
+}
+
+void StateReporter::addKey(std::string key, ValueEntry val) {
     TreeNode* branch = climbTree(_treeRoot, key.substr(1));
     std::string valueName;
     for (int i = key.size() - 1; i >= 0; i--) {
@@ -101,7 +164,7 @@ void StateReporter::deleteTree(TreeNode* node) {
 void StateReporter::buildDoc(rapidjson::Value& doc, TreeNode* current, rapidjson::Document::AllocatorType& allocator) {
     rapidjson::Value name(current->name.c_str(), current->name.size());
     if (current->fruit) {
-        doc.AddMember(name, current->value, allocator);
+        doc.AddMember(name, current->value.getGenericValue(allocator), allocator);
         return;
     }
     rapidjson::Value docBranch(rapidjson::kObjectType);
@@ -202,7 +265,7 @@ void StateReporter::logState() {
     row += std::to_string(time) + ", ";
 
     for (auto i = _state.begin(); i != _state.end(); i++) {
-        row += std::to_string(i->second->value) + ", ";
+        row += i->second->value.toString() + ", ";
     }
     row = row.substr(0, row.size() - 2);
     _logFile << row << '\n';

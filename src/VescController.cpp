@@ -133,7 +133,7 @@ void VescController::sendCurrent(float amps) {
 
 void VescController::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "connected", _connected);
-    StateReporter::GetInstance().UpdateKey(prefix + "mode", _mode);
+    StateReporter::GetInstance().UpdateKey(prefix + "mode", modeToString(_mode));
     // StateReporter::GetInstance().UpdateKey(prefix + "cmd_duty_cycle", _cmdDutyCycle);
     StateReporter::GetInstance().UpdateKey(prefix + "cmd_velocity", _cmdVelocity);
     // StateReporter::GetInstance().UpdateKey(prefix + "cmd_position", _cmdPosition);
@@ -142,4 +142,9 @@ void VescController::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "current", _current);
     StateReporter::GetInstance().UpdateKey(prefix + "output", _output);
     // StateReporter::GetInstance().UpdateKey(prefix + "voltage_in", _voltageIn);
+}
+
+std::string VescController::modeToString(VescController::Mode mode) {
+    static std::string map[4] = {"duty cycle", "velocity", "position", "current"};
+    return map[mode];
 }

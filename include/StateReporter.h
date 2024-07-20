@@ -17,7 +17,11 @@ public:
         return _instance;
     }
 
+    void UpdateKey(std::string key, bool val);
+    void UpdateKey(std::string key, int val);
     void UpdateKey(std::string key, double val);
+    void UpdateKey(std::string key, std::string val);
+
     void PushState();
     void EnableLogging();
     void EnableTelemetry();
@@ -25,27 +29,50 @@ public:
 
 private:
 
-    struct TreeNode {
-        std::string name;
-        std::vector<TreeNode*> branches;
-        bool fruit;
-        rapidjson::Value* json;
+    struct ValueEntry {
 
-        int value
+        enum ValueType {
+            NULLVALUE,
+            BOOL,
+            INT,
+            DOUBLE,
+            STRING
+        };
+
+        ValueType valueType;
         bool boolValue;
         int intValue;
         double doubleValue;
         std::string stringValue;
 
-        TreeNode() : fruit(false), json(nullptr) {}
-        TreeNode(std::string _name) : name(_name), fruit(false), json(nullptr){}
-        TreeNode(std::string _name, bool _value) : name(_name), fruit(true), boolValue(_value), json(nullptr) {}
-        TreeNode(std::string _name, double _value) : name(_name), fruit(true), value(_value), json(nullptr) {}
+        ValueEntry() : valueType(NULLVALUE) {}
+        ValueEntry(bool _value) : boolValue(_value), valueType(BOOL) {}
+        ValueEntry(int _value) : intValue(_value), valueType(INT) {}
+        ValueEntry(double _value) : doubleValue(_value), valueType(DOUBLE) {}
+        ValueEntry(std::string _value) : stringValue(_value), valueType(STRING) {}
+
+        void setJsonValue(rapidjson::Value* json, rapidjson::Document::AllocatorType& allocator);
+        rapidjson::Value getGenericValue(rapidjson::Document::AllocatorType& allocator);
+        std::string toString();
+    };
+
+    struct TreeNode {
+        std::string name;
+        std::vector<TreeNode*> branches;
+        bool fruit = true;
+        rapidjson::Value* json = nullptr;
+        ValueEntry value;
+
+        TreeNode() : fruit(false) {}
+        TreeNode(std::string _name) : name(_name), fruit(false) {}
+        TreeNode(std::string _name, ValueEntry _value) : name(_name), value(_value) {}
+
     };
 
     StateReporter();
 
-    void addKey(std::string key, double val);
+    void genericUpdateKey(std::string key, ValueEntry val);
+    void addKey(std::string key, ValueEntry val);
     TreeNode* climbTree(TreeNode* current, std::string key);
     void deleteTree(TreeNode* node);
     void buildDoc(rapidjson::Value& doc, TreeNode* current, rapidjson::Document::AllocatorType& allocator);

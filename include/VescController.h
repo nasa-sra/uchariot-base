@@ -30,6 +30,9 @@ public:
     void ReportState(std::string prefix = "/");
 
 private:
+
+    std::string modeToString(Mode mode);
+
     enum CAN_CMD_PACKET_ID {
         CAN_PACKET_SET_DUTY = 0,
         CAN_PACKET_SET_CURRENT,

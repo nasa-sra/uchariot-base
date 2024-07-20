@@ -57,8 +57,7 @@ void Robot::Run(int rate, bool& running) {
         _localization.Update(dt);
 
         // Report state
-        std::string prefix = "/robot/";
-        StateReporter::GetInstance().UpdateKey(prefix + "mode", _mode);
+        StateReporter::GetInstance().UpdateKey("/controller", modeToController(_mode).name);
 
         cmds.ReportState();
         _pathingController.ReportState();

@@ -5,6 +5,9 @@ if [ $? -eq 1 ]; then
     gpsd -D -F /dev/ttyACM0
 fi
 
+echo "Starting uchariotVision"
+sudo /home/uchariot/uchariot-vision/build/uChariotVision
+
 echo "Starting uChariotBase"
 exe=$(sudo /home/uchariot/uchariot-base/build/uChariotBase)
 $exe
