@@ -41,11 +41,15 @@ void CanConnection::Start() {
 
 void CanConnection::RegisterPacketHandler(uint16_t id, std::function<void(CanFrame)> handler) {
     struct can_filter filter;
-    filter.can_id = id;
-    filter.can_mask = 0x000000FF;
-    _filters.push_back(filter);
+    filter.can_id = id;           // Set the CAN ID for the filter
+    filter.can_mask = 0x000000FF; // Set the mask for the filter. This will match any CAN ID with the same lower byte.
+
+    _filters.push_back(filter); // Add the filter to the list of filters
+
+    // Apply the list of filters to the CAN socket using setsockopt function
     setsockopt(_socket, SOL_CAN_RAW, CAN_RAW_FILTER, _filters.data(), sizeof(can_filter) * _filters.size());
 
+    // Store the provided callback function in the _callbacks map for later use
     _callbacks[id] = handler;
 }
 
@@ -68,6 +72,15 @@ void CanConnection::Send(CanFrame in_frame) {
 #endif
 }
 
+/**
+ * @brief This function is responsible for receiving CAN frames from the CAN bus.
+ *
+ * The function continuously listens for incoming CAN frames on the CAN bus.
+ * When a frame is received, it extracts the CAN ID and checks if there is a registered callback function for that ID.
+ * If a callback function is found, it is invoked with the received CAN frame as a parameter.
+ *
+ * @return This function does not return a value. It runs in an infinite loop until the _running flag is set to false.
+ */
 void CanConnection::Recieve() {
     int nbytes;
     struct can_frame frame;
@@ -82,8 +95,8 @@ void CanConnection::Recieve() {
         tv.tv_usec = 0;
         FD_ZERO(&fds);
         FD_SET(_socket, &fds);
-        
-        if (select(_socket+1, &fds, NULL, NULL, &tv) == -1) {
+
+        if (select(_socket + 1, &fds, NULL, NULL, &tv) == -1) {
             Utils::ErrFmt("CanConnection:Recieve - Error on select");
         }
         if (FD_ISSET(_socket, &fds)) {
@@ -104,9 +117,7 @@ void CanConnection::Recieve() {
 
 void CanConnection::LogFrame(CanFrame frame) {
     printf("CAN Frame id=%08x data=", frame.arb_id);
-    for (int i = 0; i < frame.len; i++) {
-        printf("%02x ", frame.data[i]);
-    }
+    for (int i = 0; i < frame.len; i++) { printf("%02x ", frame.data[i]); }
     printf("\r\n");
 }
 

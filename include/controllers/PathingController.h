@@ -11,6 +11,13 @@ struct PathStep {
     float tolerance;
 };
 
+struct PathObject {
+    Pose pose;
+    double radius_m;
+
+    PathObject(Pose pose, double radius_m) : pose(pose), radius_m(radius_m){};
+}
+
 class PathingController : public ControllerBase {
 
 public:
@@ -23,7 +30,9 @@ public:
     void HandleNetworkInput(rapidjson::Document& doc);
     void Stop();
 
-    Utils::GeoPoint GetOrigin() {return _origin;}
+    Utils::GeoPoint GetOrigin() {
+        return _origin;
+    }
 
 private:
     bool loadPath(std::string filePath);

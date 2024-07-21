@@ -1,12 +1,22 @@
 
-#include "tinyxml2.h"
 #include "pathgen/PathGenerator.h"
+#include "tinyxml2.h"
 
 using namespace tinyxml2;
 
 uint16_t PathGenerator::_pathgenSize = 50;
 std::vector<Point> PathGenerator::_pathPointsRaw = {};
 
+/**
+ * @brief Sets the size of the path generator.
+ *
+ * This function sets the resolution of the path generator.
+ * his is the number of points between two consecutive points in the path.
+ * A higher value results in a more detailed path, while a lower value results in a less detailed path. The default
+ * value is 50.
+ *
+ * @param size The new size of the path generator.
+ */
 void PathGenerator::SetPathSize(uint16_t size) {
     PathGenerator::_pathgenSize = size;
 }
@@ -24,9 +34,9 @@ std::vector<Utils::GeoPoint> PathGenerator::GetRawPoints() {
 /**
  * @brief Generates a path from a KML file, applies a specified speed and radius, and saves the result as an XML file.
  *
- * This function reads a KML file, processes the path data, applies a specified speed and radius, and generates a new path.
- * The generated path is then saved as an XML file, along with additional attributes such as speed, tolerance, end tolerance,
- * velocity kp, and heading kp.
+ * This function reads a KML file, processes the path data, applies a specified speed and radius, and generates a new
+ * path. The generated path is then saved as an XML file, along with additional attributes such as speed, tolerance, end
+ * tolerance, velocity kp, and heading kp.
  *
  * @param filename The name of the KML file to load.
  * @param speed_ms The desired speed of the path in meters per second.
@@ -42,7 +52,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
     std::vector<GenPoint> n_points;
 
     XMLDocument doc;
-    int res = doc.LoadFile(("paths/" + filename.substr(0,filename.size() - 4) + ".kml").c_str());
+    int res = doc.LoadFile(("paths/" + filename.substr(0, filename.size() - 4) + ".kml").c_str());
 
     if (res != tinyxml2::XML_SUCCESS) {
         Utils::LogFmt("PathingContoller::loadPath - Could not load file %s, Err Code: %i", filename, res);
@@ -96,9 +106,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
 
     std::vector<Eigen::Vector3d> finPoints;
 
-    for (int i = 0; i < n_points.size(); ++i) { 
-        std::cout << n_points[i].toString() << std::endl; 
-    }
+    for (int i = 0; i < n_points.size(); ++i) { std::cout << n_points[i].toString() << std::endl; }
 
     for (int i = 0; i < n_points.size() - 1; ++i) {
         if (n_points[i + 1].control || n_points[i].control || i == (n_points.size() - 1)) {
@@ -114,9 +122,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
     Curve* curve = new Bezier();
     curve->set_steps(_pathgenSize);
 
-    for (int i = 0; i < finPoints.size(); ++i) {
-        curve->add_way_point(finPoints[i]);
-    }
+    for (int i = 0; i < finPoints.size(); ++i) { curve->add_way_point(finPoints[i]); }
 
     Utils::PrintLnFmt("Nodes: %i", curve->node_count());
     std::cout << curve->total_length() << "\n";
@@ -136,12 +142,11 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
             pathFinalString.append(tempPoint.ToPointString() + " ");
         }
         PathGenerator::_pathPointsRaw.push_back(tempPoint);
-
     }
 
     delete curve;
 
-    FILE *fp = fopen(("paths/" + filename.substr(0,filename.size() - 4) + ".xml").c_str(), "w");
+    FILE* fp = fopen(("paths/" + filename.substr(0, filename.size() - 4) + ".xml").c_str(), "w");
     if (fp == NULL) {
         Utils::LogFmt("Write Failed");
         return -3;

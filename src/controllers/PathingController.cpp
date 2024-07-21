@@ -15,6 +15,16 @@ void PathingController::Load() {
 }
 void PathingController::Unload() {};
 
+/**
+ * @brief Executes the path following logic.
+ *
+ * This function is responsible for controlling the robot's movement along the pre-loaded path. It checks if a path is
+ * currently running and, if so, calculates the next waypoint, calculates the required velocity and angular velocity,
+ * and updates the control commands accordingly. The function also handles the transition between waypoints and stops
+ * the path when it has been completed.
+ *
+ * @return A ControlCmds object containing the calculated velocity and angular velocity commands for the robot.
+ */
 ControlCmds PathingController::Run() {
     ControlCmds cmds;
 
@@ -79,6 +89,16 @@ bool PathingController::loadPath(std::string filePath) {
     return false;
 }
 
+/**
+ * @brief Loads an XML path file and parses its data into the internal path representation.
+ *
+ * This function reads an XML file specified by the given file path, extracts the path data, and populates the internal
+ * path representation. It also handles various attributes specified in the XML file, such as speed, tolerance, and
+ * control gains.
+ *
+ * @param filePath The path to the XML file containing the path data.
+ * @return True if the XML file was loaded and parsed successfully, false otherwise.
+ */
 bool PathingController::loadXMLPath(std::string filePath) {
 
     Utils::LogFmt("Loading XML Auton... ");
@@ -88,12 +108,14 @@ bool PathingController::loadXMLPath(std::string filePath) {
 
     filePath = "paths/" + filePath;
 
+    // Read XML file and check if it is loaded correctly
     int res = doc.LoadFile(filePath.c_str());
     if (res != tinyxml2::XML_SUCCESS) {
         Utils::LogFmt("PathingContoller::loadXMLPath - Could not load file %s, Err Code: %i", filePath.c_str(), res);
         return false;
     }
 
+    // Load path as data string and verfy output
     tinyxml2::XMLElement* path = doc.FirstChildElement("path");
     if (path == nullptr) {
         Utils::LogFmt("PathingContoller::loadXMLPath - No path element found");
@@ -172,7 +194,6 @@ bool PathingController::loadXMLPath(std::string filePath) {
 
                 PathStep step;
                 step.pos = parseCoordinates(coord);
-                ;
                 step.speed = speed;
                 step.tolerance = tolerance;
                 _path.push_back(step);
@@ -191,16 +212,32 @@ void PathingController::Stop() {
     _pathName = "";
 }
 
+/**
+ * @brief Loads a KML path file and parses its data into the internal path representation.
+ *
+ * This function reads a KML file specified by the given file path, extracts the path data, and populates the internal
+ * path representation. It uses the PathGenerator library to generate the path from the KML file and then converts the
+ * geographical coordinates to local tangent plane (LTP) coordinates.
+ *
+ * @param filePath The path to the KML file containing the path data.
+ * @return True if the KML file was loaded and parsed successfully, false otherwise.
+ */
 bool PathingController::loadKMLPath(std::string filePath) {
 
     Utils::LogFmt("Loading KML Auton... ");
 
+    // Generate path from KML file using PathGenerator
     if (PathGenerator::GeneratePath(filePath, _pathSpeed, _pathRadius) != 0) return false;
+
+    // Retrieve raw points from PathGenerator
     std::vector<Utils::GeoPoint> points = PathGenerator::GetRawPoints();
 
     _path.clear();
     for (Utils::GeoPoint& point : points) {
+        // Set origin for LTP conversion
         Utils::GeoPoint origin = _path.size() > 0 ? _path[0].geoPoint : point;
+
+        // Convert geographical coordinates to LTP coordinates
         Eigen::Vector3d pos = Utils::geoToLTP(point, origin);
 
         PathStep step;
@@ -210,6 +247,7 @@ bool PathingController::loadKMLPath(std::string filePath) {
         step.tolerance = 1.0;
         _path.push_back(step);
     }
+
     Utils::LogFmt("Loaded Auton");
     return true;
 }
@@ -230,6 +268,18 @@ Eigen::Vector3d PathingController::parseCoordinates(std::string coords) {
     return point;
 }
 
+/**
+ * @brief Parses a string containing geographical coordinates into a GeoPoint object.
+ *
+ * This function takes a string containing geographical coordinates in the format "latitude,longitude" or
+ * "latitude,longitude,altitude" and converts them into a GeoPoint object. The function supports parsing
+ * coordinates in both standard and flipped formats.
+ *
+ * @param coords A string containing the geographical coordinates to be parsed.
+ * @param altitude A boolean indicating whether the input string contains altitude information.
+ * @param flipped A boolean indicating whether the input string is in the flipped format (longitude, latitude).
+ * @return A GeoPoint object containing the parsed geographical coordinates.
+ */
 Utils::GeoPoint PathingController::parseGeoCoordinates(std::string coords, bool altitude, bool flipped) {
 
     std::stringstream ss(coords);
