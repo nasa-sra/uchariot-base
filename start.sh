@@ -6,7 +6,8 @@ if [ $? -eq 1 ]; then
 fi
 
 echo "Starting uchariotVision"
-sudo /home/uchariot/uchariot-vision/build/uChariotVision
+nexe=$(sudo /home/uchariot/uchariot-vision/build/uChariotVision)
+$nexe
 
 echo "Starting uChariotBase"
 exe=$(sudo /home/uchariot/uchariot-base/build/uChariotBase)
