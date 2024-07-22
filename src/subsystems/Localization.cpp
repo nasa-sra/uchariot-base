@@ -45,11 +45,11 @@ void Localization::Update(double dt) {
 //
 void Localization::ReportState(std::string prefix) {
     prefix += "localization/";
-    StateReporter::GetInstance().UpdateKey(prefix + "x", _pose.pos.x());
+    /*StateReporter::GetInstance().UpdateKey(prefix + "x", _pose.pos.x());
     StateReporter::GetInstance().UpdateKey(prefix + "y", _pose.pos.y());
     StateReporter::GetInstance().UpdateKey(prefix + "heading", _pose.heading);
     StateReporter::GetInstance().UpdateKey(prefix + "latitude", _geoPos.lat);
-    StateReporter::GetInstance().UpdateKey(prefix + "longitude", _geoPos.lon);
+    StateReporter::GetInstance().UpdateKey(prefix + "longitude", _geoPos.lon);*/
 }
 
 void Localization::ResetHeading() {

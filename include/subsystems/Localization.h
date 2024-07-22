@@ -24,7 +24,11 @@ public:
 
     void SetOrigin(Utils::GeoPoint origin) {_origin = origin; }
     Pose GetPose() { return _pose; }
-	void SetGyro(const std::string& gyro_type) { _gyro_type = gyro_type; }
+
+	void SetGyro(const std::string& gyro_type) { 
+		_gyro_type = gyro_type; 
+		Utils::LogFmt("Switching to gyro type %s", gyro_type); 
+	}
 
 private:
 
