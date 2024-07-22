@@ -1,8 +1,6 @@
 #include "Robot.h"
 
-Robot::Robot() : 
-    _localization(&_driveBase, &_imu, &_vision, &_gps),
-    _pathingController(&_localization) {
+Robot::Robot() : _localization(&_driveBase, &_imu, &_vision, &_gps), _pathingController(&_localization) {
 }
 
 // Recive a network command and handle it appropriately.
