@@ -34,6 +34,7 @@ private:
 
     Pose _pose{{0.0, 0.0}, 0.0};
     Utils::GeoPoint _origin;
+    Utils::GeoPoint _geoPos;
 
     timespec_t _lastGPSUpdate;
 

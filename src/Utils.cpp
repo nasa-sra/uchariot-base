@@ -119,6 +119,7 @@ double Utils::ScheduleRate(int rate, std::chrono::high_resolution_clock::time_po
  * This function takes a geographic coordinate in the form of a latitude, longitude, and altitude, and converts it to
  * Earth-Centered, Earth-Fixed (ECEF) coordinates. The ECEF coordinate system is a Cartesian coordinate system used to
  * describe the 3D position of objects in space.
+ * https://en.wikipedia.org/wiki/Earth-centered,_Earth-fixed_coordinate_system
  *
  * @param point A structure containing the geographic coordinate (latitude, longitude, altitude) to be converted.
  *
@@ -137,11 +138,39 @@ Eigen::Vector3d Utils::geoToECEF(GeoPoint point) {
 }
 
 /**
+ * @brief Converts Earth-Centered, Earth-Fixed (ECEF)
+ * coordinates to a geographic coordinate (latitude, longitude, altitude).
+ *
+ * This function takes a point in Earth-Centered, Earth-Fixed (ECEF) coordinates  and converts 
+ * it to a geographical coordinate in the form of a latitude, longitude, and altitude.
+ * https://en.wikipedia.org/wiki/Earth-centered,_Earth-fixed_coordinate_system
+ *
+ * @param point A 3D vector representing the ECEF coordinates of the input geographic coordinate. The x-coordinate
+ * corresponds to the north direction, the y-coordinate corresponds to the east direction, and the z-coordinate
+ * corresponds to the up direction.
+ * 
+ * @return A structure containing the geographic coordinate (latitude, longitude, altitude).
+ *
+ */
+Utils::GeoPoint Utils::ECEFToGeo(Eigen::Vector3d point) {
+
+    Utils::GeoPoint geo;
+
+    double distance = point.norm();
+    geo.lat = asin(point.z() / distance) * 180 / M_PI;
+    geo.lon = atan2(point.y(), point.x()) * 180 / M_PI;
+    geo.alt = distance - EARTHS_RADIUS;
+
+    return geo;
+}
+
+/**
  * @brief Converts a geographic coordinate (latitude, longitude, altitude) to Local Tangent Plane (LTP) coordinates.
  *
  * This function takes a geographic coordinate in the form of a latitude, longitude, and altitude, and converts it to
  * Local Tangent Plane (LTP) coordinates. The LTP coordinate system is a Cartesian coordinate system used to describe
  * the 3D position of objects relative to a reference point.
+ * https://en.wikipedia.org/wiki/Local_tangent_plane_coordinates
  *
  * @param geo A structure containing the geographic coordinate (latitude, longitude, altitude) to be converted.
  * @param geoOrigin A structure containing the geographic coordinate (latitude, longitude, altitude) of the reference
@@ -172,6 +201,46 @@ Eigen::Vector3d Utils::geoToLTP(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin) 
     Eigen::Matrix3d rotation = planeBasis.inverse(); // used identity for target basis
     // Rotate from the plane basis to a standard one, x=north, y=west, z=up
     return rotation * pos;
+}
+
+
+/**
+ * @brief Converts a Local Tangent Plane (LTP) coordinates to a geographic coordinate (latitude, longitude, altitude).
+ *
+ * This function takes a geographic coordinate in the form of a latitude, longitude, and altitude, and converts it to
+ * Local Tangent Plane (LTP) coordinates. The LTP coordinate system is a Cartesian coordinate system used to describe
+ * the 3D position of objects relative to a reference point.
+ * https://en.wikipedia.org/wiki/Local_tangent_plane_coordinates
+ *
+ * @param pos A 3D vector representing the LTP coordinates of the input geographic coordinate. The x-coordinate corresponds
+ * to the north direction, the y-coordinate corresponds to the west direction, and the z-coordinate corresponds to the
+ * up direction.
+ * @param geoOrigin A structure containing the geographic coordinate (latitude, longitude, altitude) of the reference
+ * point.
+ *
+ * @return A structure containing the geographic coordinate (latitude, longitude, altitude).
+ */
+Utils::GeoPoint Utils::LTPToGeo(Eigen::Vector3d pos, Utils::GeoPoint geoOrigin) {
+
+    Eigen::Vector3d origin = Utils::geoToECEF(geoOrigin);
+
+    // This is the solution to the intersection of each step pos vector with a plane normal to and thru the starting
+    // point
+    double t = origin.dot(origin) / origin.dot(pos);
+    // This rescale step.pos to be on the plane, then transforms its origin to be from the starting point
+    pos = t * pos - origin;
+
+    // This should all be cached
+    Eigen::Vector3d planeNormal = origin.normalized();
+    Eigen::Matrix3d planeBasis;
+    planeBasis.col(2) = planeNormal;                                 // up
+    planeBasis.col(1) = planeNormal.cross(Eigen::Vector3d(0, 0, 1)); // west
+    planeBasis.col(0) = planeBasis.col(1).cross(planeNormal);        // north
+
+    Eigen::Matrix3d rotation = planeBasis.inverse(); // used identity for target basis
+    // Rotate from the plane basis to a standard one, x=north, y=west, z=up
+    Eigen::Vector3d posECEF = planeBasis * pos;
+    return Utils::ECEFToGeo(posECEF);
 }
 
 double Utils::PIDController::Calculate(double current, double target) {
