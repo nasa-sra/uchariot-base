@@ -138,12 +138,11 @@ struct GeoPoint {
 
 };
 
-// Converts from latitude and longitude to Earth Centered, Earth Fixed coordinates
-// https://en.wikipedia.org/wiki/Earth-centered,_Earth-fixed_coordinate_system
 Eigen::Vector3d geoToECEF(GeoPoint point);
-// Converts to Local Tangent Plane Coordinates, except ignores the conventional directions and uses x - north, y - west, z - up
-// https://en.wikipedia.org/wiki/Local_tangent_plane_coordinates
-Eigen::Vector3d geoToLTP(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin);
+GeoPoint ECEFToGeo(Eigen::Vector3d point);
+
+Eigen::Vector3d geoToLTP(GeoPoint geo, GeoPoint geoOrigin);
+GeoPoint LTPToGeo(Eigen::Vector3d pos, GeoPoint origin);
 
 struct PIDValues {
     float kP;

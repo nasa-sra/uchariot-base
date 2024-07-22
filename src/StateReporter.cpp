@@ -64,6 +64,23 @@ void StateReporter::Close() {
 }
 
 /**
+ * @brief Sets a rapidjson::Value to the value stored
+ *
+ * @param json The rapidjson::Value to be set.
+ * @param allocator The allocator to be used for creating rapidjson strings
+ *
+ */
+void StateReporter::ValueEntry::setJsonValue(rapidjson::Value* json, rapidjson::Document::AllocatorType& allocator) {
+    switch (valueType) {
+        case BOOL: json->SetBool(boolValue); break;
+        case INT: json->SetInt(intValue); break;
+        case DOUBLE: json->SetDouble(doubleValue); break;
+        case STRING: json->SetString(stringValue.c_str(), stringValue.length(), allocator); break;
+        default: break;
+    }
+}
+
+/**
  * @brief Retrieves a rapidjson::Value object representing the stored value.
  *
  * This function returns a rapidjson::Value object based on the type of the stored value.

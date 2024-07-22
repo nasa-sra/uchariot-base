@@ -16,7 +16,7 @@ struct PathObject {
     double radius_m;
 
     PathObject(Pose pose, double radius_m) : pose(pose), radius_m(radius_m){};
-}
+};
 
 class PathingController : public ControllerBase {
 

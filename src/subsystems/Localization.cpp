@@ -27,6 +27,7 @@ void Localization::Update(double dt) {
         _pose.pos = Utils::geoToLTP(Utils::GeoPoint(fix), _origin).head<2>();
         _lastGPSUpdate = fix.time;
     }
+    _geoPos = Utils::LTPToGeo({_pose.pos[0], _pose.pos[1], 0.0}, _origin);
 
 	//Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs, heading_imu - heading_rs); 
 
@@ -43,6 +44,8 @@ void Localization::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "x", _pose.pos.x());
     StateReporter::GetInstance().UpdateKey(prefix + "y", _pose.pos.y());
     StateReporter::GetInstance().UpdateKey(prefix + "heading", _pose.heading);
+    StateReporter::GetInstance().UpdateKey(prefix + "latitude", _geoPos.lat);
+    StateReporter::GetInstance().UpdateKey(prefix + "longitude", _geoPos.lon);
 }
 
 void Localization::ResetHeading() {
