@@ -18,9 +18,10 @@ void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
         } else if (cmd == "stop_path") {
             _pathingController.Stop();
         }
-    } catch (...) {
-        Utils::LogFmt("Could not parse command"); // This still crashes
     }
+}
+catch (...) {
+    Utils::LogFmt("Could not parse command"); // This still crashes
 }
 
 // The main robot process scheduler.
