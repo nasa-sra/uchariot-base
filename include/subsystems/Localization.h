@@ -24,6 +24,7 @@ public:
 
     void SetOrigin(Utils::GeoPoint origin) {_origin = origin; }
     Pose GetPose() { return _pose; }
+	void SetGyro(const std::string& gyro_type) { _gyro_type = gyro_type; }
 
 private:
 
@@ -37,8 +38,8 @@ private:
     Utils::GeoPoint _geoPos;
 
     timespec_t _lastGPSUpdate;
-
-    bool _useOdometryHeading{false};
+	
+	std::string _gyro_type;
 
     double _imuOffset{0.0};
     double _rsOffset{0.0};

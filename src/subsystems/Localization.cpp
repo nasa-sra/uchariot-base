@@ -6,6 +6,7 @@ Localization::Localization(DriveBase* driveBase, IMUBase* imu, Vision* vision, G
     _imu = imu;
     _vision = vision;
     _gps = gps;
+	_gyro_type = "rs";
 }
 
 void Localization::Update(double dt) {
@@ -31,12 +32,15 @@ void Localization::Update(double dt) {
 
     // Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs, heading_imu - heading_rs);
 
-    if (_useOdometryHeading) {
+	if (_gyro_type == "odom") {
         _pose.heading += omega * dt; // For running on cart/sim
-    } else {
+    } else if (_gyro_type == "rs") {
         _pose.heading = _vision->GetHeading() - _rsOffset; // with realsense gyro
-        // _pose.heading = _imu->GetYaw() - _imuOffset; // with BNO055
-    }
+	} else if (_gyro_type == "imu") {
+        _pose.heading = _imu->GetYaw() - _imuOffset; // with BNO055
+    } else {
+		_pose.heading = 0;
+	}
 }
 //
 void Localization::ReportState(std::string prefix) {
