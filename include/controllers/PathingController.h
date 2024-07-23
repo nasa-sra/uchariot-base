@@ -30,6 +30,8 @@ public:
     void HandleNetworkInput(rapidjson::Document& doc);
     void Stop();
 
+    void Pause();
+
     Utils::GeoPoint GetOrigin() {
         return _origin;
     }
@@ -46,6 +48,7 @@ private:
 
     std::string _pathName{""};
     bool _runningPath{false};
+    bool _pathPaused{false};
 
     int _pathResolution{1};
     float _pathSpeed{2};

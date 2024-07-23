@@ -29,16 +29,16 @@ void Localization::Update(double dt) {
     }
     _geoPos = Utils::LTPToGeo({_pose.pos[0], _pose.pos[1], 0.0}, _origin);
 
-	//Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs, heading_imu - heading_rs); 
+    // Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs, heading_imu - heading_rs);
 
-#ifdef USE_ODOM_ROT
-    _pose.heading += omega * dt; // For running on cart/sim
-#else
-    _pose.heading = _vision->GetHeading() - _rsOffset; // with realsense gyro
-    // _pose.heading = _imu->GetYaw() - _imuOffset; // with BNO055
-#endif
+    if (_useOdometryHeading) {
+        _pose.heading += omega * dt; // For running on cart/sim
+    } else {
+        _pose.heading = _vision->GetHeading() - _rsOffset; // with realsense gyro
+        // _pose.heading = _imu->GetYaw() - _imuOffset; // with BNO055
+    }
 }
-// 
+//
 void Localization::ReportState(std::string prefix) {
     prefix += "localization/";
     StateReporter::GetInstance().UpdateKey(prefix + "x", _pose.pos.x());

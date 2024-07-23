@@ -38,6 +38,8 @@ ControlCmds PathingController::Run() {
         }
     }
 
+    if (_pathPaused) return cmds;
+
     if (_runningPath) {
         Pose robotPose = _localization->GetPose();
         _nextWaypoint = _path[_currentStep].pos.head<2>();
@@ -74,6 +76,11 @@ void PathingController::ReportState(std::string prefix) {
 
 void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
     _pathName = doc["name"].GetString();
+
+    if (_pathPaused) {
+        _pathPaused = false;
+        Utils::LogFmt("Path resumed");
+    }
     // _pathResolution = std::stoi(doc["res"].GetString());
     // _pathSpeed = std::stof(doc["speed"].GetString());
     // _pathRadius = std::stof(doc["rad"].GetString());
@@ -304,4 +311,8 @@ Utils::GeoPoint PathingController::parseGeoCoordinates(std::string coords, bool 
     }
 
     return point;
+}
+
+void PathingController::Pause() {
+    _pathPaused = true;
 }

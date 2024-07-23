@@ -38,6 +38,8 @@ private:
 
     timespec_t _lastGPSUpdate;
 
+    bool _useOdometryHeading{false};
+
     double _imuOffset{0.0};
     double _rsOffset{0.0};
 

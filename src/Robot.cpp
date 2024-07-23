@@ -1,15 +1,14 @@
 #include "Robot.h"
 
-Robot::Robot() : 
-    _localization(&_driveBase, &_imu, &_vision, &_gps),
-    _pathingController(&_localization) {
+Robot::Robot() : _localization(&_driveBase, &_imu, &_vision, &_gps), _pathingController(&_localization) {
 }
 
 // Recive a network command and handle it appropriately.
 void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
     try {
-        if (cmd == "set_controller") { _newMode = nameToMode(doc["name"].GetString()); }
-        if (cmd == "teleop_drive") {
+        if (cmd == "set_controller") {
+            _newMode = nameToMode(doc["name"].GetString());
+        } else if (cmd == "teleop_drive") {
             _teleopController.HandleNetworkInput(doc);
         } else if (cmd == "run_path") {
             _pathingController.HandleNetworkInput(doc);
@@ -19,6 +18,8 @@ void Robot::HandleNetCmd(const std::string& cmd, rapidjson::Document& doc) {
             _localization.ResetPose();
         } else if (cmd == "stop_path") {
             _pathingController.Stop();
+        } else if (cmd == "pause_path") {
+            _pathingController.Pause();
         }
     } catch (...) {
         Utils::LogFmt("Could not parse command"); // This still crashes
