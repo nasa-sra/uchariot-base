@@ -73,7 +73,7 @@ void PathingController::ReportState(std::string prefix) {
 }
 
 void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
-    _pathName = doc["name"].GetString();
+    _pathName = "/home/uchariot/uchariot-base/build/paths/" + std::string(doc["name"].GetString());
     // _pathResolution = std::stoi(doc["res"].GetString());
     // _pathSpeed = std::stof(doc["speed"].GetString());
     // _pathRadius = std::stof(doc["rad"].GetString());
@@ -105,8 +105,6 @@ bool PathingController::loadXMLPath(std::string filePath) {
 
     _path.clear();
     tinyxml2::XMLDocument doc;
-
-    filePath = "paths/" + filePath;
 
     // Read XML file and check if it is loaded correctly
     int res = doc.LoadFile(filePath.c_str());
@@ -162,7 +160,6 @@ bool PathingController::loadXMLPath(std::string filePath) {
             std::string coord;
 
             while (ss >> coord) {
-
                 Utils::GeoPoint point = parseGeoCoordinates(coord, false, true);
                 if (_path.size() == 0) { _origin = point; }
                 Eigen::Vector3d pos = geoToLTP(point, _origin);
@@ -191,7 +188,6 @@ bool PathingController::loadXMLPath(std::string filePath) {
             std::string coord;
 
             while (ss >> coord) {
-
                 PathStep step;
                 step.pos = parseCoordinates(coord);
                 step.speed = speed;

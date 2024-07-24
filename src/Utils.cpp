@@ -222,13 +222,7 @@ Eigen::Vector3d Utils::geoToLTP(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin) 
  */
 Utils::GeoPoint Utils::LTPToGeo(Eigen::Vector3d pos, Utils::GeoPoint geoOrigin) {
 
-    Eigen::Vector3d origin = Utils::geoToECEF(geoOrigin);
-
-    // This is the solution to the intersection of each step pos vector with a plane normal to and thru the starting
-    // point
-    double t = origin.dot(origin) / origin.dot(pos);
-    // This rescale step.pos to be on the plane, then transforms its origin to be from the starting point
-    pos = t * pos - origin;
+ 	Eigen::Vector3d origin = Utils::geoToECEF(geoOrigin);
 
     // This should all be cached
     Eigen::Vector3d planeNormal = origin.normalized();
@@ -237,10 +231,8 @@ Utils::GeoPoint Utils::LTPToGeo(Eigen::Vector3d pos, Utils::GeoPoint geoOrigin) 
     planeBasis.col(1) = planeNormal.cross(Eigen::Vector3d(0, 0, 1)); // west
     planeBasis.col(0) = planeBasis.col(1).cross(planeNormal);        // north
 
-    Eigen::Matrix3d rotation = planeBasis.inverse(); // used identity for target basis
-    // Rotate from the plane basis to a standard one, x=north, y=west, z=up
     Eigen::Vector3d posECEF = planeBasis * pos;
-    return Utils::ECEFToGeo(posECEF);
+    return Utils::ECEFToGeo(posECEF + origin);
 }
 
 double Utils::PIDController::Calculate(double current, double target) {

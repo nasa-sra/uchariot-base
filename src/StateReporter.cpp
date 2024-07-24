@@ -28,7 +28,9 @@ void StateReporter::UpdateKey(std::string key, double val) {
     if (std::isfinite(val)) {
         val = (int(val * 1000 + 0.5)) / 1000.0;
         genericUpdateKey(key, ValueEntry(val));
-    }
+    } else {
+		Utils::LogFmt("Key %s is not finite", key);
+	}
 }
 
 void StateReporter::UpdateKey(std::string key, std::string val) {

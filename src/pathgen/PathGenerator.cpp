@@ -52,7 +52,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
     std::vector<GenPoint> n_points;
 
     XMLDocument doc;
-    int res = doc.LoadFile(("paths/" + filename.substr(0, filename.size() - 4) + ".kml").c_str());
+    int res = doc.LoadFile((filename.substr(0, filename.size() - 4) + ".kml").c_str());
 
     if (res != tinyxml2::XML_SUCCESS) {
         Utils::LogFmt("PathingContoller::loadPath - Could not load file %s, Err Code: %i", filename, res);
@@ -146,7 +146,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms, double ra
 
     delete curve;
 
-    FILE* fp = fopen(("paths/" + filename.substr(0, filename.size() - 4) + ".xml").c_str(), "w");
+    FILE* fp = fopen((filename.substr(0, filename.size() - 4) + ".xml").c_str(), "w"); // wtf
     if (fp == NULL) {
         Utils::LogFmt("Write Failed");
         return -3;

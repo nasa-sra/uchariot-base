@@ -7,6 +7,8 @@ Localization::Localization(DriveBase* driveBase, IMUBase* imu, Vision* vision, G
     _vision = vision;
     _gps = gps;
 	_gyro_type = "rs";
+	_origin = Utils::GeoPoint(29.559854, -95.084349);
+	_geoPos = Utils::GeoPoint();
 }
 
 void Localization::Update(double dt) {
@@ -25,7 +27,7 @@ void Localization::Update(double dt) {
 
     gps_fix_t fix = _gps->GetFix();
     if (fix.time.tv_nsec != _lastGPSUpdate.tv_nsec && fix.time.tv_sec != _lastGPSUpdate.tv_sec) {
-        _pose.pos = Utils::geoToLTP(Utils::GeoPoint(fix), _origin).head<2>();
+        //_pose.pos = Utils::geoToLTP(Utils::GeoPoint(fix), _origin).head<2>();
         _lastGPSUpdate = fix.time;
     }
     _geoPos = Utils::LTPToGeo({_pose.pos[0], _pose.pos[1], 0.0}, _origin);
@@ -42,19 +44,22 @@ void Localization::Update(double dt) {
 		_pose.heading = 0;
 	}
 }
-//
+
 void Localization::ReportState(std::string prefix) {
     prefix += "localization/";
-    /*StateReporter::GetInstance().UpdateKey(prefix + "x", _pose.pos.x());
+    StateReporter::GetInstance().UpdateKey(prefix + "x", _pose.pos.x());
     StateReporter::GetInstance().UpdateKey(prefix + "y", _pose.pos.y());
     StateReporter::GetInstance().UpdateKey(prefix + "heading", _pose.heading);
-    StateReporter::GetInstance().UpdateKey(prefix + "latitude", _geoPos.lat);
-    StateReporter::GetInstance().UpdateKey(prefix + "longitude", _geoPos.lon);*/
+Utils::LogFmt("%d %d", _geoPos.lat, _geoPos.lon);
+Utils::LogFmt("%d %d", _geoPos.lat * 100000, _geoPos.lon * 100000);
+    StateReporter::GetInstance().UpdateKey(prefix + "lat", _geoPos.lat * 100000);
+    StateReporter::GetInstance().UpdateKey(prefix + "lon", _geoPos.lon * 100000);
 }
 
 void Localization::ResetHeading() {
     _rsOffset = _vision->GetHeading();
     _imuOffset = _imu->GetYaw();
+	_pose.heading = 0;
 }
 
 void Localization::ResetPose() {
