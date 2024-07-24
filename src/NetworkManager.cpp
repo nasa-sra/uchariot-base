@@ -249,7 +249,7 @@ void NetworkManager::CloseConnections() {
     Utils::LogFmt("Closing connections");
     _running = false;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     for (int fd : _clientSockets) { close(fd); }
     close(_net_socket);
 

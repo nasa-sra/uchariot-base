@@ -267,7 +267,7 @@ rapidjson::Value::MemberIterator StateReporter::climbDoc(rapidjson::Value& doc, 
  */
 void StateReporter::sendState() {
 
-    while (!_stateRefreshed) { std::this_thread::sleep_for(std::chrono::milliseconds(1)); }
+    while (!_stateRefreshed && _telemetry) { std::this_thread::sleep_for(std::chrono::milliseconds(1)); }
 
     _doc.SetObject();
     rapidjson::Document::AllocatorType& allocator = _doc.GetAllocator();

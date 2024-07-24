@@ -34,8 +34,8 @@ void Localization::Update(double dt) {
     if (_useOdometryHeading) {
         _pose.heading += omega * dt; // For running on cart/sim
     } else {
-        _pose.heading = _vision->GetHeading() - _rsOffset; // with realsense gyro
-        // _pose.heading = _imu->GetYaw() - _imuOffset; // with BNO055
+        // _pose.heading = _vision->GetHeading() - _rsOffset; // with realsense gyro
+        _pose.heading = _imu->GetYaw() - _imuOffset; // with BNO055
     }
 }
 //
