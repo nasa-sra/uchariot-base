@@ -1,21 +1,10 @@
 #pragma once
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <functional>
-#include <net/if.h>
-#include <stdexcept>
-#include <stdint.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <thread>
 #include <unistd.h>
-
-#include <linux/can.h>
-#include <linux/can/raw.h>
-
-#define len can_dlc
+#include <functional>
+#include <thread>
+#include <vector>
+#include <map>
 
 #include "Utils.h"
 struct CanFrame {
@@ -23,10 +12,8 @@ struct CanFrame {
     uint8_t* data;
     size_t len;
 
-    CanFrame() {
-    }
+    CanFrame() {}
     CanFrame(uint32_t arb_id, uint8_t* data, size_t len) : arb_id(arb_id), data(data), len(len){};
-    CanFrame(struct can_frame frame) : arb_id(frame.can_id), data(frame.data), len(frame.len){};
 };
 
 class CanConnection {
@@ -37,7 +24,7 @@ public:
     }
 
     void Start();
-    void RegisterPacketHandler(uint16_t id, std::function<void(CanFrame)> handler);
+    void RegisterPacketHandler(uint32_t id, std::function<void(CanFrame)> handler);
     void Send(CanFrame frame);
     void Recieve();
     void CloseConnection();
@@ -50,7 +37,6 @@ private:
     std::thread _receiveThread;
     bool _running{true};
 
-    int _socket;
-    std::vector<struct can_filter> _filters;
-    std::map<uint16_t, std::function<void(CanFrame)>> _callbacks;
+    int _serialPort;
+    std::map<uint32_t, std::function<void(CanFrame)>> _callbacks;
 };
