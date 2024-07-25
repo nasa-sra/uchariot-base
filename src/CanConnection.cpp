@@ -1,3 +1,5 @@
+#include <fcntl.h>
+
 #include "CanConnection.h"
 
 CanConnection::CanConnection() {
@@ -31,6 +33,11 @@ CanConnection::CanConnection() {
     if (ret < 0) { Utils::ErrFmt("CAN socket bind failed"); }
 
     setsockopt(_socket, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
+
+    int flags = fcntl(_socket, F_GETFL, 0);
+    flags |= O_NONBLOCK;
+    fcntl(_socket, F_SETFL, flags);
+    
 #else
 #endif
 }
@@ -62,11 +69,22 @@ void CanConnection::Send(CanFrame in_frame) {
     memcpy(frame.data, in_frame.data, in_frame.len);
 
     // Send message
-    int nbytes = write(_socket, &frame, sizeof(frame));
-    if (nbytes != sizeof(frame)) {
-        printf("Failed to send can frame\r\n");
-        // system("sudo ifconfig can0 down");
+    int bytesleft = sizeof(frame);
+    int count = 0;
+    while(bytesleft > 0) {
+        int nbytes = write(_socket, &frame, bytesleft);
+        if (nbytes == -1) {
+            Utils::LogFmt("CanConnection::Send Error on write - %s", std::strerror(errno));
+            break;
+        }
+        bytesleft -= nbytes;
+        if (count > 100) {
+            Utils::LogFmt("Failed to send can frame");
+            break;
+        }
+        count++;
     }
+
 #else
     // LogFrame(in_frame);
 #endif
