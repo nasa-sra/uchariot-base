@@ -3,7 +3,7 @@
 Robot control software for MicroChariot.
 
 To deploy the code to the robot, you can either crosscompile and deploy the executable, or clone the repo onto the jetson and build it there.  
-Then just ssh onto the jetson and run the executable in ~/uchariot-base/build/ with `./uChariotBase`  
+Then just SSH onto the jetson and run the executable in ~/uchariot-base/build/ with `sudo ./uChariotBase`  
 
 ## Libraries
 
@@ -13,8 +13,9 @@ Minimum CMake version is 3.16.
 | --- | --- | --- |
 | libeigen3 | linear algebra | sudo apt install libeigen3-dev | 
 | libi2c | i2c interface | sudo apt install libi2c-dev |
-| rapidjson | json parsing | n/a |
 | libgps | connecting to gpsd server | sudo apt install libgps-dev | 
+| rapidjson | json parsing | header-only |
+| tinyxml | XML parsing | header-only |
 
 ## Crosscompiling
 
@@ -42,27 +43,52 @@ make
 
 > If you are using X86 Windows, use WSL Debian or Ubuntu.
 > If you are using an Intel Mac, use a VM with Debian or Ubuntu.
+> 
+>IMPORTANT: You MUST use Debian 11 or Ubuntu 20.04 to crosscompile for the Jetson. The default WSL debian version is 12, so use these [instructions](https://stackoverflow.com/questions/77170725/how-to-install-debian-11-on-wsl-manually-i-am-trying-to-download-it-from-from) to get a Debian 11 disto.  
 
-NOTE: You MUST use Debian 11 or Ubuntu 20.04 LTS to crosscompile for the Jetson. The default WSL debian version is 12, so use these [instructions](https://stackoverflow.com/questions/77170725/how-to-install-debian-11-on-wsl-manually-i-am-trying-to-download-it-from-from) to get a Debian 11 disto.  
-
-Once you have your VM, install the libraries (see table above) and the g++ 9 crosscompiling toolchain for aarch64, with
+Once you have your VM, install the needed libraries (see table above) and the g++ 9 crosscompiling toolchain for aarch64, with
 
 `sudo apt install g++-9-aarch64-linux-gnu`
 
 Then to crosscompile, run 
 ```
-mkdir build
-cd build
+mkdir crossbuild
+cd crossbuild
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake ..
 make
 ```
 
 The only difference is the inclusion of `-DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake`.
 
-> If you build without this flag on X86-Windows/Max/Linux then the project will run in simulation mode, with no connection to any peripherals like the CAN bus.
-
 ### Deploy
 
 Now you should have produced a binary called `uChariotBase`. Deploy this using `../deploy.sh`.
+>You may want to set up an [SSH key](https://www.ssh.com/academy/ssh/copy-id) so that you don't have to keep entering the password.
+
+### Running
+Run the executable on the robot with  
+```
+cd ~/uchariot-base/build
+sudo ./uchariotBase
+```
+It can also be started with `sudo ~/uchariot-base/start.sh` which is what is run by the start button on the [driver console](https://github.com/nasa-sra/uchariot-console).
 
 ### Simulation
+
+You can also run the code on your local environment in simulation, this will disable peripherals like CAN, I2C, and serial connection. Just run  
+```
+mkdir build
+cd build
+cmake -DSIMULATION=true ..
+make
+sudo ./uChariotBase
+```
+
+## Documentation
+Checkout the docs at ./docs/html/index.html  
+Rebuild them with  
+```
+sudo apt install doxygen graphviz
+cd docs
+doxygen Doxyfile
+```
