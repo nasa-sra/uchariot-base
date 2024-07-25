@@ -10,3 +10,5 @@ Makefile
 cmake_install.cmake
 compile_commands.json
 /logs
+.DS_Store
+.clang-format

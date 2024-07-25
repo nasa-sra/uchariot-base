@@ -9,11 +9,6 @@ set (CMAKE_CXX_STANDARD 17)
 
 # cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake ..
 
-if(NOT ${CMAKE_CROSSCOMPILING})
-    add_compile_definitions(SIMULATION=true)
-    message("Compiling for simulation")
-endif()
-
 set(SRCS
     src/main.cpp
     src/CanConnection.cpp
@@ -39,6 +34,11 @@ set(LIBS)
 find_package(Eigen3 CONFIG REQUIRED)
 find_library(I2C_LIB libi2c.so)
 find_library(GPS_LIB libgps.so)
+
+if (${SIMULATION})
+    message("Compiling for simulation")
+    add_compile_definitions(SIMULATION=true)
+endif()
 
 add_executable(uChariotBase ${SRCS})
 target_link_libraries( uChariotBase Eigen3::Eigen ${I2C_LIB} ${GPS_LIB})
