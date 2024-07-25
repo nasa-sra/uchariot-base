@@ -12,3 +12,5 @@ compile_commands.json
 /logs
 .DS_Store
 .clang-format
+/docs/html
+!/docs/Doxyfile
