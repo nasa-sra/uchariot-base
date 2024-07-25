@@ -15,7 +15,7 @@ CanConnection::CanConnection() {
 
     Utils::LogFmt("Connecting to serial port");
     
-    _serialPort = open("/dev/ttyTHS1", O_RDWR);
+    _serialPort = open("/dev/ttyTHS0", O_RDWR);
     if (_serialPort < 0) {
         Utils::LogFmt("CanConnection - Failed to open serial port - %s", std::strerror(errno));
     }
@@ -49,6 +49,8 @@ CanConnection::CanConnection() {
     if (tcsetattr(_serialPort, TCSANOW, &tty) != 0) {
         Utils::LogFmt("CanConnection - Failed to set serial port config - %s", std::strerror(errno));
     }
+
+    Utils::LogFmt("Connected to serial port");
 
 #else
 #endif
