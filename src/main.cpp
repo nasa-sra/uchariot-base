@@ -26,7 +26,7 @@ int main() {
     
     Robot robot;
 
-    if (!NetworkManager::GetInstance().Start(8002, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);})) {
+    if (!NetworkManager::GetInstance().Start(8001, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);})) {
         can->CloseConnection();
         return 0;
     }

@@ -43,8 +43,8 @@ CanConnection::CanConnection() {
     tty.c_cc[VTIME] = 1; // 100ms timeout for read
     tty.c_cc[VMIN] = 0; // minimum number of bytes for read
 
-    // Set in/out baud rate to be 9600
-    cfsetspeed(&tty, B9600);
+    // Set in/out baud rate to be 115200
+    cfsetspeed(&tty, B115200);
 
     if (tcsetattr(_serialPort, TCSANOW, &tty) != 0) {
         Utils::LogFmt("CanConnection - Failed to set serial port config - %s", std::strerror(errno));
