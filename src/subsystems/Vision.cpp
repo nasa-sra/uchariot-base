@@ -4,41 +4,32 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 
-Vision::Vision() {
+void Vision::Update(double dt)
+{
 }
 
-/**
- * @brief Retrieves a specific entry from a message queue.
- *
- * This function connects to a message queue identified by the given entry name,
- * retrieves the latest message, and converts its content to a double value.
- * If the content cannot be parsed as a double, it logs an error and returns 0.0.
- *
- * @param entry The name of the entry to retrieve.
- * @return The double value of the entry's content, or 0.0 if parsing fails.
- */
-double Vision::GetEntry(const std::string& entry) {
-    // Grab the IMU message super easy
-    key_t key = ftok(("tmp/" + entry).c_str(), 65);
-    int msg_id = msgget(key, 0666 | IPC_CREAT);
-    msgrcv(msg_id, &_msg, sizeof(_msg), 1, IPC_NOWAIT);
-    msgctl(msg_id, IPC_RMID, NULL);
+void Vision::UpdateVisionData(std::string data)
+{
+    _document.Parse(data.c_str());
 
-    try {
-        return std::stod(_msg._content);
-    } catch (const std::exception& e) {
-        // Log error and return default value
-        // Utils::ErrFmt("Couldn't parse entry \"%s\" with value \"%s\".", entry, _msg._content);
-        return 0.0; // Return default value or throw an exception?
+    _visionData.clear();
+
+    const rapidjson::Value &arrayData = _document["detections"];
+
+    for (rapidjson::SizeType i = 0; i < arrayData.Size(); ++i)
+    {
+        VisionData sVisionData;
+        sVisionData.name = arrayData[i]["name"].GetString();
+        sVisionData.pose.x = arrayData[i]["x"].GetDouble();
+        sVisionData.pose.y = arrayData[i]["y"].GetDouble();
+        sVisionData.pose.z = arrayData[i]["z"].GetDouble();
+
+        _visionData.push_back(sVisionData);
     }
 }
 
-void Vision::Update(double dt) {
-    // _heading = GetEntry("rs_heading");
-    // Utils::LogFmt("Heading = %f", _heading);
-}
-
-void Vision::ReportState(std::string prefix) {
+void Vision::ReportState(std::string prefix)
+{
     prefix += "vision/";
     StateReporter::GetInstance().UpdateKey(prefix + "heading", _heading);
 }

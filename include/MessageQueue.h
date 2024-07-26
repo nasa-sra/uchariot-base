@@ -22,6 +22,8 @@ public:
     MessageQueue(const std::string &name);
     void Write(std::string data);
 
+    std::string ReceiveMessage();
+
 private:
     key_t _key;
     const char *_name;

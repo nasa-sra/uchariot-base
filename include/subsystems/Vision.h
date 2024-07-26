@@ -1,28 +1,36 @@
 #pragma once
 
+#include <vector>
+
 #include "Utils.h"
 #include "subsystems/SubsystemBase.h"
+#include "MessageQueue.h"
+#include "rapidjson/document.h"
+#include <Eigen/Core>
 
-struct MsgBuffer { 
-	long _type; 
-	char _content[16]; 
-}; 
+struct VisionData
+{
+    std::string name;
+    Eigen::Vector3d pose;
+};
 
-class Vision : SubsystemBase {
+class Vision : SubsystemBase
+{
+    const char *name;
 
-    const char* name;
-    MsgBuffer _msg;
+    std::vector<VisionData> _visionData;
+
+    rapidjson::Document _document;
 
     double _heading;
 
-    double GetEntry(const std::string& entry);
 public:
-
-    Vision();
+    Vision() : name("Vision"), _document() {};
 
     void Update(double dt);
     void ReportState(std::string prefix = "/");
 
-    inline double GetHeading() { return _heading; }
+    void UpdateVisionData(std::string data);
 
+    inline double GetHeading() { return _heading; }
 };
