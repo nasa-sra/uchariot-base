@@ -17,6 +17,8 @@ public:
 
     void Stop();
 
+    std::string ReceiveMessage();
+
 private:
     void recieve();
 
