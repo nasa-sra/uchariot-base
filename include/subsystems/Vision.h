@@ -12,6 +12,8 @@ struct VisionData
 {
     std::string name;
     Eigen::Vector3d pose;
+
+    VisionData() : pose() {};
 };
 
 class Vision : SubsystemBase
