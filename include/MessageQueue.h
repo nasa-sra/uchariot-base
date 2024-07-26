@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <string>
+#include <functional>
+#include <thread>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <cstdlib>
@@ -9,22 +11,21 @@
 
 #include "Utils.h"
 
-struct MsgBuffer
-{
-    long _type;
-    char _content[16];
-};
-
-class MessageQueue
-{
-
+class MessageQueue {
 public:
-    MessageQueue(const std::string &name);
-    void Write(std::string data);
+    MessageQueue(const std::string &name, std::function<void(std::string)> callback);
+
+    void Stop();
 
 private:
+    void recieve();
+
     key_t _key;
     const char *_name;
-    MsgBuffer _msg;
     int _msgid;
+    bool _running{true};
+    
+    std::thread _recieveThread;
+    std::function<void(std::string)> _callback;
+
 };
