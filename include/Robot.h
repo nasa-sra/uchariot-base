@@ -58,4 +58,40 @@ class Robot {
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase *_active_controller;
+
+    const std::map<const std::string,
+                   std::function<void(rapidjson::Document &doc)>>
+        _netHandlers = {{"set_controller",
+                         [this](rapidjson::Document &doc) -> void {
+                             _newMode = nameToMode(doc["name"].GetString());
+                         }},
+                        {"teleop_drive",
+                         [this](rapidjson::Document &doc) -> void {
+                             _teleopController.HandleNetworkInput(doc);
+                         }},
+                        {"run_path",
+                         [this](rapidjson::Document &doc) -> void {
+                             _pathingController.HandleNetworkInput(doc);
+                         }},
+                        {"reset_heading",
+                         [this](rapidjson::Document &doc) -> void {
+                             _localization.ResetHeading();
+                         }},
+                        {"reset_pose",
+                         [this](rapidjson::Document &doc) -> void {
+                             _localization.ResetPose();
+                         }},
+                        {"stop_path",
+                         [this](rapidjson::Document &doc) -> void {
+                             _pathingController.Stop();
+                         }},
+                        {"pause_path",
+                         [this](rapidjson::Document &doc) -> void {
+                             _pathingController.Pause();
+                         }},
+                        {"set_obstacle_avoidance",
+                         [this](rapidjson::Document &doc) -> void {
+                             _driveBase.usingVisionObstacleAvoidance =
+                                 doc["enabled"].GetBool();
+                         }}};
 };

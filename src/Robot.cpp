@@ -8,26 +8,10 @@ Robot::Robot()
 // Recive a network command and handle it appropriately.
 void Robot::HandleNetCmd(const std::string &cmd, rapidjson::Document &doc) {
     try {
-        if (cmd == "set_controller") {
-            _newMode = nameToMode(doc["name"].GetString());
-        } else if (cmd == "teleop_drive") {
-            _teleopController.HandleNetworkInput(doc);
-        } else if (cmd == "run_path") {
-            _pathingController.HandleNetworkInput(doc);
-        } else if (cmd == "reset_heading") {
-            _localization.ResetHeading();
-        } else if (cmd == "reset_pose") {
-            _localization.ResetPose();
-        } else if (cmd == "stop_path") {
-            _pathingController.Stop();
-        } else if (cmd == "pause_path") {
-            _pathingController.Pause();
-        } else if (cmd == "set_obstacle_avoidance") {
-            if (doc["enabled"].GetString() == "true") {
-                _driveBase.usingVisionObstacleAvoidance = true;  //;
-            } else {
-                _driveBase.usingVisionObstacleAvoidance = false;  //;
-            }
+        auto it = _netHandlers.find(cmd);
+        if (it != _netHandlers.end()) {
+            std::function<void(rapidjson::Document & doc)> cmdF = it->second;
+            cmdF(doc);
         }
     } catch (...) {
         Utils::LogFmt("Could not parse command");  // This still crashes
