@@ -8,13 +8,7 @@ Robot::Robot()
 // Recive a network command and handle it appropriately.
 void Robot::HandleNetCmd(const std::string &cmd, rapidjson::Document &doc) {
     try {
-        auto it = _netHandlers.find(cmd);
-        if (it != _netHandlers.end()) {
-            std::function<void(rapidjson::Document & doc)> cmdF = it->second;
-            cmdF(doc);
-        } else {
-            throw std::runtime_error("Unknown command: " + cmd);
-        }
+        _netHandlers.at(cmd)(doc);
     } catch (...) {
         Utils::LogFmt("Could not parse command");  // This still crashes
     }
