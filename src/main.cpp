@@ -35,7 +35,8 @@ int main() {
     StateReporter::GetInstance().EnableTelemetry();
 
     robot.Run(50, running);
-    
+
+    queue.Stop();
     robot.Shutdown();
     can->CloseConnection();
     NetworkManager::GetInstance().CloseConnections();

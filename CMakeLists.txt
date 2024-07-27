@@ -29,6 +29,7 @@ set(SRCS
     src/pathgen/PathGenerator.cpp
     src/subsystems/BNO055.cpp
     src/subsystems/GPS.cpp
+    src/MessageQueue.cpp
 )
 
 set(LIBS)
