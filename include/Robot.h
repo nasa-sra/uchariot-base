@@ -4,18 +4,14 @@
 #include <cstdio>
 #include <thread>
 
-#include "rapidjson/document.h"
-#include "subsystems/DriveBase.h"
-
+#include "MessageQueue.h"
+#include "StateReporter.h"
 #include "controllers/PathingController.h"
 #include "controllers/TeleopController.h"
-
-#include "StateReporter.h"
-
+#include "rapidjson/document.h"
 #include "subsystems/DriveBase.h"
 #include "subsystems/GPS.h"
 #include "subsystems/Localization.h"
-#include "MessageQueue.h"
 #ifndef SIMULATION
 #include "subsystems/BNO055.h"
 #else
@@ -27,15 +23,11 @@
 // - timing update loops
 // - switching active controllers
 // - dispatching network handles
-class Robot
-{
-public:
-    enum ControlMode
-    {
-        DISABLED,
-        TELEOP,
-        PATHING
-    };
+class Robot {
+   public:
+    enum ControlMode { DISABLED, TELEOP, PATHING };
+
+    Vision _vision;
 
     Robot();
 
@@ -44,7 +36,7 @@ public:
     void Run(int rate, bool &running);
     void HandleNetCmd(const std::string &cmd, rapidjson::Document &doc);
 
-private:
+   private:
     void ManageController();
     ControlMode nameToMode(std::string name);
     ControllerBase &modeToController(ControlMode mode);
@@ -56,7 +48,6 @@ private:
     PathingController _pathingController;
 
     DriveBase _driveBase;
-    MessageQueue _msgQueue;
 #ifndef SIMULATION
     BNO055 _imu;
 #else
@@ -64,7 +55,6 @@ private:
 #endif
     GPS _gps;
     Localization _localization;
-    Vision _vision;
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase *_active_controller;

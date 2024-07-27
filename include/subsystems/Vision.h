@@ -1,23 +1,22 @@
 #pragma once
 
+#include <Eigen/Core>
 #include <vector>
 
-#include "Utils.h"
-#include "subsystems/SubsystemBase.h"
+#include "DriveBase.h"
 #include "MessageQueue.h"
+#include "Utils.h"
 #include "rapidjson/document.h"
-#include <Eigen/Core>
+#include "subsystems/SubsystemBase.h"
 
-struct VisionData
-{
+struct VisionData {
     std::string name;
     Eigen::Vector3d pose;
 
     VisionData() : pose() {};
 };
 
-class Vision : SubsystemBase
-{
+class Vision : SubsystemBase {
     const char *name;
 
     std::vector<VisionData> _visionData;
@@ -26,8 +25,9 @@ class Vision : SubsystemBase
 
     double _heading;
 
-public:
-    Vision() : name("Vision"), _document() {};
+   public:
+    Vision(DriveBase *driveBase)
+        : name("Vision"), _driveBase(driveBase), _document() {};
 
     void Update(double dt);
     void ReportState(std::string prefix = "/");
@@ -35,4 +35,7 @@ public:
     void UpdateVisionData(std::string data);
 
     inline double GetHeading() { return _heading; }
+
+   private:
+    DriveBase *_driveBase;
 };
