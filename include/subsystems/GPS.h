@@ -7,7 +7,7 @@
 #include "subsystems/SubsystemBase.h"
 
 class GPS : SubsystemBase {
-public:
+   public:
     GPS();
 
     void Update(double dt);
@@ -16,7 +16,7 @@ public:
 
     gps_fix_t GetFix() { return _lastFix; }
 
-private:
+   private:
     bool _connected{false};
     gps_data_t _gps_data;
     gps_fix_t _lastFix;

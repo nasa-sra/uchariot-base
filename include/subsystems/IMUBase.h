@@ -2,33 +2,31 @@
 
 #include <Eigen/Core>
 
-#include "subsystems/SubsystemBase.h"
-#include "Utils.h"
 #include "StateReporter.h"
+#include "Utils.h"
+#include "subsystems/SubsystemBase.h"
 
 class IMUBase : SubsystemBase {
-  public:
-
+   public:
     virtual void Update(double dt) = 0;
     virtual void ReportState(std::string prefix = "/") {
-      prefix += "imu/";
-      StateReporter::GetInstance().UpdateKey(prefix + "yaw", _gyroAngles.z());
-      StateReporter::GetInstance().UpdateKey(prefix + "pitch", _gyroAngles.y());
-      StateReporter::GetInstance().UpdateKey(prefix + "roll", _gyroAngles.x());
+        prefix += "imu/";
+        StateReporter::GetInstance().UpdateKey(prefix + "yaw", _gyroAngles.z());
+        StateReporter::GetInstance().UpdateKey(prefix + "pitch",
+                                               _gyroAngles.y());
+        StateReporter::GetInstance().UpdateKey(prefix + "roll",
+                                               _gyroAngles.x());
     }
 
-    float GetRoll() {return _gyroAngles.x();}
-    float GetPitch() {return _gyroAngles.y();}
-    float GetYaw() {return _gyroAngles.z();}
+    float GetRoll() { return _gyroAngles.x(); }
+    float GetPitch() { return _gyroAngles.y(); }
+    float GetYaw() { return _gyroAngles.z(); }
 
-protected:
-
+   protected:
     Eigen::Vector3f _gyroAngles;
 };
 
 class SimIMU : public IMUBase {
-public:
-	void Update(double dt) {
-		_gyroAngles = {0.0, 0.0, 0.0};
-	}
+   public:
+    void Update(double dt) { _gyroAngles = {0.0, 0.0, 0.0}; }
 };

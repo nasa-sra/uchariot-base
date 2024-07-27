@@ -1,19 +1,19 @@
 #pragma once
 
+#include <linux/can.h>
+#include <linux/can/raw.h>
+#include <net/if.h>
+#include <stdint.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <functional>
-#include <net/if.h>
 #include <stdexcept>
-#include <stdint.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
 #include <thread>
-#include <unistd.h>
-
-#include <linux/can.h>
-#include <linux/can/raw.h>
 
 #define len can_dlc
 
@@ -23,26 +23,28 @@ struct CanFrame {
     uint8_t* data;
     size_t len;
 
-    CanFrame() {
-    }
-    CanFrame(uint32_t arb_id, uint8_t* data, size_t len) : arb_id(arb_id), data(data), len(len){};
-    CanFrame(struct can_frame frame) : arb_id(frame.can_id), data(frame.data), len(frame.len){};
+    CanFrame() {}
+    CanFrame(uint32_t arb_id, uint8_t* data, size_t len)
+        : arb_id(arb_id), data(data), len(len) {};
+    CanFrame(struct can_frame frame)
+        : arb_id(frame.can_id), data(frame.data), len(frame.len) {};
 };
 
 class CanConnection {
-public:
+   public:
     static CanConnection& GetInstance() {
-        static CanConnection _instance; // Guaranteed to be destroyed.
+        static CanConnection _instance;  // Guaranteed to be destroyed.
         return _instance;
     }
 
     void Start();
-    void RegisterPacketHandler(uint16_t id, std::function<void(CanFrame)> handler);
+    void RegisterPacketHandler(uint16_t id,
+                               std::function<void(CanFrame)> handler);
     void Send(CanFrame frame);
     void Recieve();
     void CloseConnection();
 
-private:
+   private:
     void LogFrame(CanFrame frame);
 
     CanConnection();

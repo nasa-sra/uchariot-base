@@ -6,13 +6,8 @@
 #include "StateReporter.h"
 
 class VescController {
-public:
-    enum Mode {
-        DUTY_CYCLE = 0,
-        VELOCITY,
-        POSITION,
-        CURRENT
-    };
+   public:
+    enum Mode { DUTY_CYCLE = 0, VELOCITY, POSITION, CURRENT };
 
     VescController(uint16_t id);
 
@@ -20,17 +15,16 @@ public:
 
     void SetMode(Mode mode);
     void SetCmd(float cmd);
-    void SetScale(float scale) {_scale = scale;}
+    void SetScale(float scale) { _scale = scale; }
 
-    double GetVoltage() {return _voltageIn;}
-    double GetVelocity() {return _velocity;}
-    double GetCmdVelocity() {return _cmdVelocity;}
+    double GetVoltage() { return _voltageIn; }
+    double GetVelocity() { return _velocity; }
+    double GetCmdVelocity() { return _cmdVelocity; }
 
     void packetHandler(CanFrame frame);
     void ReportState(std::string prefix = "/");
 
-private:
-
+   private:
     std::string modeToString(Mode mode);
 
     enum CAN_CMD_PACKET_ID {
@@ -47,12 +41,12 @@ private:
     };
 
     enum CAN_STATUS_PACKET_ID {
-        CAN_PACKET_STATUS = 9, //	ERPM, Current, Duty Cycle
-        CAN_PACKET_STATUS_2 = 14, // Ah Used, Ah Charged
-        CAN_PACKET_STATUS_3, // Wh Used, Wh Charged
-        CAN_PACKET_STATUS_4, // Temp Fet, Temp Motor, Current In, PID position
-        CAN_PACKET_STATUS_5	= 27, // Tachometer, Voltage In
-        CAN_PACKET_STATUS_6, //ADC1, ADC2, ADC3, PPM
+        CAN_PACKET_STATUS = 9,     //	ERPM, Current, Duty Cycle
+        CAN_PACKET_STATUS_2 = 14,  // Ah Used, Ah Charged
+        CAN_PACKET_STATUS_3,       // Wh Used, Wh Charged
+        CAN_PACKET_STATUS_4,  // Temp Fet, Temp Motor, Current In, PID position
+        CAN_PACKET_STATUS_5 = 27,  // Tachometer, Voltage In
+        CAN_PACKET_STATUS_6,       // ADC1, ADC2, ADC3, PPM
     };
 
     void readStatus1Packet(uint8_t* data);
@@ -65,12 +59,12 @@ private:
 
     CanConnection* _can;
     uint16_t _can_id;
-    float _scale {1.0};
+    float _scale{1.0};
     int _disconnectTimer{0};
 
     bool _connected{false};
     int _warningCounter{0};
-    Mode _mode {DUTY_CYCLE};
+    Mode _mode{DUTY_CYCLE};
     double _cmdDutyCycle{0.0};
     double _cmdVelocity{0.0};
     double _cmdPosition{0.0};
