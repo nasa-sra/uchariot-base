@@ -22,6 +22,10 @@ void Vision::UpdateVisionData(std::string data)
         sVisionData.name = arrayData[i]["name"].GetString();
         sVisionData.pose = Eigen::Vector3d(arrayData[i]["x"].GetDouble(), arrayData[i]["y"].GetDouble(), arrayData[i]["z"].GetDouble());
 
+        if (sVisionData.pose.norm() > 1.0)
+        {
+        }
+
         _visionData.push_back(sVisionData);
     }
 }

@@ -14,3 +14,4 @@ compile_commands.json
 .clang-format
 /docs/html
 !/docs/Doxyfile
+eigen_fix.h
