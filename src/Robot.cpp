@@ -12,6 +12,8 @@ void Robot::HandleNetCmd(const std::string &cmd, rapidjson::Document &doc) {
         if (it != _netHandlers.end()) {
             std::function<void(rapidjson::Document & doc)> cmdF = it->second;
             cmdF(doc);
+        } else {
+            throw std::runtime_error("Unknown command: " + cmd);
         }
     } catch (...) {
         Utils::LogFmt("Could not parse command");  // This still crashes
