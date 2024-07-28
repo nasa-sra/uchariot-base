@@ -33,6 +33,8 @@ class DriveBase : public SubsystemBase {
 
     void SetObstacleDetected(bool obstacleDetected) {
         _obstacleDetected = obstacleDetected;
+        Utils::LogFmt("Obstacle detected: %s",
+                      obstacleDetected ? "true" : "false");
     }
 
    private:
