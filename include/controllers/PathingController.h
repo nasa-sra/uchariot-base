@@ -1,7 +1,6 @@
 #pragma once
 
 #include "controllers/ControllerBase.h"
-#include "rapidjson/document.h"
 #include "subsystems/Localization.h"
 
 struct PathStep {
@@ -25,16 +24,14 @@ public:
 
     void Load() override;
     void Unload() override;
-    ControlCmds Run();
-    void ReportState(std::string prefix = "/");
-    void HandleNetworkInput(rapidjson::Document& doc);
+    ControlCmds Run(ControlCmds cmds = ControlCmds()) override;
+    void SetPathName(std::string name);
+    void Pause();
     void Stop();
 
-    void Pause();
+    void ReportState(std::string prefix = "/");
 
-    Utils::GeoPoint GetOrigin() {
-        return _origin;
-    }
+    Utils::GeoPoint GetOrigin() { return _origin; }
 
 private:
     bool loadPath(std::string filePath);

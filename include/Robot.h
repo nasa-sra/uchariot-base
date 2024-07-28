@@ -6,6 +6,7 @@
 
 #include "MessageQueue.h"
 #include "StateReporter.h"
+#include "controllers/OverrideController.h"
 #include "controllers/PathingController.h"
 #include "controllers/TeleopController.h"
 #include "rapidjson/document.h"
@@ -31,10 +32,10 @@ class Robot {
 
     Robot();
 
-    void Shutdown() {};
-
     void Run(int rate, bool &running);
     void HandleNetCmd(const std::string &cmd, rapidjson::Document &doc);
+
+    void Shutdown();
 
    private:
     void ManageController();
@@ -44,6 +45,7 @@ class Robot {
     ControlMode _mode{DISABLED};
     ControlMode _newMode{DISABLED};
 
+    OverrideController _overrideController;
     TeleopController _teleopController;
     PathingController _pathingController;
 
@@ -59,39 +61,5 @@ class Robot {
     std::string _active_controller_name, _last_controller_name;
     ControllerBase *_active_controller;
 
-    const std::map<const std::string,
-                   std::function<void(rapidjson::Document &doc)>>
-        _netHandlers = {{"set_controller",
-                         [this](rapidjson::Document &doc) -> void {
-                             _newMode = nameToMode(doc["name"].GetString());
-                         }},
-                        {"teleop_drive",
-                         [this](rapidjson::Document &doc) -> void {
-                             _teleopController.HandleNetworkInput(doc);
-                         }},
-                        {"run_path",
-                         [this](rapidjson::Document &doc) -> void {
-                             _pathingController.HandleNetworkInput(doc);
-                         }},
-                        {"reset_heading",
-                         [this](rapidjson::Document &doc) -> void {
-                             _localization.ResetHeading();
-                         }},
-                        {"reset_pose",
-                         [this](rapidjson::Document &doc) -> void {
-                             _localization.ResetPose();
-                         }},
-                        {"stop_path",
-                         [this](rapidjson::Document &doc) -> void {
-                             _pathingController.Stop();
-                         }},
-                        {"pause_path",
-                         [this](rapidjson::Document &doc) -> void {
-                             _pathingController.Pause();
-                         }},
-                        {"set_obstacle_avoidance",
-                         [this](rapidjson::Document &doc) -> void {
-                             _driveBase.usingVisionObstacleAvoidance =
-                                 doc["enabled"].GetBool();
-                         }}};
+    std::map<const std::string, std::function<void(rapidjson::Document &doc)>> _netHandlers;
 };

@@ -53,7 +53,6 @@ void Localization::ReportState(std::string prefix) {
 }
 
 void Localization::ResetHeading() {
-    _rsOffset = _vision->GetHeading();
     _imuOffset = _imu->GetYaw();
 }
 

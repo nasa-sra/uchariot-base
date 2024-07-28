@@ -26,14 +26,7 @@ int main() {
 
     Robot robot;
 
-    MessageQueue _msgQueue("/tmp/uChariotBase", [&robot](std::string msg) {
-        robot._vision.UpdateVisionData(msg);
-    });
-
-    if (!NetworkManager::GetInstance().Start(
-            8000, [&robot](std::string cmd, rapidjson::Document &doc) {
-                robot.HandleNetCmd(cmd, doc);
-            })) {
+    if (!NetworkManager::GetInstance().Start( 8000, [&robot](std::string cmd, rapidjson::Document &doc) { robot.HandleNetCmd(cmd, doc); })) {
         can->CloseConnection();
         return 0;
     }
@@ -43,7 +36,6 @@ int main() {
 
     robot.Run(50, running);
 
-    _msgQueue.Stop();
     robot.Shutdown();
     can->CloseConnection();
     NetworkManager::GetInstance().CloseConnections();

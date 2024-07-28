@@ -1,41 +1,37 @@
 #pragma once
 
-#include <Eigen/Core>
+#include <mutex>
 #include <vector>
 
-#include "DriveBase.h"
+#include "subsystems/SubsystemBase.h"
 #include "MessageQueue.h"
 #include "Utils.h"
-#include "rapidjson/document.h"
-#include "subsystems/SubsystemBase.h"
 
-struct VisionData {
+struct Detection {
     std::string name;
     Eigen::Vector3d pose;
 
-    VisionData() : pose() {};
+    Detection() : pose() {};
 };
 
 class Vision : SubsystemBase {
-    const char *name;
-
-    std::vector<VisionData> _visionData;
-
-    rapidjson::Document _document;
-
-    double _heading;
-
-   public:
-    Vision(DriveBase *driveBase)
-        : name("Vision"), _driveBase(driveBase), _document() {};
+public:
+    Vision();
 
     void Update(double dt);
+    void Disconnect();
     void ReportState(std::string prefix = "/");
 
-    void UpdateVisionData(std::string data);
+    double GetClosestDetectionDisance() {return _closestDetectionDistance;}
 
-    inline double GetHeading() { return _heading; }
+private:
 
-   private:
-    DriveBase *_driveBase;
+    void updateDetections(std::string data);
+
+    MessageQueue _messageQueue;
+
+    std::vector<Detection> _detections;
+    std::mutex _detectionsMutex;
+
+    double _closestDetectionDistance{-1.0};
 };
