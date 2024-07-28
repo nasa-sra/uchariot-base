@@ -1,3 +1,5 @@
+
+#include "rapidjson/error/en.h"
 #include "NetworkManager.h"
 
 NetworkManager::NetworkManager() {}
@@ -210,6 +212,10 @@ void NetworkManager::handlePacket(char* buffer, int start, size_t len) {
 
     rapidjson::Document document;
     document.Parse(data.c_str());
+    if (document.HasParseError()) {
+        Utils::LogFmt("NetworkManager::handlePacket JSON Parse Error. Offset %u: %s", (unsigned)document.GetErrorOffset(), rapidjson::GetParseError_En(document.GetParseError()));
+        return;
+    }
     _packetCallback(cmd, document);
 }
 

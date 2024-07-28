@@ -1,8 +1,14 @@
 #include "controllers/TeleopController.h"
 
-void TeleopController::HandleNetworkInput(rapidjson::Document& doc) {
-    _fwdVelocity = doc["velocity"].GetDouble();  // m/s
-    _angVelocity = doc["rotation"].GetDouble();  // rad/s
+TeleopController::TeleopController() : ControllerBase("teleop") {}
+
+void TeleopController::SetDriveInput(double velocity, double rotation) {
+    _fwdVelocity = velocity;
+    _angVelocity = rotation;
 }
 
-ControlCmds TeleopController::Run() { return {_fwdVelocity, _angVelocity}; }
+ControlCmds TeleopController::Run(ControlCmds cmds) {
+    cmds.drive.velocity = _fwdVelocity;
+    cmds.drive.angularVelocity = _angVelocity;
+    return cmds;
+}

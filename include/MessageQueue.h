@@ -17,7 +17,7 @@ class MessageQueue {
     MessageQueue(const std::string &name,
                  std::function<void(std::string)> callback);
 
-    void Stop();
+    void Close();
 
     std::string ReceiveMessage();
 

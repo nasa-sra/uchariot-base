@@ -29,9 +29,7 @@ void PathingController::Unload() {};
  * @return A ControlCmds object containing the calculated velocity and angular
  * velocity commands for the robot.
  */
-ControlCmds PathingController::Run() {
-    ControlCmds cmds;
-
+ControlCmds PathingController::Run(ControlCmds cmds) {
     if (!_runningPath && _pathName != "") {
         _runningPath = loadPath(_pathName);
         if (!_runningPath) {
@@ -73,6 +71,21 @@ ControlCmds PathingController::Run() {
     return cmds;
 }
 
+void PathingController::SetPathName(std::string name) {
+    _pathName = name;
+    if (_pathPaused) {
+        _pathPaused = false;
+        Utils::LogFmt("Path resumed");
+    }
+}
+
+void PathingController::Pause() { _pathPaused = true; }
+
+void PathingController::Stop() {
+    _runningPath = false;
+    _pathName = "";
+}
+
 void PathingController::ReportState(std::string prefix) {
     prefix += "pathing_controller/";
     StateReporter::GetInstance().UpdateKey(prefix + "waypointX",
@@ -87,18 +100,6 @@ void PathingController::ReportState(std::string prefix) {
                                            _runningPath);
     StateReporter::GetInstance().UpdateKey(prefix + "currentStep",
                                            _currentStep);
-}
-
-void PathingController::HandleNetworkInput(rapidjson::Document& doc) {
-    _pathName = doc["name"].GetString();
-
-    if (_pathPaused) {
-        _pathPaused = false;
-        Utils::LogFmt("Path resumed");
-    }
-    // _pathResolution = std::stoi(doc["res"].GetString());
-    // _pathSpeed = std::stof(doc["speed"].GetString());
-    // _pathRadius = std::stof(doc["rad"].GetString());
 }
 
 bool PathingController::loadPath(std::string filePath) {
@@ -244,11 +245,6 @@ bool PathingController::loadXMLPath(std::string filePath) {
     return true;
 }
 
-void PathingController::Stop() {
-    _runningPath = false;
-    _pathName = "";
-}
-
 /**
  * @brief Loads a KML path file and parses its data into the internal path
  * representation.
@@ -350,5 +346,3 @@ Utils::GeoPoint PathingController::parseGeoCoordinates(std::string coords,
 
     return point;
 }
-
-void PathingController::Pause() { _pathPaused = true; }

@@ -16,7 +16,8 @@ MessageQueue::MessageQueue(const std::string& name,
     _recieveThread = std::thread(&MessageQueue::recieve, this);
 }
 
-void MessageQueue::Stop() {
+void MessageQueue::Close() {
+    Utils::LogFmt("Closing message queue");
     _running = false;
     _recieveThread.join();
 }
@@ -33,11 +34,11 @@ void MessageQueue::recieve() {
                 bytesRead = msgrcv(_msgid, &buf, sizeof(buf), 1, IPC_NOWAIT);
                 if (bytesRead == -1) {
                     Utils::LogFmt(
-                        "MessageQueue::Recieve - Error recieving -  %s",
+                        "MessageQueue::Recieve - Error recieving: %s",
                         strerror(errno));
                 }
             }
-            std::string msg(buf, bytesRead);
+            std::string msg(buf+sizeof(long), bytesRead-sizeof(long));
             _callback(msg);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
