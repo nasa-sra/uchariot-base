@@ -4,30 +4,45 @@ Robot::Robot()
     : _vision(),
       _localization(&_driveBase, &_imu, &_vision, &_gps),
       _overrideController(&_vision),
-      _pathingController(&_localization)
-    {
+      _pathingController(&_localization) {
     _netHandlers["set_controller"] = [this](rapidjson::Document &doc) {
-            if (!doc.HasMember("name") || !doc["name"].IsString()) throw std::runtime_error("no name");
-            _newMode = nameToMode(doc["name"].GetString());
-        };
+        if (!doc.HasMember("name") || !doc["name"].IsString())
+            throw std::runtime_error("no name");
+        _newMode = nameToMode(doc["name"].GetString());
+    };
     _netHandlers["teleop_drive"] = [this](rapidjson::Document &doc) {
-            if (!doc.HasMember("velocity") || !doc["velocity"].IsDouble()) throw std::runtime_error("no velocity");
-            if (!doc.HasMember("rotation") || !doc["rotation"].IsDouble()) throw std::runtime_error("no rotation");
-            _teleopController.SetDriveInput(doc["velocity"].GetDouble(), doc["rotation"].GetDouble());
-        };
+        if (!doc.HasMember("velocity") || !doc["velocity"].IsDouble())
+            throw std::runtime_error("no velocity");
+        if (!doc.HasMember("rotation") || !doc["rotation"].IsDouble())
+            throw std::runtime_error("no rotation");
+        _teleopController.SetDriveInput(doc["velocity"].GetDouble(),
+                                        doc["rotation"].GetDouble());
+    };
     _netHandlers["run_path"] = [this](rapidjson::Document &doc) {
-            if (!doc.HasMember("name") || !doc["name"].IsString()) throw std::runtime_error("no name");
-            _pathingController.SetPathName(doc["name"].GetString());
-        };
+        if (!doc.HasMember("name") || !doc["name"].IsString())
+            throw std::runtime_error("no name");
+        _pathingController.SetPathName(doc["name"].GetString());
+    };
     _netHandlers["set_stop_distance"] = [this](rapidjson::Document &doc) {
-            if (!doc.HasMember("distance") || !doc["distance"].IsDouble()) throw std::runtime_error("no distance");
-            _overrideController.SetStopDistance(doc["distance"].GetDouble());
-        };
-    _netHandlers["reset_heading"] = [this](rapidjson::Document &doc) { _localization.ResetHeading(); };
-    _netHandlers["reset_pose"] = [this](rapidjson::Document &doc) { _localization.ResetPose(); };
-    _netHandlers["stop_path"] = [this](rapidjson::Document &doc) { _pathingController.Stop(); };
-    _netHandlers["pause_path"] = [this](rapidjson::Document &doc) { _pathingController.Pause(); };
-    _netHandlers["estop"] = [this](rapidjson::Document &doc) { _overrideController.EStop(); };
+        if (!doc.HasMember("distance") || !doc["distance"].IsDouble())
+            throw std::runtime_error("no distance");
+        _overrideController.SetStopDistance(doc["distance"].GetDouble());
+    };
+    _netHandlers["reset_heading"] = [this](rapidjson::Document &doc) {
+        _localization.ResetHeading();
+    };
+    _netHandlers["reset_pose"] = [this](rapidjson::Document &doc) {
+        _localization.ResetPose();
+    };
+    _netHandlers["stop_path"] = [this](rapidjson::Document &doc) {
+        _pathingController.Stop();
+    };
+    _netHandlers["pause_path"] = [this](rapidjson::Document &doc) {
+        _pathingController.Pause();
+    };
+    _netHandlers["estop"] = [this](rapidjson::Document &doc) {
+        _overrideController.EStop();
+    };
 }
 
 // The main robot process scheduler.
@@ -70,7 +85,8 @@ void Robot::Run(int rate, bool &running) {
         _localization.Update(dt);
 
         // Report state
-        StateReporter::GetInstance().UpdateKey("/controller", modeToController(_mode).name);
+        StateReporter::GetInstance().UpdateKey("/controller",
+                                               modeToController(_mode).name);
 
         cmds.ReportState();
         _overrideController.ReportState();
@@ -93,15 +109,14 @@ void Robot::Run(int rate, bool &running) {
 // Recive a network command and handle it appropriately.
 void Robot::HandleNetCmd(const std::string &cmd, rapidjson::Document &doc) {
     try {
-        _netHandlers.at(cmd)(doc);
-    } catch (std::exception& e) {
-        Utils::LogFmt("Robot::HandleNetCmd - Could not parse command %s: %s", cmd, e.what());
+        (_netHandlers.at(cmd))(doc);
+    } catch (std::exception &e) {
+        Utils::LogFmt("Robot::HandleNetCmd - Could not parse command %s: %s",
+                      cmd, e.what());
     }
 }
 
-void Robot::Shutdown() {
-    _vision.Disconnect();
-}
+void Robot::Shutdown() { _vision.Disconnect(); }
 
 void Robot::ManageController() {
     if (_newMode != _mode) {
