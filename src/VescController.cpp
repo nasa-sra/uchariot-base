@@ -89,6 +89,8 @@ void VescController::readStatus1Packet(uint8_t* data) {
     int32_t lBuf;
     memcpy(&lBuf, data+4, 4);
     _velocity = lBuf / _scale;
+
+    std::cout << _can_id << ": " << _velocity << "\n" ;
 }
 
 void VescController::readStatus5Packet(uint8_t* data) {

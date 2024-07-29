@@ -26,7 +26,7 @@ int main() {
     
     Robot robot;
 
-    if (!NetworkManager::GetInstance().Start(8001, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);})) {
+    if (!NetworkManager::GetInstance().Start(8000, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);})) {
         can->CloseConnection();
         return 0;
     }
@@ -34,17 +34,17 @@ int main() {
     StateReporter::GetInstance().EnableLogging();
     StateReporter::GetInstance().EnableTelemetry();
 
-    while(running) {
-        CanFrame frame;
-        frame.arb_id = 1;
-        int n = 100000;
-        frame.data = (uint8_t*)&n;
-        frame.len = 4;
-        can->Send(frame);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    }
+    // while(running) {
+    //     CanFrame frame;
+    //     frame.arb_id = 1;
+    //     int n = 100000;
+    //     frame.data = (uint8_t*)&n;
+    //     frame.len = 4;
+    //     can->Send(frame);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    // }
 
-    // robot.Run(50, running);
+    robot.Run(50, running);
     
     robot.Shutdown();
     can->CloseConnection();

@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <termios.h>
+#include <bitset>
 
 #include "CanConnection.h"
 
@@ -25,26 +26,31 @@ CanConnection::CanConnection() {
         Utils::LogFmt("CanConnection - Failed to read serial port config - %s", std::strerror(errno));
     }
 
-    tty.c_cflag &= ~PARENB; // No parity
-    tty.c_cflag |= CSTOPB; // One stop bit
-    tty.c_cflag &= ~CSIZE;
-    tty.c_cflag |= CS8; // 8 bits
-    tty.c_cflag &= ~CRTSCTS; // Disable RTS/CTS
-    tty.c_cflag |= CREAD | CLOCAL; // Turn on read and ignore ctrl lines
-    tty.c_lflag &= ~ICANON;
-    tty.c_lflag &= ~ECHO; // Disable echo
-    tty.c_lflag &= ~ECHOE; // Disable erasure
-    tty.c_lflag &= ~ECHONL; // Disable new-line echo
-    tty.c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
-    tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
-    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
-    tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
+    tty.c_cflag = 0b00000000000000000001100010111001;
+    tty.c_lflag = 0b00000000000000001000101000110000;
+    tty.c_iflag = 0b00000000000000000000000000000110;
+    tty.c_oflag = 0b00000000000000000000000000000000;
+
+    // tty.c_cflag &= ~PARENB; // No parity
+    // tty.c_cflag |= CSTOPB; // One stop bit
+    // tty.c_cflag &= ~CSIZE;
+    // tty.c_cflag |= CS8; // 8 bits
+    // tty.c_cflag &= ~CRTSCTS; // Disable RTS/CTS
+    // tty.c_cflag |= CREAD | CLOCAL; // Turn on read and ignore ctrl lines
+    // tty.c_lflag &= ~ICANON;
+    // tty.c_lflag &= ~ECHO; // Disable echo
+    // tty.c_lflag &= ~ECHOE; // Disable erasure
+    // tty.c_lflag &= ~ECHONL; // Disable new-line echo
+    // tty.c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
+    // tty.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
+    // tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
+    // tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    // tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
     tty.c_cc[VTIME] = 1; // 100ms timeout for read
     tty.c_cc[VMIN] = 0; // minimum number of bytes for read
 
-    // Set in/out baud rate to be 115200
-    cfsetspeed(&tty, B115200);
+    // Set in/out baud rate to be 1152000
+    cfsetspeed(&tty, B1152000);
 
     if (tcsetattr(_serialPort, TCSANOW, &tty) != 0) {
         Utils::LogFmt("CanConnection - Failed to set serial port config - %s", std::strerror(errno));
@@ -115,7 +121,6 @@ void CanConnection::Recieve() {
     char buffer[256];
     int place = 0;
     int bytesChecked = 0;
-    CanFrame frame;
 
     while (_running) {
 #ifndef SIMULATION
@@ -125,13 +130,29 @@ void CanConnection::Recieve() {
         if (nbytes > 0) {
             place += nbytes;
             bytesChecked = 0;
+
+            // printf("Read %i bytes:", nbytes);
+            // for (int i = 0; i < place; i++)
+            // {
+            //     printf("%02X ", buffer[i]);
+            // }
+            // std::cout << "\n";
+
             for (int i = 0; i < place; i++) { // Search buffer for frames
                 if (buffer[i] == '#' && place - i >= 13) { // There is a full frame found
 
                     // Extract and handle can frame
-                    memcpy(&frame.arb_id, buffer+i, 4);
-                    memcpy(&frame.data, buffer+i+4, 8);
-                    auto callback = _callbacks.find(frame.arb_id);
+                    CanFrame frame;
+                    uint8_t idBytes[4];
+                    memcpy(idBytes, buffer+i+1, 4);
+                    for (int j = 0; j < 4; j++) {
+                        frame.arb_id += idBytes[j] << j*8;    
+                    }
+                    frame.len = 8;
+                    frame.data = (uint8_t*) buffer+i+5;
+                    // std::cout << "I found a frame with id " << (((frame.arb_id & 0x0000FF00) >> 8)) << (frame.arb_id & 0x000000FF) << "\n";
+
+                    auto callback = _callbacks.find(frame.arb_id & 0x000000FF);
                     if (callback != _callbacks.end()) { callback->second(frame); }
 
                     bytesChecked = i + 13;
