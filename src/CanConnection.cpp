@@ -76,12 +76,17 @@ void CanConnection::Send(CanFrame in_frame) {
 #ifndef SIMULATION
 
     // Constructs a message packet of there format: #[4 byte arb id][8 bytes of data with leading zero padding]
-    char zeros[8] = {0};
     char buffer[1+4+8];
     buffer[0] = '#';
     memcpy(buffer+1, &in_frame.arb_id, 4);
-    memcpy(buffer+5, zeros, 8 - in_frame.len);
-    memcpy(buffer+13-in_frame.len, in_frame.data, in_frame.len);
+    memcpy(buffer+5, in_frame.data, in_frame.len);
+    bzero(buffer+13-in_frame.len, 8 - in_frame.len);
+
+    for (int i = 0; i < 13; i++)
+    {
+        printf("%02X ", buffer[i]);
+    }
+    std::cout << "\n";
 
     int bytesLeft = sizeof(buffer);
     int bytesSent = 0;
