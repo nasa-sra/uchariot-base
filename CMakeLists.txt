@@ -18,19 +18,22 @@ set(SRCS
     src/NetworkManager.cpp
     src/StateReporter.cpp
     src/MessageQueue.cpp
+
     src/controllers/OverrideController.cpp
     src/controllers/TeleopController.cpp
     src/controllers/PathingController.cpp
+    src/controllers/FollowingController.cpp
+
     src/subsystems/DriveBase.cpp
     src/subsystems/Localization.cpp
     src/subsystems/Vision.cpp
+    src/subsystems/BNO055.cpp
+    src/subsystems/GPS.cpp
+    
     src/tinyxml2.cpp
     src/pathgen/Bezier.cpp
     src/pathgen/Curve.cpp
     src/pathgen/PathGenerator.cpp
-    src/subsystems/BNO055.cpp
-    src/subsystems/GPS.cpp
-    src/MessageQueue.cpp
 )
 
 set(LIBS)

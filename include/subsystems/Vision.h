@@ -11,7 +11,7 @@ struct Detection {
     std::string name;
     Eigen::Vector3d pose;
 
-    Detection() : pose() {};
+    Detection() : name(""), pose({0.0, 0.0, 0.0}) {};
 };
 
 class Vision : SubsystemBase {
@@ -22,7 +22,8 @@ public:
     void Disconnect();
     void ReportState(std::string prefix = "/");
 
-    double GetClosestDetectionDisance() {return _closestDetectionDistance;}
+    double GetClosestDetectionDisance() { return _closestDetectionDistance; }
+    std::vector<Detection> GetDetections() { return _detections; }
 
 private:
 

@@ -4,21 +4,24 @@
 #include <cstdio>
 #include <thread>
 
+#include "rapidjson/document.h"
 #include "MessageQueue.h"
 #include "StateReporter.h"
+
 #include "controllers/OverrideController.h"
 #include "controllers/PathingController.h"
 #include "controllers/TeleopController.h"
-#include "rapidjson/document.h"
+#include "controllers/FollowingController.h"
+
 #include "subsystems/DriveBase.h"
 #include "subsystems/GPS.h"
+#include "subsystems/Vision.h"
 #include "subsystems/Localization.h"
 #ifndef SIMULATION
 #include "subsystems/BNO055.h"
 #else
 #include "subsystems/IMUBase.h"
 #endif
-#include "subsystems/Vision.h"
 
 // The main robot class is resonsible for:
 // - timing update loops
@@ -26,7 +29,7 @@
 // - dispatching network handles
 class Robot {
    public:
-    enum ControlMode { DISABLED, TELEOP, PATHING };
+    enum ControlMode { DISABLED, TELEOP, PATHING, FOLLOWING };
 
     Vision _vision;
 
@@ -48,6 +51,7 @@ class Robot {
     OverrideController _overrideController;
     TeleopController _teleopController;
     PathingController _pathingController;
+    FollowingController _followingController;
 
     DriveBase _driveBase;
 #ifndef SIMULATION

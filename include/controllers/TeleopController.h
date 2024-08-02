@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ControllerBase.h"
-#include "VescController.h"
 
 class TeleopController : public ControllerBase {
 public:

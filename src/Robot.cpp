@@ -4,7 +4,8 @@ Robot::Robot()
     : _vision(),
       _localization(&_driveBase, &_imu, &_vision, &_gps),
       _overrideController(&_vision),
-      _pathingController(&_localization) {
+      _pathingController(&_localization),
+      _followingController(&_vision) {
     _netHandlers["set_controller"] = [this](rapidjson::Document &doc) {
         if (!doc.HasMember("name") || !doc["name"].IsString())
             throw std::runtime_error("no name");
@@ -69,6 +70,9 @@ void Robot::Run(int rate, bool &running) {
             case ControlMode::PATHING:
                 cmds = _pathingController.Run();
                 break;
+            case ControlMode::FOLLOWING:
+                cmds = _followingController.Run();
+                break;
             default:
                 break;
         }
@@ -131,6 +135,7 @@ void Robot::ManageController() {
 Robot::ControlMode Robot::nameToMode(std::string name) {
     if (name == _teleopController.name) return ControlMode::TELEOP;
     if (name == _pathingController.name) return ControlMode::PATHING;
+    if (name == _followingController.name) return ControlMode::FOLLOWING;
     return ControlMode::DISABLED;
 }
 
@@ -138,5 +143,6 @@ ControllerBase &Robot::modeToController(ControlMode mode) {
     static DisabledController dc;
     if (mode == TELEOP) return _teleopController;
     if (mode == PATHING) return _pathingController;
+    if (mode == FOLLOWING) return _followingController;
     return dc;
 }
