@@ -1,3 +1,5 @@
+
+#include "tinyxml2.h"
 #include "Robot.h"
 
 Robot::Robot()
@@ -6,6 +8,7 @@ Robot::Robot()
       _overrideController(&_vision),
       _pathingController(&_localization),
       _followingController(&_vision) {
+
     _netHandlers["set_controller"] = [this](rapidjson::Document &doc) {
         if (!doc.HasMember("name") || !doc["name"].IsString())
             throw std::runtime_error("no name");
@@ -44,6 +47,13 @@ Robot::Robot()
     _netHandlers["estop"] = [this](rapidjson::Document &doc) {
         _overrideController.EStop();
     };
+    _netHandlers["load_config"] = [this](rapidjson::Document &doc) {
+        if (doc.HasMember("filepath") && doc["filepath"].IsString()) {
+            loadConfig(doc["filepath"].GetString());
+        } else { loadConfig("../config/robotConfig.xml"); }
+    };
+
+    loadConfig("../config/robotConfig.xml");
 }
 
 // The main robot process scheduler.
@@ -145,4 +155,48 @@ ControllerBase &Robot::modeToController(ControlMode mode) {
     if (mode == PATHING) return _pathingController;
     if (mode == FOLLOWING) return _followingController;
     return dc;
+}
+
+
+bool Robot::loadConfig(std::string filePath) {
+
+    tinyxml2::XMLDocument doc;
+
+    // Read XML file and check if it is loaded correctly
+    int res = doc.LoadFile(filePath.c_str());
+    if (res != tinyxml2::XML_SUCCESS) {
+        Utils::LogFmt("Robot::loadConfig - Could not load file %s, Err Code: " "%i", filePath.c_str(), res);
+        return false;
+    }
+
+    // Load path as data string and verfy output
+    tinyxml2::XMLElement* robot = doc.FirstChildElement("robot");
+    if (robot == nullptr) {
+        Utils::LogFmt("Robot::loadConfig - No robot element found");
+        return false;
+    }
+
+    tinyxml2::XMLElement* line = nullptr;
+    while (true) {
+        if (line == nullptr) {
+            line = robot->FirstChildElement();
+        } else {
+            line = line->NextSiblingElement();
+        }
+        if (line == nullptr) {
+            break;
+        }
+
+        if (std::strcmp(line->Name(), _overrideController.name.c_str()) == 0) {
+            _overrideController.Configure(line);
+        } else if (std::strcmp(line->Name(), _pathingController.name.c_str()) == 0) {
+            _pathingController.Configure(line);
+        } else if (std::strcmp(line->Name(), _followingController.name.c_str()) == 0) {
+            _followingController.Configure(line);
+        } else {
+            Utils::LogFmt("Robot::LoadConfig - Could not read line in XML");
+        }
+    }
+    Utils::LogFmt("Loaded Robot Config");
+    return true;
 }

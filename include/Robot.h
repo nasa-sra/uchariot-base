@@ -23,10 +23,6 @@
 #include "subsystems/IMUBase.h"
 #endif
 
-// The main robot class is resonsible for:
-// - timing update loops
-// - switching active controllers
-// - dispatching network handles
 class Robot {
    public:
     enum ControlMode { DISABLED, TELEOP, PATHING, FOLLOWING };
@@ -41,9 +37,11 @@ class Robot {
     void Shutdown();
 
    private:
+   
     void ManageController();
     ControlMode nameToMode(std::string name);
     ControllerBase &modeToController(ControlMode mode);
+    bool loadConfig(std::string filePath);
 
     ControlMode _mode{DISABLED};
     ControlMode _newMode{DISABLED};

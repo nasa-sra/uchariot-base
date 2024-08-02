@@ -10,6 +10,11 @@ PathingController::PathingController(Localization* localization)
     _localization = localization;
 }
 
+void PathingController::Configure(tinyxml2::XMLElement* xml) {
+    xml->QueryDoubleAttribute("velocityKp", &_velocityGain);
+    xml->QueryDoubleAttribute("headingKp", &_headingGain);
+}
+
 void PathingController::Load() {
     _runningPath = false;
     _currentStep = 0;
@@ -152,10 +157,6 @@ bool PathingController::loadXMLPath(std::string filePath) {
 
     float pathSpeed = 0.5;
     path->QueryFloatAttribute("speed", &pathSpeed);
-    _velocityGain = 5.0;
-    path->QueryDoubleAttribute("velocitykp", &_velocityGain);
-    _headingGain = 1.0;
-    path->QueryDoubleAttribute("headingkp", &_headingGain);
     float pathTolerance = 3.0;
     path->QueryFloatAttribute("tolerance", &pathTolerance);
     _endTolerance = 0.1;

@@ -2,6 +2,10 @@
 
 OverrideController::OverrideController(Vision* vision) : ControllerBase("override"), _vision(vision) {}
 
+void OverrideController::Configure(tinyxml2::XMLElement* xml) {
+    xml->QueryDoubleAttribute("stoppingDistance", &_stoppingDistance);
+}
+
 ControlCmds OverrideController::Run(ControlCmds cmds) {
     double closestObstacle = _vision->GetClosestDetectionDisance();
     _obstacleBlocked = closestObstacle > 0 && closestObstacle < _stoppingDistance;

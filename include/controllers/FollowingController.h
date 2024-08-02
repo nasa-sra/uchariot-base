@@ -7,6 +7,7 @@ class FollowingController : public ControllerBase {
 public:
     FollowingController(Vision* vision);
 
+    void Configure(tinyxml2::XMLElement* xml) override;
     void Load() override {};
     void Unload() override {}
 
@@ -18,6 +19,11 @@ private:
     Vision* _vision {nullptr};
     Detection _target;
     double _targetFilteredDistance {0.0};
-    double _distanceFilterAlpha {0.5};
 
+    const char* _targetName {"Person"};
+    double _maxFollowDistance {6.0};
+    double _minFollowDistance {2.0};
+    double _distanceFilterAlpha {0.5};
+    double _driveVelocity {0.5};
+    double _headingKp {-1.0};
 };

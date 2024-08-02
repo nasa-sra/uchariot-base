@@ -3,12 +3,21 @@
 
 FollowingController::FollowingController(Vision* vision) : ControllerBase("following"), _vision(vision) {}
 
+void FollowingController::Configure(tinyxml2::XMLElement* xml) {
+    xml->QueryStringAttribute("targetName", &_targetName);
+    xml->QueryDoubleAttribute("maxFollowDistance", &_maxFollowDistance);
+    xml->QueryDoubleAttribute("minFollowDistance", &_minFollowDistance);
+    xml->QueryDoubleAttribute("distanceFilterAlpha", &_distanceFilterAlpha);
+    xml->QueryDoubleAttribute("driveVelocity", &_driveVelocity);
+    xml->QueryDoubleAttribute("headingKp", &_headingKp);
+}
+
 ControlCmds FollowingController::Run(ControlCmds cmds) {
 
     _target = Detection();
-    _target.pose = {0.0, 0.0, 6.0};
+    _target.pose = {0.0, 0.0, _maxFollowDistance};
     for (Detection& det : _vision->GetDetections()) {
-        if (det.name == "Person" && det.pose.z() < _target.pose.z()) {
+        if (strcmp(_targetName, det.name.c_str()) == 0 && det.pose.z() < _target.pose.z()) {
             _target = det;
         }
     }
@@ -18,10 +27,10 @@ ControlCmds FollowingController::Run(ControlCmds cmds) {
             _targetFilteredDistance = _target.pose.z();
         }
         _targetFilteredDistance = _distanceFilterAlpha * _target.pose.z() + (1 - _distanceFilterAlpha) * _targetFilteredDistance;
-        if (_targetFilteredDistance > 2.0) {
-            cmds.drive.velocity = 0.5;
+        if (_targetFilteredDistance > _minFollowDistance) {
+            cmds.drive.velocity = _driveVelocity;
         }
-        cmds.drive.angularVelocity = _target.pose.x() * -0.1;
+        cmds.drive.angularVelocity = _target.pose.x() * _headingKp;
     }
 
     return cmds;

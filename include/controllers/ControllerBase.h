@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tinyxml2.h"
 #include "subsystems/DriveBase.h"
 
 struct ControlCmds {
@@ -19,6 +20,7 @@ public:
     virtual void Load() = 0;
     virtual ControlCmds Run(ControlCmds cmds = ControlCmds()) = 0;
     virtual void Unload() = 0;
+    virtual void Configure(tinyxml2::XMLElement* xml) {}
 
     std::string name;
 };

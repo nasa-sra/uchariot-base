@@ -22,6 +22,7 @@ class PathingController : public ControllerBase {
 public:
     PathingController(Localization* localization);
 
+    void Configure(tinyxml2::XMLElement* xml) override;
     void Load() override;
     void Unload() override;
     ControlCmds Run(ControlCmds cmds = ControlCmds()) override;
@@ -54,8 +55,8 @@ private:
     std::vector<PathStep> _path;
     int _currentStep{0};
 
-    double _velocityGain{5.0};
-    double _headingGain{1.0};
+    double _velocityGain{0.5};
+    double _headingGain{-1.0};
     float _endTolerance{0.1};
     double _targetHeading{0.0};
     double _distanceToWaypoint{0.0};

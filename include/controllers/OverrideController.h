@@ -7,6 +7,7 @@ class OverrideController : public ControllerBase {
 public:
     OverrideController(Vision* vision);
 
+    void Configure(tinyxml2::XMLElement* xml) override;
     void Load() override {};
     void Unload() override {};
 
