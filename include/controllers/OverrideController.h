@@ -14,7 +14,6 @@ public:
     ControlCmds Run(ControlCmds cmds = ControlCmds());
 
     void EStop() { _eStopped = true;}
-    void SetStopDistance(double stopDistance) {_stoppingDistance = stopDistance;}
 
     void ReportState(std::string prefix = "/");
 

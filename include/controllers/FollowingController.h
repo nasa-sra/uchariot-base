@@ -12,7 +12,7 @@ public:
     void Unload() override {}
 
     ControlCmds Run(ControlCmds cmds = ControlCmds()) override;
-    void ReportState(std::string prefix = "/");
+    void ReportState(std::string prefix = "/") override;
 
 private:
 
@@ -20,7 +20,7 @@ private:
     Detection _target;
     double _targetFilteredDistance {0.0};
 
-    const char* _targetName {"Person"};
+    const char* _targetName {"person"};
     double _maxFollowDistance {6.0};
     double _minFollowDistance {2.0};
     double _distanceFilterAlpha {0.5};

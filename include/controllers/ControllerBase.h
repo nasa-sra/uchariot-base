@@ -21,6 +21,7 @@ public:
     virtual ControlCmds Run(ControlCmds cmds = ControlCmds()) = 0;
     virtual void Unload() = 0;
     virtual void Configure(tinyxml2::XMLElement* xml) {}
+    virtual void ReportState(std::string prefix = "/") {}
 
     std::string name;
 };

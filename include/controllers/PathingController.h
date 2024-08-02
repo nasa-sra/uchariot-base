@@ -30,7 +30,7 @@ public:
     void Pause();
     void Stop();
 
-    void ReportState(std::string prefix = "/");
+    void ReportState(std::string prefix = "/") override;
 
     Utils::GeoPoint GetOrigin() { return _origin; }
 

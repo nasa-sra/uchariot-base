@@ -27,11 +27,6 @@ Robot::Robot()
             throw std::runtime_error("no name");
         _pathingController.SetPathName(doc["name"].GetString());
     };
-    _netHandlers["set_stop_distance"] = [this](rapidjson::Document &doc) {
-        if (!doc.HasMember("distance") || !doc["distance"].IsDouble())
-            throw std::runtime_error("no distance");
-        _overrideController.SetStopDistance(doc["distance"].GetDouble());
-    };
     _netHandlers["reset_heading"] = [this](rapidjson::Document &doc) {
         _localization.ResetHeading();
     };
@@ -105,6 +100,7 @@ void Robot::Run(int rate, bool &running) {
         cmds.ReportState();
         _overrideController.ReportState();
         _pathingController.ReportState();
+        _followingController.ReportState();
         _driveBase.ReportState();
         _localization.ReportState();
         _gps.ReportState();
