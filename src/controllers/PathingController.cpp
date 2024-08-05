@@ -5,14 +5,19 @@
 #include "pathgen/PathGenerator.h"
 #include "tinyxml2.h"
 
-PathingController::PathingController(Localization* localization)
+PathingController::PathingController(Localization* localization, Vision* vision)
     : ControllerBase("pathing") {
     _localization = localization;
+    _vision = vision;
 }
 
 void PathingController::Configure(tinyxml2::XMLElement* xml) {
     xml->QueryDoubleAttribute("velocityKp", &_velocityGain);
     xml->QueryDoubleAttribute("headingKp", &_headingGain);
+    xml->QueryBoolAttribute("obstacleAvoidance", &_obstacleAvoidance);
+    xml->QueryDoubleAttribute("obstacleConfThresh", &_obstacleConfThresh);
+    xml->QueryDoubleAttribute("obstacleSizeThresh", &_obstacleSizeThresh);
+    xml->QueryDoubleAttribute("avoidanceGain", &_avoidanceGain);
 }
 
 void PathingController::Load() {
@@ -52,10 +57,33 @@ ControlCmds PathingController::Run(ControlCmds cmds) {
         _nextWaypoint = _path[_currentStep].pos.head<2>();
         Eigen::Vector2d diff = _nextWaypoint - robotPose.pos;
         _distanceToWaypoint = diff.norm();
-        double velocity =
-            std::clamp((float)(_distanceToWaypoint * _velocityGain),
-                       -_path[_currentStep].speed, _path[_currentStep].speed);
+        double velocity = std::clamp((float)(_distanceToWaypoint * _velocityGain), -_path[_currentStep].speed, _path[_currentStep].speed);
         _targetHeading = atan2(diff.y(), diff.x());
+
+        if (_obstacleAvoidance) {
+
+            std::vector<Detection> detections = _vision->GetDetections();
+            _obstaclePresent = false;
+            Detection obstacle;
+            for (Detection& det : detections) {
+                if (det.name == "rock" && det.confidence > _obstacleConfThresh && det.width > _obstacleSizeThresh) {
+                    if (!_obstaclePresent) {
+                        obstacle = det;
+                        _obstaclePresent = true;
+                    } else if (det.pose.z() < obstacle.pose.z()) {
+                        obstacle = det;
+                    }
+                }
+            }
+
+            _avoidanceBias = 0.0;
+            if (_obstaclePresent) {
+                _avoidanceBias = std::clamp(_avoidanceGain / obstacle.pose.x(), -M_PI / 4, M_PI / 4);
+                _targetHeading += _avoidanceBias;
+            }
+
+        }
+
         double headingErr = _targetHeading - robotPose.heading;
         double angularVelocity = headingErr * _headingGain;
 

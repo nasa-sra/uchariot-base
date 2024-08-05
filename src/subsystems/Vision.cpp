@@ -59,6 +59,16 @@ void Vision::updateDetections(std::string data) {
             det.pose = Eigen::Vector3d(jsonDets[i]["x"].GetDouble(),
                                        jsonDets[i]["y"].GetDouble(),
                                        jsonDets[i]["z"].GetDouble());
+
+            if (jsonDets[i].HasMember("confidence") && jsonDets[i]["confidence"].IsDouble()) {
+                det.confidence = jsonDets[i]["confidence"].GetDouble();
+            }
+            if (jsonDets[i].HasMember("width") && jsonDets[i]["width"].IsDouble()) {
+                det.width = jsonDets[i]["width"].GetDouble();
+            }
+            if (jsonDets[i].HasMember("height") && jsonDets[i]["height"].IsDouble()) {
+                det.height = jsonDets[i]["height"].GetDouble();
+            }
             detections.push_back(det);
         }
     } catch (std::exception& e) {

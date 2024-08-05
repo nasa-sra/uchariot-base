@@ -11,6 +11,9 @@ struct Detection {
     std::string name;
     Eigen::Vector3d pose;
 
+    float confidence = 0.0;
+    float width = 0.0, height = 0.0;
+
     Detection() : name(""), pose({0.0, 0.0, 0.0}) {};
 };
 

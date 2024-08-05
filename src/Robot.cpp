@@ -6,7 +6,7 @@ Robot::Robot()
     : _vision(),
       _localization(&_driveBase, &_imu, &_vision, &_gps),
       _overrideController(&_vision),
-      _pathingController(&_localization),
+      _pathingController(&_localization, &_vision),
       _followingController(&_vision) {
 
     _netHandlers["set_controller"] = [this](rapidjson::Document &doc) {
