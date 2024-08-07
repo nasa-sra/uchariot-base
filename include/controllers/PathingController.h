@@ -1,8 +1,8 @@
 #pragma once
 
 #include "controllers/ControllerBase.h"
-#include "rapidjson/document.h"
 #include "subsystems/Localization.h"
+#include "subsystems/Vision.h"
 
 struct PathStep {
     Eigen::Vector3d pos;
@@ -21,20 +21,19 @@ struct PathObject {
 class PathingController : public ControllerBase {
 
 public:
-    PathingController(Localization* localization);
+    PathingController(Localization* localization, Vision* vision);
 
+    void Configure(tinyxml2::XMLElement* xml) override;
     void Load() override;
     void Unload() override;
-    ControlCmds Run();
-    void ReportState(std::string prefix = "/");
-    void HandleNetworkInput(rapidjson::Document& doc);
+    ControlCmds Run(ControlCmds cmds = ControlCmds()) override;
+    void SetPathName(std::string name);
+    void Pause();
     void Stop();
 
-    void Pause();
+    void ReportState(std::string prefix = "/") override;
 
-    Utils::GeoPoint GetOrigin() {
-        return _origin;
-    }
+    Utils::GeoPoint GetOrigin() { return _origin; }
 
 private:
     bool loadPath(std::string filePath);
@@ -45,6 +44,7 @@ private:
     Eigen::Vector3d geoToPathCoord(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin);
 
     Localization* _localization;
+    Vision* _vision;
 
     std::string _pathName{""};
     bool _runningPath{false};
@@ -57,13 +57,21 @@ private:
     std::vector<PathStep> _path;
     int _currentStep{0};
 
-    double _velocityGain{5.0};
-    double _headingGain{1.0};
+    double _velocityGain{0.5};
+    double _headingGain{-1.0};
+    bool _obstacleAvoidance{false};
+    double _obstacleConfThresh{0.6};
+    double _obstacleSizeThresh{0.5};
+    double _avoidanceGain{0.25};
+
     float _endTolerance{0.1};
     double _targetHeading{0.0};
     double _distanceToWaypoint{0.0};
-
     Eigen::Vector2d _nextWaypoint{0.0, 0.0};
 
+    bool _obstaclePresent{false};
+    double _avoidanceBias{0.0};
+
     Utils::GeoPoint _origin;
+
 };

@@ -43,7 +43,8 @@ void Curve::add_node(const Eigen::Vector3d& node) {
     } else {
         int new_node_index = _nodes.size() - 1;
 
-        double segment_distance = (_nodes[new_node_index] - _nodes[new_node_index - 1]).norm();
+        double segment_distance =
+            (_nodes[new_node_index] - _nodes[new_node_index - 1]).norm();
         _distances.push_back(segment_distance + _distances[new_node_index - 1]);
     }
 }

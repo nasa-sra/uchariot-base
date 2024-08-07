@@ -1,16 +1,10 @@
 #pragma once
 
 #include "ControllerBase.h"
-#include "VescController.h"
-#include "rapidjson/document.h"
 
 class TeleopController : public ControllerBase {
-
-    double _fwdVelocity{0.0};
-    double _angVelocity{0.0};
-
 public:
-    TeleopController() : ControllerBase("teleop") {}
+    TeleopController();
 
     inline void Load() override {
         _fwdVelocity = 0.0;
@@ -21,12 +15,12 @@ public:
         Load();
     }
 
-    ControlCmds Run();
+    ControlCmds Run(ControlCmds cmds = ControlCmds()) override;
+    void SetDriveInput(double velocity, double rotation);
 
-    void HandleNetworkInput(rapidjson::Document& doc);
+private:
 
-    static TeleopController& GetInstance() {
-        static TeleopController _instance;
-        return _instance;
-    }
+    double _fwdVelocity{0.0};
+    double _angVelocity{0.0};
+
 };

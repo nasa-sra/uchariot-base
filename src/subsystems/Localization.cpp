@@ -1,7 +1,9 @@
 #include "subsystems/Localization.h"
+
 #include "Utils.h"
 
-Localization::Localization(DriveBase* driveBase, IMUBase* imu, Vision* vision, GPS* gps) {
+Localization::Localization(DriveBase* driveBase, IMUBase* imu, Vision* vision,
+                           GPS* gps) {
     _driveBase = driveBase;
     _imu = imu;
     _vision = vision;
@@ -9,7 +11,6 @@ Localization::Localization(DriveBase* driveBase, IMUBase* imu, Vision* vision, G
 }
 
 void Localization::Update(double dt) {
-
     DriveBaseFeedback driveVels = _driveBase->GetVelocities();
 
     double vl = (driveVels.lf + driveVels.lb) / 2;
@@ -23,19 +24,22 @@ void Localization::Update(double dt) {
     _pose.pos += vel * dt;
 
     gps_fix_t fix = _gps->GetFix();
-    if (fix.time.tv_nsec != _lastGPSUpdate.tv_nsec && fix.time.tv_sec != _lastGPSUpdate.tv_sec) {
+    if (fix.time.tv_nsec != _lastGPSUpdate.tv_nsec &&
+        fix.time.tv_sec != _lastGPSUpdate.tv_sec) {
         _pose.pos = Utils::geoToLTP(Utils::GeoPoint(fix), _origin).head<2>();
         _lastGPSUpdate = fix.time;
     }
     _geoPos = Utils::LTPToGeo({_pose.pos[0], _pose.pos[1], 0.0}, _origin);
 
-    // Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs, heading_imu - heading_rs);
+    // Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs,
+    // heading_imu - heading_rs);
 
     if (_useOdometryHeading) {
-        _pose.heading += omega * dt; // For running on cart/sim
+        _pose.heading += omega * dt;  // For running on cart/sim
     } else {
-        // _pose.heading = _vision->GetHeading() - _rsOffset; // with realsense gyro
-        _pose.heading = _imu->GetYaw() - _imuOffset; // with BNO055
+        // _pose.heading = _vision->GetHeading() - _rsOffset; // with realsense
+        // gyro
+        _pose.heading = _imu->GetYaw() - _imuOffset;  // with BNO055
     }
 }
 //
@@ -49,10 +53,7 @@ void Localization::ReportState(std::string prefix) {
 }
 
 void Localization::ResetHeading() {
-    _rsOffset = _vision->GetHeading();
     _imuOffset = _imu->GetYaw();
 }
 
-void Localization::ResetPose() {
-    _pose = {{0.0, 0.0}, _pose.heading};
-}
+void Localization::ResetPose() { _pose = {{0.0, 0.0}, _pose.heading}; }

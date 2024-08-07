@@ -1,44 +1,91 @@
+
 #include "subsystems/Vision.h"
-#include "Utils.h"
 
-#include <sys/ipc.h>
-#include <sys/msg.h>
+#include "rapidjson/document.h"
+#include "rapidjson/error/en.h"
 
-Vision::Vision() {
-}
-
-/**
- * @brief Retrieves a specific entry from a message queue.
- *
- * This function connects to a message queue identified by the given entry name,
- * retrieves the latest message, and converts its content to a double value.
- * If the content cannot be parsed as a double, it logs an error and returns 0.0.
- *
- * @param entry The name of the entry to retrieve.
- * @return The double value of the entry's content, or 0.0 if parsing fails.
- */
-double Vision::GetEntry(const std::string& entry) {
-    // Grab the IMU message super easy
-    key_t key = ftok(("tmp/" + entry).c_str(), 65);
-    int msg_id = msgget(key, 0666 | IPC_CREAT);
-    msgrcv(msg_id, &_msg, sizeof(_msg), 1, IPC_NOWAIT);
-    msgctl(msg_id, IPC_RMID, NULL);
-
-    try {
-        return std::stod(_msg._content);
-    } catch (const std::exception& e) {
-        // Log error and return default value
-        // Utils::ErrFmt("Couldn't parse entry \"%s\" with value \"%s\".", entry, _msg._content);
-        return 0.0; // Return default value or throw an exception?
-    }
-}
+Vision::Vision()
+    : _messageQueue("/tmp/uchariotVision", [this](std::string msg) {
+          this->updateDetections(msg);
+      }) {};
 
 void Vision::Update(double dt) {
-    // _heading = GetEntry("rs_heading");
-    // Utils::LogFmt("Heading = %f", _heading);
+    if (!_detectionsMutex.try_lock()) {
+        Utils::LogFmt("Vision::Update failed to get detections lock");
+        return;
+    }
+
+    _closestDetectionDistance = -1.0;
+    for (Detection& det : _detections) {
+        if (det.name == "closest") {
+            _closestDetectionDistance = det.pose.z();
+        }
+    }
+    _detectionsMutex.unlock();
+}
+
+void Vision::Disconnect() { _messageQueue.Close(); }
+
+void Vision::updateDetections(std::string data) {
+    std::vector<Detection> detections;
+
+    try {
+        rapidjson::Document doc;
+        doc.Parse(data.c_str());
+        if (doc.HasParseError())
+            throw std::runtime_error(Utils::StrFmt(
+                "JSON Parse Error offset %u: %s",
+                (unsigned)doc.GetErrorOffset(),
+                rapidjson::GetParseError_En(doc.GetParseError())));
+        if (!doc.IsObject())
+            throw std::runtime_error("JSON document malformed");
+        if (!doc.HasMember("detections"))
+            throw std::runtime_error("JSON missing detections");
+        const rapidjson::Value& jsonDets = doc["detections"];
+        if (!jsonDets.IsArray())
+            throw std::runtime_error("JSON detections malformed");
+
+        for (rapidjson::SizeType i = 0; i < jsonDets.Size(); ++i) {
+            if (!jsonDets[i].HasMember("name") ||
+                !jsonDets[i]["name"].IsString())
+                throw std::runtime_error("JSON detection without proper name");
+            if (!jsonDets[i].HasMember("x") || !jsonDets[i]["x"].IsDouble())
+                throw std::runtime_error("JSON detection without proper x");
+            if (!jsonDets[i].HasMember("y") || !jsonDets[i]["y"].IsDouble())
+                throw std::runtime_error("JSON detection without proper y");
+
+            Detection det;
+            det.name = jsonDets[i]["name"].GetString();
+            det.pose = Eigen::Vector3d(jsonDets[i]["x"].GetDouble(),
+                                       jsonDets[i]["y"].GetDouble(),
+                                       jsonDets[i]["z"].GetDouble());
+
+            if (jsonDets[i].HasMember("confidence") && jsonDets[i]["confidence"].IsDouble()) {
+                det.confidence = jsonDets[i]["confidence"].GetDouble();
+            }
+            if (jsonDets[i].HasMember("width") && jsonDets[i]["width"].IsDouble()) {
+                det.width = jsonDets[i]["width"].GetDouble();
+            }
+            if (jsonDets[i].HasMember("height") && jsonDets[i]["height"].IsDouble()) {
+                det.height = jsonDets[i]["height"].GetDouble();
+            }
+            detections.push_back(det);
+        }
+    } catch (std::exception& e) {
+        Utils::LogFmt("Vision::updateDetections - Error: %s", e.what());
+        std::cout << data << "\n";
+    }
+
+    if (_detectionsMutex.try_lock()) {
+        _detections = detections;
+        _detectionsMutex.unlock();
+    } else {
+        Utils::LogFmt("Vision::updateDetections failed to get detections lock");
+    }
 }
 
 void Vision::ReportState(std::string prefix) {
     prefix += "vision/";
-    StateReporter::GetInstance().UpdateKey(prefix + "heading", _heading);
+    StateReporter::GetInstance().UpdateKey(
+        prefix + "closest_detection_distance", _closestDetectionDistance);
 }

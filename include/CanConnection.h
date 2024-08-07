@@ -17,9 +17,9 @@ struct CanFrame {
 };
 
 class CanConnection {
-public:
+   public:
     static CanConnection& GetInstance() {
-        static CanConnection _instance; // Guaranteed to be destroyed.
+        static CanConnection _instance;  // Guaranteed to be destroyed.
         return _instance;
     }
 
@@ -29,7 +29,7 @@ public:
     void Recieve();
     void CloseConnection();
 
-private:
+   private:
     void LogFrame(CanFrame frame);
 
     CanConnection();

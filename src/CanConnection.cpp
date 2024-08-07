@@ -10,7 +10,7 @@
 
 #include "CanConnection.h"
 
-CanConnection::CanConnection() {
+#include <fcntl.h>
 
 #ifndef SIMULATION
 
@@ -72,7 +72,6 @@ void CanConnection::RegisterPacketHandler(uint32_t id, std::function<void(CanFra
 }
 
 void CanConnection::Send(CanFrame in_frame) {
-
 #ifndef SIMULATION
 
     // Constructs a message packet of there format: #[4 byte arb id][8 bytes of data with leading zero padding]
@@ -94,7 +93,8 @@ void CanConnection::Send(CanFrame in_frame) {
     while(bytesLeft > 0) {
         int nbytes = write(_serialPort, buffer + bytesSent, bytesLeft);
         if (nbytes == -1) {
-            Utils::LogFmt("CanConnection::Send Error on write - %s", std::strerror(errno));
+            Utils::LogFmt("CanConnection::Send Error on write - %s",
+                          std::strerror(errno));
             break;
         }
         bytesLeft -= nbytes;
@@ -112,13 +112,16 @@ void CanConnection::Send(CanFrame in_frame) {
 }
 
 /**
- * @brief This function is responsible for receiving CAN frames from the CAN bus.
+ * @brief This function is responsible for receiving CAN frames from the CAN
+ * bus.
  *
  * The function continuously listens for incoming CAN frames on the CAN bus.
- * When a frame is received, it extracts the CAN ID and checks if there is a registered callback function for that ID.
- * If a callback function is found, it is invoked with the received CAN frame as a parameter.
+ * When a frame is received, it extracts the CAN ID and checks if there is a
+ * registered callback function for that ID. If a callback function is found, it
+ * is invoked with the received CAN frame as a parameter.
  *
- * @return This function does not return a value. It runs in an infinite loop until the _running flag is set to false.
+ * @return This function does not return a value. It runs in an infinite loop
+ * until the _running flag is set to false.
  */
 void CanConnection::Recieve() {
 
@@ -181,7 +184,9 @@ void CanConnection::Recieve() {
 
 void CanConnection::LogFrame(CanFrame frame) {
     printf("CAN Frame id=%08x data=", frame.arb_id);
-    for (int i = 0; i < frame.len; i++) { printf("%02x ", frame.data[i]); }
+    for (int i = 0; i < frame.len; i++) {
+        printf("%02x ", frame.data[i]);
+    }
     printf("\r\n");
 }
 

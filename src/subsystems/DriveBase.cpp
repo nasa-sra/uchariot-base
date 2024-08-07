@@ -1,18 +1,20 @@
 #define _USE_MATH_DEFINES
-#include <cmath>
-
 #include "subsystems/DriveBase.h"
+
+#include <cmath>
 
 void DriveBaseCmds::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "velocity", velocity);
-    StateReporter::GetInstance().UpdateKey(prefix + "angular_velocity", angularVelocity);
+    StateReporter::GetInstance().UpdateKey(prefix + "angular_velocity",
+                                           angularVelocity);
 }
 
-DriveBase::DriveBase() : _left_front(1), _right_front(4), _left_back(2), _right_back(3) {
-
+DriveBase::DriveBase()
+    : _left_front(1), _right_front(4), _left_back(2), _right_back(3) {
     float gearRatio = 160;
-    float wheelRadius = 0.254;                               // m
-    float scale = gearRatio * 60 / (2 * M_PI * wheelRadius); // converts from m/s to motor RPM
+    float wheelRadius = 0.254;  // m
+    float scale = gearRatio * 60 /
+                  (2 * M_PI * wheelRadius);  // converts from m/s to motor RPM
     _left_front.SetScale(scale);
     _right_front.SetScale(scale);
     _left_back.SetScale(scale);
@@ -26,15 +28,15 @@ DriveBase::DriveBase() : _left_front(1), _right_front(4), _left_back(2), _right_
 }
 
 void DriveBase::Update(double dt) {
-
-    // Utils::LogFmt("Drivebase Speeds: lb %f  lf %f  rb %f  sb %f", _cmds._lb_speed, _cmds._lf_speed, _cmds._rb_speed,
-    // _cmds._rf_speed);
+    // Utils::LogFmt("Drivebase Speeds: lb %f  lf %f  rb %f  sb %f",
+    // _cmds._lb_speed, _cmds._lf_speed, _cmds._rb_speed, _cmds._rf_speed);
 
     const double maxAng = MAX_DRIVE_SPEED / ROBOT_WIDTH;
     double vel = std::clamp(_cmds.velocity, -MAX_DRIVE_SPEED, MAX_DRIVE_SPEED);
+
     double omega = std::clamp(2 * _cmds.angularVelocity, -maxAng, maxAng);
 
-    double accelerationLimit = 3.0; // m/s^2
+    double accelerationLimit = 3.0;  // m/s^2
     double maxDv = accelerationLimit * dt;
 
     double left = std::clamp((omega * ROBOT_WIDTH / 2) + vel, -MAX_DRIVE_SPEED, MAX_DRIVE_SPEED);
@@ -53,8 +55,7 @@ void DriveBase::Update(double dt) {
     _left_back.Update();
     _right_back.Update();
 
-    _voltage = (_left_front.GetVoltage() + _right_front.GetVoltage() + _left_back.GetVoltage() +
-                _right_back.GetVoltage()) / 4;
+    _voltage = (_left_front.GetVoltage() + _right_front.GetVoltage() + _left_back.GetVoltage() + _right_back.GetVoltage()) / 4;
 }
 
 void DriveBase::ReportState(std::string prefix) {
@@ -68,5 +69,6 @@ void DriveBase::ReportState(std::string prefix) {
 }
 
 DriveBaseFeedback DriveBase::GetVelocities() {
-    return {_left_front.GetVelocity(), _right_front.GetVelocity(), _left_back.GetVelocity(), _right_back.GetVelocity()};
+    return {_left_front.GetVelocity(), _right_front.GetVelocity(),
+            _left_back.GetVelocity(), _right_back.GetVelocity()};
 }

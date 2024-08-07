@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Utils.h"
-#include "subsystems/SubsystemBase.h"
 #include "subsystems/DriveBase.h"
-#include "subsystems/IMUBase.h"
-#include "subsystems/Vision.h"
 #include "subsystems/GPS.h"
+#include "subsystems/IMUBase.h"
+#include "subsystems/SubsystemBase.h"
+#include "subsystems/Vision.h"
 
 struct Pose {
     Eigen::Vector2d pos;
@@ -13,7 +13,7 @@ struct Pose {
 };
 
 class Localization : SubsystemBase {
-public:
+   public:
     Localization(DriveBase* driveBase, IMUBase* imu, Vision* vision, GPS* gps);
 
     void Update(double dt);
@@ -22,11 +22,10 @@ public:
     void ResetHeading();
     void ResetPose();
 
-    void SetOrigin(Utils::GeoPoint origin) {_origin = origin; }
+    void SetOrigin(Utils::GeoPoint origin) { _origin = origin; }
     Pose GetPose() { return _pose; }
 
-private:
-
+   private:
     DriveBase* _driveBase;
     IMUBase* _imu;
     Vision* _vision;
@@ -42,5 +41,4 @@ private:
 
     double _imuOffset{0.0};
     double _rsOffset{0.0};
-
 };

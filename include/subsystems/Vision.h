@@ -1,28 +1,41 @@
 #pragma once
 
-#include "Utils.h"
-#include "subsystems/SubsystemBase.h"
+#include <mutex>
+#include <vector>
 
-struct MsgBuffer { 
-	long _type; 
-	char _content[16]; 
-}; 
+#include "subsystems/SubsystemBase.h"
+#include "MessageQueue.h"
+#include "Utils.h"
+
+struct Detection {
+    std::string name;
+    Eigen::Vector3d pose;
+
+    float confidence = 0.0;
+    float width = 0.0, height = 0.0;
+
+    Detection() : name(""), pose({0.0, 0.0, 0.0}) {};
+};
 
 class Vision : SubsystemBase {
-
-    const char* name;
-    MsgBuffer _msg;
-
-    double _heading;
-
-    double GetEntry(const std::string& entry);
 public:
-
     Vision();
 
     void Update(double dt);
+    void Disconnect();
     void ReportState(std::string prefix = "/");
 
-    inline double GetHeading() { return _heading; }
+    double GetClosestDetectionDisance() { return _closestDetectionDistance; }
+    std::vector<Detection> GetDetections() { return _detections; }
 
+private:
+
+    void updateDetections(std::string data);
+
+    MessageQueue _messageQueue;
+
+    std::vector<Detection> _detections;
+    std::mutex _detectionsMutex;
+
+    double _closestDetectionDistance{-1.0};
 };

@@ -5,6 +5,9 @@ if [ $? -eq 1 ]; then
     gpsd -D -F /dev/ttyACM0
 fi
 
+# need to start this
+# sudo slcand -o -s6 -S 1152000 /dev/ttyACM1
+
 echo "Starting uchariotVision"
 nexe=$(sudo /home/uchariot/uchariot-vision/build/uChariotVision)
 $nexe

@@ -1,32 +1,32 @@
-#include <cstdio>
-#include <stdexcept>
 #include <csignal>
-#include <thread>
+#include <cstdio>
 #include <cstdlib>
-#include <vector>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
+#include <thread>
+#include <vector>
 
 #include "CanConnection.h"
-#include "Robot.h"
+#include "MessageQueue.h"
 #include "NetworkManager.h"
-#include "Utils.h"
+#include "Robot.h"
 #include "StateReporter.h"
+#include "Utils.h"
 
 bool running = true;
 
 void HandleSigInt(int s) { running = false; }
 
 int main() {
-
     signal(SIGINT, HandleSigInt);
 
-    CanConnection* can = &CanConnection::GetInstance();
+    CanConnection *can = &CanConnection::GetInstance();
     can->Start();
-    
+
     Robot robot;
 
-    if (!NetworkManager::GetInstance().Start(8000, [&robot](std::string cmd, rapidjson::Document& doc){robot.HandleNetCmd(cmd, doc);})) {
+    if (!NetworkManager::GetInstance().Start( 8000, [&robot](std::string cmd, rapidjson::Document &doc) { robot.HandleNetCmd(cmd, doc); })) {
         can->CloseConnection();
         return 0;
     }

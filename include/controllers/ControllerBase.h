@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tinyxml2.h"
 #include "subsystems/DriveBase.h"
 
 struct ControlCmds {
@@ -17,8 +18,10 @@ class ControllerBase {
 public:
     ControllerBase(std::string _name) : name(_name) {}
     virtual void Load() = 0;
-    virtual ControlCmds Run(void) = 0;
+    virtual ControlCmds Run(ControlCmds cmds = ControlCmds()) = 0;
     virtual void Unload() = 0;
+    virtual void Configure(tinyxml2::XMLElement* xml) {}
+    virtual void ReportState(std::string prefix = "/") {}
 
     std::string name;
 };
@@ -27,6 +30,6 @@ class DisabledController : public ControllerBase {
 public:
     DisabledController() : ControllerBase("disabled") {}
      void Load() {}
-     ControlCmds Run(void) {return ControlCmds();}
+     ControlCmds Run(ControlCmds cmds = ControlCmds()) {return ControlCmds();}
      void Unload() {}
 };
