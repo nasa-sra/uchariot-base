@@ -121,18 +121,14 @@ void PathingController::Stop() {
 
 void PathingController::ReportState(std::string prefix) {
     prefix += "pathing_controller/";
-    StateReporter::GetInstance().UpdateKey(prefix + "waypointX",
-                                           _nextWaypoint.x());
-    StateReporter::GetInstance().UpdateKey(prefix + "waypointY",
-                                           _nextWaypoint.y());
-    StateReporter::GetInstance().UpdateKey(prefix + "targetHeading",
-                                           _targetHeading);
-    StateReporter::GetInstance().UpdateKey(prefix + "distanceToWaypoint",
-                                           _distanceToWaypoint);
-    StateReporter::GetInstance().UpdateKey(prefix + "runningPath",
-                                           _runningPath);
-    StateReporter::GetInstance().UpdateKey(prefix + "currentStep",
-                                           _currentStep);
+    StateReporter::GetInstance().UpdateKey(prefix + "waypointX", _nextWaypoint.x());
+    StateReporter::GetInstance().UpdateKey(prefix + "waypointY", _nextWaypoint.y());
+    StateReporter::GetInstance().UpdateKey(prefix + "targetHeading", _targetHeading);
+    StateReporter::GetInstance().UpdateKey(prefix + "distanceToWaypoint", _distanceToWaypoint);
+    StateReporter::GetInstance().UpdateKey(prefix + "runningPath", _runningPath);
+    StateReporter::GetInstance().UpdateKey(prefix + "currentStep", _currentStep);
+    StateReporter::GetInstance().UpdateKey(prefix + "obstaclePresent", _obstaclePresent);
+    StateReporter::GetInstance().UpdateKey(prefix + "avoidanceBias", _avoidanceBias);
 }
 
 bool PathingController::loadPath(std::string filePath) {
