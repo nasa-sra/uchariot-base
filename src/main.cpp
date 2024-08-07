@@ -35,13 +35,8 @@ int main() {
     StateReporter::GetInstance().EnableTelemetry();
 
     while(running) {
-        CanFrame frame;
-        frame.arb_id = 1;
-        int n = 100000;
-        frame.data = (uint8_t*)&n;
-        frame.len = 4;
-        can->Send(frame);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        // can->SendCan(1, 100000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
     // robot.Run(50, running);

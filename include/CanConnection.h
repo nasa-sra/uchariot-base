@@ -25,7 +25,8 @@ class CanConnection {
 
     void Start();
     void RegisterPacketHandler(uint32_t id, std::function<void(CanFrame)> handler);
-    void Send(CanFrame frame);
+    void Send(std::string msg);
+    void SendCan(uint32_t id, int32_t data);
     void Recieve();
     void CloseConnection();
 

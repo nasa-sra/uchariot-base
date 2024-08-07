@@ -98,34 +98,23 @@ void VescController::readStatus5Packet(uint8_t* data) {
 
 void VescController::sendDutyCycle(float dc) {
     uint32_t arbId = _can_id | ((uint32_t)CAN_PACKET_SET_DUTY << 8);
-    int32_t send_index = 0;
-    uint8_t buffer[4];
-    Utils::BufferAppendInt32(buffer, (int32_t)(dc * 100000.0), &send_index);
-    _can->Send(CanFrame(arbId, buffer, send_index));
+    _can->SendCan(arbId, (int32_t)(dc * 100000.0));
 }
 
 void VescController::sendRPM(float rpm) {
     uint32_t arbId = _can_id | ((uint32_t)CAN_PACKET_SET_RPM << 8);
-    int32_t send_index = 0;
-    uint8_t buffer[4];
-    Utils::BufferAppendInt32(buffer, (int32_t)rpm, &send_index);
-    _can->Send(CanFrame(arbId, buffer, send_index));
+    _can->SendCan(arbId, (int32_t) rpm);
 }
 
 void VescController::sendPosition(float deg) {
     uint32_t arbId = _can_id | ((uint32_t)CAN_PACKET_SET_POS << 8);
-    int32_t send_index = 0;
-    uint8_t buffer[4];
-    Utils::BufferAppendInt32(buffer, (int32_t)(deg * 1000000.0), &send_index);
-    _can->Send(CanFrame(arbId, buffer, send_index));
+    _can->SendCan(arbId, (int32_t)(deg * 1000000.0));
+
 }
 
 void VescController::sendCurrent(float amps) {
     uint32_t arbId = _can_id | ((uint32_t)CAN_PACKET_SET_CURRENT << 8);
-    int32_t send_index = 0;
-    uint8_t buffer[4];
-    Utils::BufferAppendInt32(buffer, (int32_t)(amps * 1000.0), &send_index);
-    _can->Send(CanFrame(arbId, buffer, send_index));
+    _can->SendCan(arbId, (int32_t)(amps * 1000.0));
 }
 
 void VescController::ReportState(std::string prefix) {
