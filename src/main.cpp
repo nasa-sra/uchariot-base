@@ -21,8 +21,10 @@ void HandleSigInt(int s) { running = false; }
 int main() {
     signal(SIGINT, HandleSigInt);
 
-    CanConnection *can = &CanConnection::GetInstance();
+    CanConnection* can = &CanConnection::GetInstance();
     can->Start();
+
+	can->SendCan(0, 0);
 
     Robot robot;
 
@@ -34,7 +36,7 @@ int main() {
     StateReporter::GetInstance().EnableLogging();
     StateReporter::GetInstance().EnableTelemetry();
 
-    robot.Run(50, running);
+    //robot.Run(50, running);
     
     robot.Shutdown();
     can->CloseConnection();

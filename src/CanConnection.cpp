@@ -76,21 +76,23 @@ void CanConnection::RegisterPacketHandler(uint32_t id, std::function<void(CanFra
 }
 
 void CanConnection::SendCan(uint32_t id, int32_t data) {
-    std::string msg = "T" + Utils::StrFmt("%08X", id) + Utils::StrFmt("%08X", data) + "\r";
+    std::string msg = "T" + Utils::StrFmt("%08X", id) + "4" + Utils::StrFmt("%08X", data) + "\r";
+	msg = "T00000303400001796\r";
     Send(msg);
 }
 
 
 void CanConnection::Send(std::string msg) {
 #ifndef SIMULATION
-
     const char* buffer = msg.c_str();
-    int bytesLeft = sizeof(buffer);
+    int bytesLeft = msg.size(); // <--
     int bytesSent = 0;
     int count = 0;
-    Utils::LogFmt("Sending: %s", buffer);
+    Utils::LogFmt("Size %d Sending: %s", bytesLeft, buffer);
     while(bytesLeft > 0) {
         int nbytes = write(_serialPort, buffer + bytesSent, bytesLeft);
+		std::cout << "nbytes = " << nbytes << "\n";
+
         if (nbytes == -1) {
             Utils::LogFmt("CanConnection::Send Error on write - %s",
                           std::strerror(errno));
