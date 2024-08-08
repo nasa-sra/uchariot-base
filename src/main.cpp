@@ -24,7 +24,6 @@ int main() {
     CanConnection* can = &CanConnection::GetInstance();
     can->Start();
 
-	can->SendCan(0, 0);
 
     Robot robot;
 
@@ -36,7 +35,19 @@ int main() {
     StateReporter::GetInstance().EnableLogging();
     StateReporter::GetInstance().EnableTelemetry();
 
-    //robot.Run(50, running);
+    while (running)
+    {
+        can->SendCan(1, 10000);
+        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        can->SendCan(2, 10000);
+        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        can->SendCan(3, 10000);
+        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        can->SendCan(4, 10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+    
+    // robot.Run(50, running);
     
     robot.Shutdown();
     can->CloseConnection();

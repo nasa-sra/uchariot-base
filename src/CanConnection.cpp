@@ -50,7 +50,7 @@ CanConnection::CanConnection() {
     tty.c_cc[VTIME] = 1; // 100ms timeout for read
     tty.c_cc[VMIN] = 0; // minimum number of bytes for read
 
-    // Set in/out baud rate to be 1152000
+    // Set in/out baud rate to be 1000000
     cfsetspeed(&tty, B115200);
 
     if (tcsetattr(_serialPort, TCSANOW, &tty) != 0) {
@@ -77,7 +77,6 @@ void CanConnection::RegisterPacketHandler(uint32_t id, std::function<void(CanFra
 
 void CanConnection::SendCan(uint32_t id, int32_t data) {
     std::string msg = "T" + Utils::StrFmt("%08X", id) + "4" + Utils::StrFmt("%08X", data) + "\r";
-	msg = "T00000303400001796\r";
     Send(msg);
 }
 
@@ -85,7 +84,7 @@ void CanConnection::SendCan(uint32_t id, int32_t data) {
 void CanConnection::Send(std::string msg) {
 #ifndef SIMULATION
     const char* buffer = msg.c_str();
-    int bytesLeft = msg.size(); // <--
+    int bytesLeft = msg.size();
     int bytesSent = 0;
     int count = 0;
     Utils::LogFmt("Size %d Sending: %s", bytesLeft, buffer);
@@ -106,6 +105,7 @@ void CanConnection::Send(std::string msg) {
         }
         count++;
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 #else
     // LogFrame(in_frame);
