@@ -138,22 +138,25 @@ void CanConnection::Recieve() {
             place += nbytes;
             bytesChecked = 0;
             std::string thg(buffer, place);
-            Utils::LogFmt("I read %i bytes - %s", nbytes, thg);
-
 
             for (int i = 0; i < place; i++) { // Search buffer for frames
                 if (buffer[i] == 'T' && place - i >= 26) { // There is a full frame found
 
                     // Extract and handle can frame
                     CanFrame frame;
-                    std::string msg(buffer[i+1], 25);
-                    frame.arb_id = (uint32_t) strtol(msg.substr(0,8).c_str(), NULL, 16);
-                    frame.len = (uint32_t) std::stoi(msg.substr(8,9).c_str());
+                    std::string msg(buffer + i + 1, 25);
+
+					std::string arbstr =  msg.substr(0,8);
+                    frame.arb_id = (uint32_t) strtol(arbstr.c_str(), NULL, 16);
+					
+                    frame.len = (uint32_t) 8; // todo next year: fix
                     frame.data = new uint8_t[8];
                     long data = (uint8_t) strtol(msg.substr(9,25).c_str(), NULL, 16);
                     memcpy(frame.data, &data, 8);
 
                     auto callback = _callbacks.find(frame.arb_id & 0x000000FF);
+					LogFrame(frame);
+
                     if (callback != _callbacks.end()) { callback->second(frame); }
                     delete[] frame.data;
 

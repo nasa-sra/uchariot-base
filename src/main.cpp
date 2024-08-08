@@ -34,12 +34,7 @@ int main() {
     StateReporter::GetInstance().EnableLogging();
     StateReporter::GetInstance().EnableTelemetry();
 
-    while(running) {
-        // can->SendCan(1, 100000);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    }
-
-    // robot.Run(50, running);
+    robot.Run(50, running);
     
     robot.Shutdown();
     can->CloseConnection();
