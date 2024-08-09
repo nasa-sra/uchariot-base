@@ -12,10 +12,10 @@ CanConnection::CanConnection() {
     // system("sudo ip link set can0 up type can bitrate 500000 restart-ms 100");
     // system("pkill slcand");
     // system("sudo slcand -o -s6 -S 1152000 /dev/ttyACM1");
-    system("sudo ip link set up slcan0");
-    system("sudo ifconfig slcan0 txqueuelen 1000");
+    system("sudo ip link set up can0");
+    system("sudo ifconfig can0 txqueuelen 1000");
 
-    Utils::LogFmt("Connecting to slcan0");
+    Utils::LogFmt("Connecting to can0");
 
     // 1.Create socket
     _socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
@@ -25,7 +25,7 @@ CanConnection::CanConnection() {
 
     // 2.Specify can0 device
     struct ifreq ifr;
-    strcpy(ifr.ifr_name, "slcan0");
+    strcpy(ifr.ifr_name, "can0");
     int ret = ioctl(_socket, SIOCGIFINDEX, &ifr);
     if (ret < 0) {
         Utils::ErrFmt("CAN socket ioctl failed");
@@ -162,7 +162,7 @@ void CanConnection::CloseConnection() {
     _receiveThread.join();
 #ifndef SIMULATION
     close(_socket);
-    system("sudo ifconfig slcan0 down");
+    system("sudo ifconfig can0 down");
     // system("sudo slcand -c -s6 -S 1152000 /dev/ttyACM1");
 #endif
 }
