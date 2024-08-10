@@ -4,10 +4,11 @@
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
 
-Vision::Vision()
-    : _messageQueue("/tmp/uchariotVision", [this](std::string msg) {
-          this->updateDetections(msg);
-      }) {};
+Vision::Vision() : 
+    _network("VisionServer")
+{
+    _network.Start(9000, [this](std::string tag, rapidjson::Document &doc) {this->handleUpdate(tag, doc); });
+};
 
 void Vision::Update(double dt) {
     if (!_detectionsMutex.try_lock()) {
@@ -24,14 +25,12 @@ void Vision::Update(double dt) {
     _detectionsMutex.unlock();
 }
 
-void Vision::Disconnect() { _messageQueue.Close(); }
+void Vision::Disconnect() { _network.CloseConnections(); }
 
-void Vision::updateDetections(std::string data) {
+void Vision::handleUpdate(std::string tag, rapidjson::Document &doc) {
     std::vector<Detection> detections;
 
     try {
-        rapidjson::Document doc;
-        doc.Parse(data.c_str());
         if (doc.HasParseError())
             throw std::runtime_error(Utils::StrFmt(
                 "JSON Parse Error offset %u: %s",
@@ -73,7 +72,6 @@ void Vision::updateDetections(std::string data) {
         }
     } catch (std::exception& e) {
         Utils::LogFmt("Vision::updateDetections - Error: %s", e.what());
-        std::cout << data << "\n";
     }
 
     if (_detectionsMutex.try_lock()) {

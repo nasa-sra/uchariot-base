@@ -2,7 +2,10 @@
 #include "rapidjson/error/en.h"
 #include "NetworkManager.h"
 
-NetworkManager::NetworkManager() {}
+NetworkManager::NetworkManager(std::string name, bool singleCommanding) {
+    _name = name;
+    _singleCmding = singleCommanding;
+}
 
 /**
  * @brief Initializes and starts the network manager.
@@ -34,8 +37,7 @@ bool NetworkManager::Start(int port, PacketCallback packetCallback) {
 
     _net_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (_net_socket == -1) {
-        Utils::LogFmt("NetworkManager failed to create socket. Error: %s",
-                      strerror(errno));
+        Utils::LogFmt("%s failed to create socket. Error: %s", _name, strerror(errno));
         return false;
     }
     _net_addr.sin_family = AF_INET;
@@ -47,13 +49,12 @@ bool NetworkManager::Start(int port, PacketCallback packetCallback) {
 
     if (bind(_net_socket, (struct sockaddr*)&_net_addr, sizeof(_net_addr)) ==
         -1) {
-        Utils::LogFmt("NetworkManager Socket Bind Failed. Error: %s",
-                      strerror(errno));
+        Utils::LogFmt("%s socket bind failed. Error: %s", _name, strerror(errno));
         close(_net_socket);
         return false;
     }
 
-    Utils::LogFmt("Listening on port %i", port);
+    Utils::LogFmt("%s Listening on port %i", _name, port);
     listen(_net_socket, 10);
     FD_SET(_net_socket, &_fds);
     _running = true;
@@ -77,7 +78,7 @@ void NetworkManager::run() {
         tv.tv_usec = 0;
         read_fds = _fds;
         if (select(_fdmax + 1, &read_fds, NULL, NULL, &tv) == -1) {
-            Utils::ErrFmt("NetworkManager - Error on select");
+            Utils::ErrFmt("%s - Error on select", _name);
         }
 
         for (int i = 0; i <= _fdmax; i++) {
@@ -97,17 +98,17 @@ void NetworkManager::acceptConnection() {
     socklen_t addrlen = sizeof remoteaddr;
     int conn = accept(_net_socket, (struct sockaddr*)&remoteaddr, &addrlen);
     if (conn == -1) {
-        Utils::LogFmt("NetworkManager - Error on accept");
+        Utils::LogFmt("%s - Error on accept", _name);
     } else {
         FD_SET(conn, &_fds);
         if (conn > _fdmax) {
             _fdmax = conn;
         }
-        if (_cmdClient == -1) {
+        if (_singleCmding && _cmdClient == -1) {
             _cmdClient = conn;
-            Utils::LogFmt("New commanding client %i connected", conn);
+            Utils::LogFmt("%s - New commanding client %i connected", _name, conn);
         } else {
-            Utils::LogFmt("New client %i connected", conn);
+            Utils::LogFmt("%s - New client %i connected", _name, conn);
         }
         _clientNum++;
         _clientSockets.push_back(conn);
@@ -144,9 +145,9 @@ void NetworkManager::receivePacket(int fd) {
     ssize_t nbytes = recv(fd, buffer, sizeof(buffer), 0);
     if (nbytes <= 0) {
         if (nbytes == 0) {
-            Utils::LogFmt("Client %i Disconencted", fd);
+            Utils::LogFmt("%s - Client %i Disconencted", _name, fd);
         } else {
-            Utils::LogFmt("NetworkManager - Error on recv");
+            Utils::LogFmt("%s - Error on recv", _name);
         }
         _clientSockets.erase(
             std::remove(_clientSockets.begin(), _clientSockets.end(), fd),
@@ -160,13 +161,10 @@ void NetworkManager::receivePacket(int fd) {
         if (fd == _cmdClient) {
             if (_clientNum > 0) {
                 _cmdClient = _fdmax;
-                Utils::LogFmt("Switched commanding client to %i", _cmdClient);
+                Utils::LogFmt("%s switched commanding client to %i", _name, _cmdClient);
             } else {
                 _cmdClient = -1;
-                // rapidjson::Document document;
-                // document.Parse("{\"speed\":0, \"fwd\":0.0, \"turn\": 0.0}");
-                // _packetCallback("teleop_drive", document);
-                Utils::LogFmt("Lost commanding client");
+                Utils::LogFmt("%s lost commanding client", _name);
             }
         }
     } else if (fd == _cmdClient) {
@@ -213,7 +211,7 @@ void NetworkManager::handlePacket(char* buffer, int start, size_t len) {
     rapidjson::Document document;
     document.Parse(data.c_str());
     if (document.HasParseError()) {
-        Utils::LogFmt("NetworkManager::handlePacket JSON Parse Error. Offset %u: %s", (unsigned)document.GetErrorOffset(), rapidjson::GetParseError_En(document.GetParseError()));
+        Utils::LogFmt("%s JSON Parse Error. Offset %u: %s", _name, (unsigned)document.GetErrorOffset(), rapidjson::GetParseError_En(document.GetParseError()));
         return;
     }
     _packetCallback(cmd, document);
@@ -265,7 +263,7 @@ void NetworkManager::Send(int fd, const char* buffer, int len) {
     while (total < len) {
         n = send(fd, buffer + total, bytesleft, 0);
         if (n == -1) {
-            Utils::LogFmt("NetworkManger - Error on send");
+            Utils::LogFmt("%s - Error on send", _name);
             return;
         }
         total += n;
@@ -274,10 +272,10 @@ void NetworkManager::Send(int fd, const char* buffer, int len) {
 }
 
 void NetworkManager::CloseConnections() {
-    Utils::LogFmt("Closing connections");
+    Utils::LogFmt("%s closing connections", _name);
     _running = false;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     for (int fd : _clientSockets) {
         close(fd);
     }

@@ -6,14 +6,10 @@ CanConnection::CanConnection() {
     Utils::LogFmt("Setting up can0");
 
 #ifndef SIMULATION
-    // system("sudo modprobe can");
-    // system("sudo modprobe can_raw");
-    // system("sudo modprobe mttcan");
     // system("sudo ip link set can0 up type can bitrate 500000 restart-ms 100");
-    // system("pkill slcand");
-    // system("sudo slcand -o -s6 -S 1152000 /dev/ttyACM1");
-    system("sudo ip link set up can0");
-    system("sudo ifconfig can0 txqueuelen 1000");
+    // system("sudo ifconfig can0 txqueuelen 1000");
+    system("sudo ip link set can0 type can bitrate 500000");
+    system("sudo ifconfig can0 up");
 
     Utils::LogFmt("Connecting to can0");
 

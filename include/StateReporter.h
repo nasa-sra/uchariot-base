@@ -9,6 +9,8 @@
 
 #include "rapidjson/document.h"
 
+#include "NetworkManager.h"
+
 class StateReporter {
    public:
     static StateReporter& GetInstance() {
@@ -23,7 +25,7 @@ class StateReporter {
 
     void PushState();
     void EnableLogging();
-    void EnableTelemetry();
+    void EnableTelemetry(NetworkManager* network);
     void Close();
 
    private:
@@ -90,4 +92,5 @@ class StateReporter {
     bool _stateRefreshed{false};
     bool _telemetry{false};
     std::thread _telemetryThread;
+    NetworkManager* _network{nullptr};
 };

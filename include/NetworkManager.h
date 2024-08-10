@@ -15,10 +15,7 @@ typedef std::function<void(std::string, rapidjson::Document&)> PacketCallback;
 
 class NetworkManager {
 public:
-    static NetworkManager& GetInstance() {
-        static NetworkManager _instance;
-        return _instance;
-    }
+    NetworkManager(std::string name, bool singleCommanding=false);
 
     bool Start(int port, PacketCallback packetCallback);
     void Send(int fd, const char* buffer, int len);
@@ -26,12 +23,14 @@ public:
     void CloseConnections();
 
 private:
-    NetworkManager();
 
     void run();
     void acceptConnection();
     void receivePacket(int fd);
     void handlePacket(char* buffer, int start, size_t len);
+
+    std::string _name;
+    bool _singleCmding{false};
 
     int _net_socket;
     sockaddr_in _net_addr;

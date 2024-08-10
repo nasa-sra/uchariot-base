@@ -4,12 +4,12 @@
 #include <cmath>
 
 #define RAPIDJSON_HAS_STDSTRING 1
-#include "NetworkManager.h"
-#include "StateReporter.h"
-#include "Utils.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
+#include "Utils.h"
+
+#include "StateReporter.h"
 
 StateReporter::StateReporter() {
     _startTime = std::chrono::steady_clock::now();  // Sets start time
@@ -48,9 +48,10 @@ void StateReporter::PushState() {
 
 void StateReporter::EnableLogging() { _logging = true; }
 
-void StateReporter::EnableTelemetry() {
+void StateReporter::EnableTelemetry(NetworkManager* network) {
     _telemetry = true;
     _telemetryThread = std::thread(&StateReporter::sendState, this);
+    _network = network;
 }
 
 void StateReporter::Close() {
@@ -354,7 +355,7 @@ void StateReporter::sendState() {
         rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
         _doc.Accept(writer);
 
-        NetworkManager::GetInstance().SendAll(strbuf.GetString(),
+        _network->SendAll(strbuf.GetString(),
                                               strbuf.GetSize());
 
         int rate = 10;  // Hz

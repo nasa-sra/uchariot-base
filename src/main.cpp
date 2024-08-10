@@ -26,19 +26,21 @@ int main() {
 
     Robot robot;
 
-    if (!NetworkManager::GetInstance().Start( 8000, [&robot](std::string cmd, rapidjson::Document &doc) { robot.HandleNetCmd(cmd, doc); })) {
+    NetworkManager network("CmdServer", true);
+
+    if (!network.Start(8000, [&robot](std::string cmd, rapidjson::Document &doc) { robot.HandleNetCmd(cmd, doc); })) {
         can->CloseConnection();
         return 0;
     }
 
     StateReporter::GetInstance().EnableLogging();
-    StateReporter::GetInstance().EnableTelemetry();
+    StateReporter::GetInstance().EnableTelemetry(&network);
 
     robot.Run(50, running);
 
     robot.Shutdown();
     can->CloseConnection();
-    NetworkManager::GetInstance().CloseConnections();
+    network.CloseConnections();
     StateReporter::GetInstance().Close();
     Utils::LogFmt("Shutdown");
 

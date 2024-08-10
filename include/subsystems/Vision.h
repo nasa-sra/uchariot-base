@@ -30,9 +30,9 @@ public:
 
 private:
 
-    void updateDetections(std::string data);
+    void handleUpdate(std::string tag, rapidjson::Document &doc);
 
-    MessageQueue _messageQueue;
+    NetworkManager _network;
 
     std::vector<Detection> _detections;
     std::mutex _detectionsMutex;

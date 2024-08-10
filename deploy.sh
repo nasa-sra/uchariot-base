@@ -1,3 +1,3 @@
-scp ./uChariotBase uchariot@10.93.24.5:~/uchariot-base/build
-# scp -r ../paths/ uchariot@10.93.24.5:~/uchariot-base/build/paths
-scp -r ../config/ uchariot@10.93.24.5:~/uchariot-base/
+scp ./uChariotBase uchariot@192.168.1.3:~/uchariot-base/build
+# scp -r ../paths/ uchariot@192.168.1.3:~/uchariot-base/build/paths
+scp -r ../config/ uchariot@192.168.1.3:~/uchariot-base/
