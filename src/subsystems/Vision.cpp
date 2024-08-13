@@ -84,6 +84,6 @@ void Vision::handleUpdate(std::string tag, rapidjson::Document &doc) {
 
 void Vision::ReportState(std::string prefix) {
     prefix += "vision/";
-    StateReporter::GetInstance().UpdateKey(
-        prefix + "closest_detection_distance", _closestDetectionDistance);
+    StateReporter::GetInstance().UpdateKey(prefix + "closest_detection_distance", _closestDetectionDistance);
+    StateReporter::GetInstance().UpdateKey(prefix + "num_detections", int (_detections.size()));
 }

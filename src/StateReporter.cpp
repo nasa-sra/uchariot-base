@@ -355,8 +355,7 @@ void StateReporter::sendState() {
         rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
         _doc.Accept(writer);
 
-        _network->SendAll(strbuf.GetString(),
-                                              strbuf.GetSize());
+        _network->SendAll(strbuf.GetString(), strbuf.GetSize());
 
         int rate = 10;  // Hz
         double dt = Utils::ScheduleRate(rate, start_time);

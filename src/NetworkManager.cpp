@@ -158,7 +158,7 @@ void NetworkManager::receivePacket(int fd) {
         if (fd == _fdmax) {
             _fdmax--;
         }
-        if (fd == _cmdClient) {
+        if (_singleCmding && fd == _cmdClient) {
             if (_clientNum > 0) {
                 _cmdClient = _fdmax;
                 Utils::LogFmt("%s switched commanding client to %i", _name, _cmdClient);
@@ -167,7 +167,7 @@ void NetworkManager::receivePacket(int fd) {
                 Utils::LogFmt("%s lost commanding client", _name);
             }
         }
-    } else if (fd == _cmdClient) {
+    } else if (!_singleCmding || fd == _cmdClient) {
         int start = 0;
         for (int i = 0; i < BUFFER_SIZE; i++) {
             if (buffer[i] == ';') {
@@ -260,6 +260,7 @@ void NetworkManager::Send(int fd, const char* buffer, int len) {
     int bytesleft = len;
     int n;
 
+    int count = 0;
     while (total < len) {
         n = send(fd, buffer + total, bytesleft, 0);
         if (n == -1) {
@@ -268,6 +269,11 @@ void NetworkManager::Send(int fd, const char* buffer, int len) {
         }
         total += n;
         bytesleft -= n;
+        count++;
+        if (count > 100) {
+            Utils::LogFmt("%s - Failed to send", _name);
+            break;
+        }
     }
 }
 

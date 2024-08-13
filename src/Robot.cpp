@@ -94,8 +94,8 @@ void Robot::Run(int rate, bool &running) {
         _localization.Update(dt);
 
         // Report state
-        StateReporter::GetInstance().UpdateKey("/controller",
-                                               modeToController(_mode).name);
+        StateReporter::GetInstance().UpdateKey("/runTime", _runTime);
+        StateReporter::GetInstance().UpdateKey("/controller", modeToController(_mode).name);
 
         cmds.ReportState();
         _overrideController.ReportState();
@@ -113,6 +113,7 @@ void Robot::Run(int rate, bool &running) {
         if (dt > 1.0 / rate) {
             Utils::LogFmt("Robot Run overran by %f s", dt);
         }
+        _runTime += dt;
     }
 }
 
