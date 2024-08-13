@@ -12,6 +12,7 @@
 #include "controllers/PathingController.h"
 #include "controllers/TeleopController.h"
 #include "controllers/FollowingController.h"
+#include "controllers/SummonController.h"
 
 #include "subsystems/DriveBase.h"
 #include "subsystems/GPS.h"
@@ -25,7 +26,7 @@
 
 class Robot {
    public:
-    enum ControlMode { DISABLED, TELEOP, PATHING, FOLLOWING };
+    enum ControlMode { DISABLED, TELEOP, PATHING, FOLLOWING, SUMMON };
 
     Vision _vision;
 
@@ -50,6 +51,7 @@ class Robot {
     TeleopController _teleopController;
     PathingController _pathingController;
     FollowingController _followingController;
+    SummonController _summonController;
 
     DriveBase _driveBase;
 #ifndef SIMULATION

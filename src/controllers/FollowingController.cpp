@@ -14,6 +14,12 @@ void FollowingController::Configure(tinyxml2::XMLElement* xml) {
     xml->QueryDoubleAttribute("headingKp", &_headingKp);
 }
 
+void FollowingController::Load() {
+    _target = Detection();
+    _targetFilteredDistance = 0.0;
+    _locked = false;
+}
+
 ControlCmds FollowingController::Run(ControlCmds cmds) {
 
     _locked = false;

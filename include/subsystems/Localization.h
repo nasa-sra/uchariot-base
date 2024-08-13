@@ -24,6 +24,7 @@ class Localization : SubsystemBase {
 
     void SetOrigin(Utils::GeoPoint origin) { _origin = origin; }
     Pose GetPose() { return _pose; }
+    Utils::GeoPoint GetGeoLocation() { return _geoPos; }
 
    private:
     DriveBase* _driveBase;

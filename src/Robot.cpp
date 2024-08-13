@@ -7,7 +7,8 @@ Robot::Robot()
       _localization(&_driveBase, &_imu, &_vision, &_gps),
       _overrideController(&_vision),
       _pathingController(&_localization, &_vision),
-      _followingController(&_vision) {
+      _followingController(&_vision),
+      _summonController(&_localization, &_vision) {
 
     _netHandlers["set_controller"] = [this](rapidjson::Document &doc) {
         if (!doc.HasMember("name") || !doc["name"].IsString())
@@ -47,6 +48,14 @@ Robot::Robot()
             loadConfig(doc["filepath"].GetString());
         } else { loadConfig("../config/robotConfig.xml"); }
     };
+    _netHandlers["summon"] = [this](rapidjson::Document &doc) {
+        if (!doc.HasMember("latitude") || !doc["latitude"].IsDouble())
+            throw std::runtime_error("no latitude");
+        if (!doc.HasMember("longitude") || !doc["longitude"].IsDouble())
+            throw std::runtime_error("no longitude");
+        Utils::GeoPoint target(doc["latitude"].GetDouble(), doc["longitude"].GetDouble());
+        _summonController.Summon(target);
+    };
 
     loadConfig("../config/robotConfig.xml");
 }
@@ -78,6 +87,9 @@ void Robot::Run(int rate, bool &running) {
             case ControlMode::FOLLOWING:
                 cmds = _followingController.Run();
                 break;
+            case ControlMode::SUMMON:
+                cmds = _summonController.Run();
+                break;
             default:
                 break;
         }
@@ -101,6 +113,7 @@ void Robot::Run(int rate, bool &running) {
         _overrideController.ReportState();
         _pathingController.ReportState();
         _followingController.ReportState();
+        _summonController.ReportState();
         _driveBase.ReportState();
         _localization.ReportState();
         _gps.ReportState();
@@ -143,6 +156,7 @@ Robot::ControlMode Robot::nameToMode(std::string name) {
     if (name == _teleopController.name) return ControlMode::TELEOP;
     if (name == _pathingController.name) return ControlMode::PATHING;
     if (name == _followingController.name) return ControlMode::FOLLOWING;
+    if (name == _summonController.name) return ControlMode::SUMMON;
     return ControlMode::DISABLED;
 }
 
@@ -151,6 +165,7 @@ ControllerBase &Robot::modeToController(ControlMode mode) {
     if (mode == TELEOP) return _teleopController;
     if (mode == PATHING) return _pathingController;
     if (mode == FOLLOWING) return _followingController;
+    if (mode == SUMMON) return _summonController;
     return dc;
 }
 
@@ -190,6 +205,8 @@ bool Robot::loadConfig(std::string filePath) {
             _pathingController.Configure(line);
         } else if (std::strcmp(line->Name(), _followingController.name.c_str()) == 0) {
             _followingController.Configure(line);
+        } else if (std::strcmp(line->Name(), _summonController.name.c_str()) == 0) {
+            _summonController.Configure(line);
         } else {
             Utils::LogFmt("Robot::LoadConfig - Could not read line in XML");
         }

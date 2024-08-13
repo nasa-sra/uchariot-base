@@ -23,6 +23,7 @@ set(SRCS
     src/controllers/TeleopController.cpp
     src/controllers/PathingController.cpp
     src/controllers/FollowingController.cpp
+    src/controllers/SummonController.cpp
 
     src/subsystems/DriveBase.cpp
     src/subsystems/Localization.cpp

@@ -57,7 +57,7 @@ ControlCmds PathingController::Run(ControlCmds cmds) {
         _nextWaypoint = _path[_currentStep].pos.head<2>();
         Eigen::Vector2d diff = _nextWaypoint - robotPose.pos;
         _distanceToWaypoint = diff.norm();
-        double velocity = std::clamp((float)(_distanceToWaypoint * _velocityGain), -_path[_currentStep].speed, _path[_currentStep].speed);
+        double velocity = std::clamp((float)(_distanceToWaypoint * _velocityGain), 0.0f, _path[_currentStep].speed);
         _targetHeading = atan2(diff.y(), diff.x());
 
         if (_obstacleAvoidance) {
