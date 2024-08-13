@@ -40,7 +40,7 @@ void Localization::Update(double dt) {
     } else {
         // _pose.heading = _vision->GetHeading() - _rsOffset; // with realsense
         // gyro
-        _pose.heading = _imu->GetYaw() - _imuOffset;  // with BNO055
+        _pose.heading = Utils::normalizeAngle(_imu->GetYaw() - _imuOffset);  // with BNO055
     }
 }
 //
@@ -57,4 +57,7 @@ void Localization::ResetHeading() {
     _imuOffset = _imu->GetYaw();
 }
 
-void Localization::ResetPose() { _pose = {{0.0, 0.0}, _pose.heading}; }
+void Localization::ResetPose() { 
+    _pose = {{0.0, 0.0}, _pose.heading};
+    _origin = _gps->GetFix();
+}

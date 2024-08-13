@@ -144,8 +144,11 @@ long VectorIndexOf(const std::vector<T> v, const T x) {
     return pos;
 }
 
-double ScheduleRate(int rate,
-                    std::chrono::high_resolution_clock::time_point start_time);
+double ScheduleRate(int rate, std::chrono::high_resolution_clock::time_point start_time);
+
+double normalizeAnglePositive(double angle);
+double normalizeAngle(double angle);
+double shortestAngularDistance(double from, double to);
 
 #define EARTHS_RADIUS 6378137.0  // m
 struct GeoPoint {

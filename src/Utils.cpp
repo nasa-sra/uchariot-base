@@ -131,6 +131,24 @@ double Utils::ScheduleRate(
            1000.0;
 }
 
+double Utils::normalizeAnglePositive(double angle) {
+    return fmod(fmod(angle, (2.0 * M_PI)) + (2.0 * M_PI), (2.0 * M_PI));
+}
+
+double Utils::normalizeAngle(double angle) {
+    double a = normalizeAnglePositive(angle);
+    if (a > M_PI)
+        a -= (2.0 * M_PI);
+    return a;
+}
+
+double Utils::shortestAngularDistance(double from, double to) {
+    double result = Utils::normalizeAnglePositive(Utils::normalizeAnglePositive(to) - Utils::normalizeAnglePositive(from));
+    if (result > M_PI)
+        result = -((2.0 * M_PI) - result);
+    return Utils::normalizeAngle(result);
+}
+
 /**
  * @brief Converts a geographic coordinate (latitude, longitude, altitude) to
  * Earth-Centered, Earth-Fixed (ECEF) coordinates.

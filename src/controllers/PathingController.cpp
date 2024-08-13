@@ -66,7 +66,8 @@ ControlCmds PathingController::Run(ControlCmds cmds) {
             _obstaclePresent = false;
             Detection obstacle;
             for (Detection& det : detections) {
-                if (det.name == "rock" && det.confidence > _obstacleConfThresh && det.width > _obstacleSizeThresh) {
+                Utils::LogFmt("Detection %s, conf: %f, width: %f", det.name, det.confidence, det.width);
+                if ((det.name == "person" || det.name == "rock") && det.confidence > _obstacleConfThresh && det.width > _obstacleSizeThresh) {
                     if (!_obstaclePresent) {
                         obstacle = det;
                         _obstaclePresent = true;
@@ -84,7 +85,7 @@ ControlCmds PathingController::Run(ControlCmds cmds) {
 
         }
 
-        double headingErr = _targetHeading - robotPose.heading;
+        double headingErr = Utils::shortestAngularDistance(robotPose.heading, _targetHeading);
         double angularVelocity = headingErr * _headingGain;
 
         if (_currentStep == _path.size() - 1 && _distanceToWaypoint < 1.0) {
@@ -225,6 +226,7 @@ bool PathingController::loadXMLPath(std::string filePath) {
                     _origin = point;
                 }
                 Eigen::Vector3d pos = geoToLTP(point, _origin);
+                pos /= 2.75; // need to fix math
 
                 PathStep step;
                 step.pos = pos;

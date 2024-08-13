@@ -46,7 +46,7 @@ ControlCmds SummonController::Run(ControlCmds cmds) {
         double velocity = std::clamp((float)(_distanceToWaypoint * _velocityKp), 0.0f, (float) _driveVelocity);
         _targetHeading = atan2(diff.y(), diff.x());
         
-        double headingErr = _targetHeading - robotPose.heading;
+        double headingErr = Utils::shortestAngularDistance(robotPose.heading, _targetHeading);
         double angularVelocity = headingErr * _headingKp;
 
         cmds.drive = {velocity, angularVelocity};

@@ -51,7 +51,7 @@ void BNO055::Update(double dt) {
 
     _gyroAngles.x() = (((float)x) / 16.0) * DEG2RAD;
     _gyroAngles.y() = (((float)y) / 16.0) * DEG2RAD;
-    _gyroAngles.z() = (((float)z) / 16.0) * DEG2RAD;
+    _gyroAngles.z() = -(((float)z) / 16.0) * DEG2RAD;
 }
 
 /**

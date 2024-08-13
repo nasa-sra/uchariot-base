@@ -51,7 +51,7 @@ private:
     bool _pathPaused{false};
 
     int _pathResolution{1};
-    float _pathSpeed{2};
+    float _pathSpeed{0.5};
     float _pathRadius{3};
 
     std::vector<PathStep> _path;
@@ -60,8 +60,8 @@ private:
     double _velocityGain{0.5};
     double _headingGain{-1.0};
     bool _obstacleAvoidance{false};
-    double _obstacleConfThresh{0.6};
-    double _obstacleSizeThresh{0.5};
+    double _obstacleConfThresh{0.5};
+    double _obstacleSizeThresh{0.4};
     double _avoidanceGain{0.25};
 
     float _endTolerance{0.1};
