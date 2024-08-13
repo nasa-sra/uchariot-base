@@ -10,6 +10,12 @@ Robot::Robot()
       _followingController(&_vision),
       _summonController(&_localization, &_vision) {
 
+    _netHandlers["enable"] = [this](rapidjson::Document &doc) {
+        _enabled = true;
+    };
+    _netHandlers["disable"] = [this](rapidjson::Document &doc) {
+        _enabled = false;
+    };
     _netHandlers["set_controller"] = [this](rapidjson::Document &doc) {
         if (!doc.HasMember("name") || !doc["name"].IsString())
             throw std::runtime_error("no name");
@@ -95,8 +101,10 @@ void Robot::Run(int rate, bool &running) {
         }
         cmds = _overrideController.Run(cmds);
 
-        // Commmand subsystems
-        _driveBase.SetCmds(cmds.drive);
+        if (_enabled) {
+            // Commmand subsystems
+            _driveBase.SetCmds(cmds.drive);
+        }
 
         // Update subsystems
         _driveBase.Update(dt);
@@ -106,6 +114,7 @@ void Robot::Run(int rate, bool &running) {
         _localization.Update(dt);
 
         // Report state
+        StateReporter::GetInstance().UpdateKey("/enabled", _enabled);
         StateReporter::GetInstance().UpdateKey("/runTime", _runTime);
         StateReporter::GetInstance().UpdateKey("/controller", modeToController(_mode).name);
 
@@ -168,7 +177,6 @@ ControllerBase &Robot::modeToController(ControlMode mode) {
     if (mode == SUMMON) return _summonController;
     return dc;
 }
-
 
 bool Robot::loadConfig(std::string filePath) {
 

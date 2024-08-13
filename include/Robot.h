@@ -68,4 +68,5 @@ class Robot {
     std::map<const std::string, std::function<void(rapidjson::Document &doc)>> _netHandlers;
 
     double _runTime {0.0};
+    bool _enabled {false};
 };
