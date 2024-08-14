@@ -73,9 +73,7 @@ void GPS::Disconnect() {
 
 void GPS::ReportState(std::string prefix) {
     prefix += "GPS/";
-    StateReporter::GetInstance().UpdateKey(prefix + "latitude", _lastFix.latitude);
-    StateReporter::GetInstance().UpdateKey(prefix + "longitude", _lastFix.longitude);
-    StateReporter::GetInstance().UpdateKey(prefix + "latitude_exact", _lastFix.latitude * 10000);
-    StateReporter::GetInstance().UpdateKey(prefix + "longitude_exact", _lastFix.longitude * 10000);
+    StateReporter::GetInstance().UpdateKey(prefix + "latitude", std::to_string(_lastFix.latitude));
+    StateReporter::GetInstance().UpdateKey(prefix + "longitude", std::to_string(_lastFix.longitude));
     StateReporter::GetInstance().UpdateKey(prefix + "altitude", _lastFix.altMSL);
 }

@@ -1,4 +1,5 @@
 
+#include <string>
 #include "tinyxml2.h"
 #include "Robot.h"
 
@@ -55,11 +56,11 @@ Robot::Robot()
         } else { loadConfig("../config/robotConfig.xml"); }
     };
     _netHandlers["summon"] = [this](rapidjson::Document &doc) {
-        if (!doc.HasMember("latitude") || !doc["latitude"].IsDouble())
+        if (!doc.HasMember("latitude") || !doc["latitude"].IsString())
             throw std::runtime_error("no latitude");
-        if (!doc.HasMember("longitude") || !doc["longitude"].IsDouble())
+        if (!doc.HasMember("longitude") || !doc["longitude"].IsString())
             throw std::runtime_error("no longitude");
-        Utils::GeoPoint target(doc["latitude"].GetDouble(), doc["longitude"].GetDouble());
+        Utils::GeoPoint target(std::stod(doc["latitude"].GetString()), std::stod(doc["longitude"].GetString()));
         _summonController.Summon(target);
     };
 

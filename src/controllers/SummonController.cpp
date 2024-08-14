@@ -51,7 +51,8 @@ ControlCmds SummonController::Run(ControlCmds cmds) {
 
         cmds.drive = {velocity, angularVelocity};
 
-        if (_distanceToWaypoint < _transitionDistance && _targetDet.pose.z() < _transitionDistance) {
+        if ((_distanceToWaypoint < _transitionDistance && _targetDet.pose.z() < _transitionDistance) ||
+                _distanceToWaypoint < 1.0) {
             _runningPath = false;
             _targetPos = {0.0, 0.0};
             _runningTracking = true;
@@ -74,6 +75,7 @@ ControlCmds SummonController::Run(ControlCmds cmds) {
 void SummonController::Summon(Utils::GeoPoint target) {
     Utils::LogFmt("Robot Summoned to %f, %f", target.lat, target.lon);
     _targetPos = Utils::geoToLTP(target, _localization->GetGeoLocation()).head<2>();
+    // _targetPos /= 2.75; // need to fix math
     _summoned = true;
 }
 
