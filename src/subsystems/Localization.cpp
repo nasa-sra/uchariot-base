@@ -57,7 +57,7 @@ void Localization::ResetHeading() {
     _imuOffset = _imu->GetYaw();
 }
 
-void Localization::ResetPose() { 
+void Localization::ResetPose() {
     _pose = {{0.0, 0.0}, _pose.heading};
     _origin = _gps->GetFix();
 }
