@@ -72,7 +72,6 @@ cd ~/uchariot-base/build
 It can also be started with `~/uchariot-base/start.sh` which is what is run by the start button on the [driver console](https://github.com/nasa-sra/uchariot-console).
 
 ### Simulation
-
 You can also run the code on your local environment in simulation, this will disable peripherals like CAN, I2C, and serial connection. Just run  
 ```
 mkdir build
@@ -81,6 +80,12 @@ cmake -DSIMULATION=true ..
 make
 sudo ./uChariotBase
 ```
+### Config
+The robot will load a configuration XML file at uchariot-base/config/robotConfig.xml. The deploy script will update the config file on the robot.  
+
+### Autonomous Paths
+The robot will look for paths in the uchariot/build/paths folder. Paths can be either XML or KML files, but XML is recommended.  
+To make a new path, open google earth, draw a path, save it as a KML, open the KML and copy the coordinates into a XML, using another path as a template. Adjust the parameters as needed, and run it from the driver console. 
 
 ## Documentation
 Checkout the docs at ./docs/html/index.html  
