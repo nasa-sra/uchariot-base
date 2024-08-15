@@ -21,11 +21,11 @@ Minimum CMake version is 3.16.
 
 ### Sysroot 
 
-To crosscompile for the Jetson, you first need to create a sysroot directory. The cmake points by default to `~/uchariot-sys/sysroot/`
+To crosscompile for the raspberry pi, you first need to create a sysroot directory. The cmake points by default to `~/uchariot-sys/sysroot/`
 
-You can use the following command to copy the jetsons's lib and usr directories to the sysroot in WSL or your VM.
+You can use the following command to copy the pi's lib and usr directories to the sysroot.
 
-`rsync -vR --progress -rl --delete-after --safe-links USERNAME@IP:/{lib,usr,opt/vc/lib} $HOME/uchariot-sys/sysroot`
+`rsync -vR --progress -rl --delete-after --safe-links USERNAME@RPI_IP:/{lib,usr,opt/vc/lib} $HOME/uchariot-sys/sysroot`
 
 ### Native Compiling (ARM-Linux or M-series Mac)
  
@@ -43,17 +43,15 @@ make
 
 > If you are using X86 Windows, use WSL Debian or Ubuntu.
 > If you are using an Intel Mac, use a VM with Debian or Ubuntu.
-> 
->IMPORTANT: You MUST use Debian 11 or Ubuntu 20.04 to crosscompile for the Jetson. The default WSL debian version is 12, so use these [instructions](https://stackoverflow.com/questions/77170725/how-to-install-debian-11-on-wsl-manually-i-am-trying-to-download-it-from-from) to get a Debian 11 disto.  
 
-Once you have your VM, install the needed libraries (see table above) and the g++ 9 crosscompiling toolchain for aarch64, with
+Then install the crosscompiling toolchain for aarch64, and run
 
-`sudo apt install g++-9-aarch64-linux-gnu`
+`sudo apt install g++-aarch64-linux-gnu`
 
 Then to crosscompile, run 
 ```
-mkdir crossbuild
-cd crossbuild
+mkdir build
+cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake ..
 make
 ```
@@ -69,9 +67,9 @@ Now you should have produced a binary called `uChariotBase`. Deploy this using `
 Run the executable on the robot with  
 ```
 cd ~/uchariot-base/build
-sudo ./uchariotBase
+./uchariotBase
 ```
-It can also be started with `sudo ~/uchariot-base/start.sh` which is what is run by the start button on the [driver console](https://github.com/nasa-sra/uchariot-console).
+It can also be started with `~/uchariot-base/start.sh` which is what is run by the start button on the [driver console](https://github.com/nasa-sra/uchariot-console).
 
 ### Simulation
 
