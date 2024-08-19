@@ -75,7 +75,6 @@ ControlCmds SummonController::Run(ControlCmds cmds) {
 void SummonController::Summon(Utils::GeoPoint target) {
     Utils::LogFmt("Robot Summoned to %f, %f", target.lat, target.lon);
     _targetPos = Utils::geoToLTP(target, _localization->GetGeoLocation()).head<2>();
-    // _targetPos /= 2.75; // need to fix math
     _summoned = true;
 }
 

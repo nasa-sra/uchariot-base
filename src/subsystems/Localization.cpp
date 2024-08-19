@@ -29,7 +29,6 @@ void Localization::Update(double dt) {
         _pose.pos = Utils::geoToLTP(Utils::GeoPoint(fix), _origin).head<2>();
         _lastGPSUpdate = fix.time;
     }
-    // This utils function may need to be fixed
     _geoPos = Utils::LTPToGeo({_pose.pos[0], _pose.pos[1], 0.0}, _origin);
 
     // Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs,

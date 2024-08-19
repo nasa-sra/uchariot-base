@@ -157,8 +157,8 @@ void Robot::ManageController() {
         modeToController(_mode).Unload();
         _mode = _newMode;
         modeToController(_mode).Load();
-        Utils::LogFmt("Switching to active controller %s",
-                      modeToController(_mode).name);
+        _enabled = false;
+        Utils::LogFmt("Switching to active controller %s", modeToController(_mode).name);
     }
 }
 

@@ -150,12 +150,12 @@ double normalizeAnglePositive(double angle);
 double normalizeAngle(double angle);
 double shortestAngularDistance(double from, double to);
 
-#define EARTHS_RADIUS 6378137.0  // m
+#define EARTHS_RADIUS 6372962.0 // m (at houston)
 struct GeoPoint {
     double lat, lon, alt;
-    GeoPoint() : lat(0.0), lon(0.0), alt(EARTHS_RADIUS) {}
+    GeoPoint() : lat(0.0), lon(0.0), alt(0.0) {}
     GeoPoint(double _lat, double _long)
-        : lat(_lat), lon(_long), alt(EARTHS_RADIUS) {}
+        : lat(_lat), lon(_long), alt(0.0) {}
     GeoPoint(gps_fix_t fix)
         : lat(fix.latitude), lon(fix.longitude), alt(fix.altMSL) {}
 };

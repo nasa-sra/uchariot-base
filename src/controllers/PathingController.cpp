@@ -226,7 +226,6 @@ bool PathingController::loadXMLPath(std::string filePath) {
                     _origin = point;
                 }
                 Eigen::Vector3d pos = geoToLTP(point, _origin);
-                pos /= 2.75; // need to fix math
 
                 PathStep step;
                 step.pos = pos;

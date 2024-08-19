@@ -172,8 +172,8 @@ Eigen::Vector3d Utils::geoToECEF(GeoPoint point) {
     point.lon *= M_PI / 180;
 
     double distance = point.alt + EARTHS_RADIUS;
-    return Eigen::Vector3d(cos(point.lon) * distance * cos(point.lat),
-                           sin(point.lon) * distance * cos(point.lat),
+    return Eigen::Vector3d(distance * cos(point.lat) * cos(point.lon),
+                           distance * cos(point.lat) * sin(point.lon),
                            distance * sin(point.lat));
 }
 
@@ -226,29 +226,31 @@ Utils::GeoPoint Utils::ECEFToGeo(Eigen::Vector3d point) {
  * y-coordinate corresponds to the west direction, and the z-coordinate
  * corresponds to the up direction.
  */
-Eigen::Vector3d Utils::geoToLTP(Utils::GeoPoint geo,
-                                Utils::GeoPoint geoOrigin) {
+Eigen::Vector3d Utils::geoToLTP(Utils::GeoPoint geo, Utils::GeoPoint geoOrigin) {
+
     Eigen::Vector3d pos = Utils::geoToECEF(geo);
     Eigen::Vector3d origin = Utils::geoToECEF(geoOrigin);
 
+    // This projects pos onto the plane, ensuring that z is 0, but it appears more accurate to just discard the z
+
     // This is the solution to the intersection of each step pos vector with a
     // plane normal to and thru the starting point
-    double t = origin.dot(origin) / origin.dot(pos);
+    // double t = origin.dot(origin) / origin.dot(pos);
     // This rescale step.pos to be on the plane, then transforms its origin to
     // be from the starting point
-    pos = t * pos - origin;
+    // pos = t * pos - origin;
 
-    // This should all be cached
+    // This could be cached for a given origin
     Eigen::Vector3d planeNormal = origin.normalized();
     Eigen::Matrix3d planeBasis;
-    planeBasis.col(2) = planeNormal;                                  // up
-    planeBasis.col(1) = planeNormal.cross(Eigen::Vector3d(0, 0, 1));  // west
-    planeBasis.col(0) = planeBasis.col(1).cross(planeNormal);         // north
+    planeBasis.col(2) = planeNormal; // up
+    planeBasis.col(1) = planeNormal.cross(Eigen::Vector3d(0, 0, 1)) / cos(geoOrigin.lat * M_PI / 180); // west
+    planeBasis.col(0) = planeBasis.col(1).cross(planeNormal); // north
 
-    Eigen::Matrix3d rotation =
-        planeBasis.inverse();  // used identity for target basis
+    // Eigen::Matrix3d rotation = planeBasis.inverse();  // used identity for target basis
+    Eigen::Matrix3d rotation = planeBasis.transpose();  // inverse of orthogonal matrix is transpose
     // Rotate from the plane basis to a standard one, x=north, y=west, z=up
-    return rotation * pos;
+    return rotation * (pos - origin);
 }
 
 /**
@@ -271,16 +273,16 @@ Eigen::Vector3d Utils::geoToLTP(Utils::GeoPoint geo,
  * @return A structure containing the geographic coordinate (latitude,
  * longitude, altitude).
  */
-Utils::GeoPoint Utils::LTPToGeo(Eigen::Vector3d pos,
-                                Utils::GeoPoint geoOrigin) {
+Utils::GeoPoint Utils::LTPToGeo(Eigen::Vector3d pos, Utils::GeoPoint geoOrigin) {
+
     Eigen::Vector3d origin = Utils::geoToECEF(geoOrigin);
 
-    // This should all be cached
+    // This could all be cached
     Eigen::Vector3d planeNormal = origin.normalized();
     Eigen::Matrix3d planeBasis;
-    planeBasis.col(2) = planeNormal;                                  // up
-    planeBasis.col(1) = planeNormal.cross(Eigen::Vector3d(0, 0, 1));  // west
-    planeBasis.col(0) = planeBasis.col(1).cross(planeNormal);         // north
+    planeBasis.col(2) = planeNormal; // up
+    planeBasis.col(1) = planeNormal.cross(Eigen::Vector3d(0, 0, 1)) / cos(geoOrigin.lat * M_PI / 180); // west
+    planeBasis.col(0) = planeBasis.col(1).cross(planeNormal); // north
 
     Eigen::Vector3d posECEF = planeBasis * pos;
     return Utils::ECEFToGeo(posECEF + origin);
