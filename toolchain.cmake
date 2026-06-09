@@ -4,15 +4,19 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 
 set(CMAKE_GENERATOR "Unix Makefiles")
 
+#TODO: add spdlog into cmake file with proper fetches
+
 set(UCHARIOT_TOOLCHAIN_PREFIX "aarch64-linux-gnu" CACHE STRING "Compiler prefix for the target toolchain")
 set(UCHARIOT_SYSROOT "$ENV{UCHARIOT_SYSROOT}" CACHE PATH "Path to the target sysroot")
 
+#TODO: log files being set up 
 set(_UCHARIOT_SYSROOT_CANDIDATES
 	"${UCHARIOT_SYSROOT}"
 	"/opt/uchariot-sys/sysroot"
 	"/usr/local/uchariot-sys/sysroot"
 )
 
+#TODO: log if any target roots are found or not
 foreach(_candidate_sysroot IN LISTS _UCHARIOT_SYSROOT_CANDIDATES)
 	if(_candidate_sysroot AND EXISTS "${_candidate_sysroot}")
 		set(CMAKE_SYSROOT "${_candidate_sysroot}" CACHE PATH "Target sysroot" FORCE)
@@ -20,6 +24,7 @@ foreach(_candidate_sysroot IN LISTS _UCHARIOT_SYSROOT_CANDIDATES)
 	endif()
 endforeach()
 
+#TODO: Log system root availability
 if(CMAKE_SYSROOT)
 	set(CMAKE_FIND_ROOT_PATH "${CMAKE_SYSROOT}")
 endif()
