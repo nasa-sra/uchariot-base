@@ -9,6 +9,7 @@
 
 static std::string mode_str[MODE_STR_NUM] = {"n/a", "None", "2D", "3D"};
 
+//TODO: Add more logging for GPS status and errors for debugging purposes
 GPS::GPS() {
     if (0 != gps_open("localhost", "2947", &_gps_data)) {
         Utils::LogFmt("GPS: Failed to connect to gpsd server");

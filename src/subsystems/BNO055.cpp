@@ -1,6 +1,6 @@
 
 #include "subsystems/BNO055.h"
-
+#include "spdlog/spdlog.h"
 #include "StateReporter.h"
 
 #define BNO055_ADDR 0x28
@@ -33,6 +33,8 @@ BNO055::BNO055() : IMUBase() {
     writeRegister(OPR_MODE_REG, 0b00001100);  // Set IMU mode
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     uint8_t calib_status = ReadRegister8(CALIB_STATUS_REG);
+    
+    //TODO: Add more logging statuses to debugging IMU issues
     Utils::LogFmt("Connected to BNO055 IMU Status %i, Calibration %i", status,
                   (calib_status & 0b11000000) >> 6);
     if (status == 1) {
