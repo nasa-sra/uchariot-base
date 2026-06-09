@@ -19,13 +19,17 @@ Minimum CMake version is 3.16.
 
 ## Crosscompiling
 
+The cross-compilation toolchain now prefers standard host tool paths and a configurable sysroot instead of hard-coded user-specific locations. If you need to point CMake at a custom sysroot, set `UCHARIOT_SYSROOT` before configuring.
+
 ### Sysroot 
 
-To crosscompile for the raspberry pi, you first need to create a sysroot directory. The cmake points by default to `~/uchariot-sys/sysroot/`
+To crosscompile for the raspberry pi, you should create a sysroot directory and expose it to CMake with `UCHARIOT_SYSROOT`. If that variable is not set, the toolchain will also look in common locations such as `~/uchariot-sys/sysroot`, `/opt/uchariot-sys/sysroot`, and `/usr/local/uchariot-sys/sysroot`.
 
 You can use the following command to copy the pi's lib and usr directories to the sysroot.
 
 `rsync -vR --progress -rl --delete-after --safe-links USERNAME@RPI_IP:/{lib,usr,opt/vc/lib} $HOME/uchariot-sys/sysroot`
+
+On WSL2 Ubuntu, make sure the aarch64 development packages are installed from Ubuntu ports before building: `sudo apt install g++-aarch64-linux-gnu libi2c-dev:arm64 libgps-dev:arm64`.
 
 ### Native Compiling (ARM-Linux or M-series Mac)
  
@@ -53,7 +57,8 @@ Then to crosscompile, run
 mkdir build
 cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake ..
-make
+cmake --build . -j2
+# make
 ```
 
 The only difference is the inclusion of `-DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake`.
@@ -86,6 +91,9 @@ The robot will load a configuration XML file at uchariot-base/config/robotConfig
 ### Autonomous Paths
 The robot will look for paths in the uchariot/build/paths folder. Paths can be either XML or KML files, but XML is recommended.  
 To make a new path, open google earth, draw a path, save it as a KML, open the KML and copy the coordinates into a XML, using another path as a template. Adjust the parameters as needed, and run it from the driver console. 
+
+### Verifying Binary Platform
+To verify that the binary you built is for the correct platform, you can use the `file` command on the executable. For example, if you run `file ./uChariotBase` and it outputs something like `ELF 64-bit LSB executable, ARM aarch64`, then you have successfully built for the ARM architecture used by the Jetson and Raspberry Pi. If it says something like `ELF 64-bit LSB executable, x86-64`, then you have built for your host machine's architecture instead of the target.
 
 ## Documentation
 Checkout the docs at ./docs/html/index.html  

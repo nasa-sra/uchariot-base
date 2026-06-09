@@ -4,12 +4,30 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 
 set(CMAKE_GENERATOR "Unix Makefiles")
 
-set(TOOLCHAIN_DIR /usr/bin)
-set(CMAKE_SYSROOT /home/$ENV{USER}/uchariot-sys/sysroot)
+set(UCHARIOT_TOOLCHAIN_PREFIX "aarch64-linux-gnu" CACHE STRING "Compiler prefix for the target toolchain")
+set(UCHARIOT_SYSROOT "$ENV{UCHARIOT_SYSROOT}" CACHE PATH "Path to the target sysroot")
+
+set(_UCHARIOT_SYSROOT_CANDIDATES
+	"${UCHARIOT_SYSROOT}"
+	"/opt/uchariot-sys/sysroot"
+	"/usr/local/uchariot-sys/sysroot"
+)
+
+foreach(_candidate_sysroot IN LISTS _UCHARIOT_SYSROOT_CANDIDATES)
+	if(_candidate_sysroot AND EXISTS "${_candidate_sysroot}")
+		set(CMAKE_SYSROOT "${_candidate_sysroot}" CACHE PATH "Target sysroot" FORCE)
+		break()
+	endif()
+endforeach()
+
+if(CMAKE_SYSROOT)
+	set(CMAKE_FIND_ROOT_PATH "${CMAKE_SYSROOT}")
+endif()
+
 set(CMAKE_BUILD_RPATH /usr/lib/aarch64-linux-gnu)
 
-set(CMAKE_C_COMPILER ${TOOLCHAIN_DIR}/aarch64-linux-gnu-gcc)
-set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/aarch64-linux-gnu-g++)
+set(CMAKE_C_COMPILER "/usr/bin/${UCHARIOT_TOOLCHAIN_PREFIX}-gcc" CACHE FILEPATH "C compiler" FORCE)
+set(CMAKE_CXX_COMPILER "/usr/bin/${UCHARIOT_TOOLCHAIN_PREFIX}-g++" CACHE FILEPATH "C++ compiler" FORCE)
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
