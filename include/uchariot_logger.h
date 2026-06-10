@@ -10,24 +10,27 @@ class uchariot_logger {
         static void init() {
             GetLogger()->set_level(spdlog::level::info);
         }
-        //TODO add more logging functions for different levels of logging (debug, error, etc.)
+        //TODO add more logging functions for different levels of logging (debug, error, filesink, etc.)
         template<typename... Args>
-        static void LogFmt(const char* fmt, const Args&... args) {
+        static void info(const char* fmt, const Args&... args) {
             GetLogger()->info(fmt, args...);
         } 
-        static void info(const std::string& msg) {
-            GetLogger()->info(msg);
-        }
+        // static void info(const std::string& msg) {
+        //     GetLogger()->info(msg);
+        // }
         static void error(const std::string& errmsg) {
             GetLogger()->error(errmsg);
         }
+        static void debug(const std::string& dbgmsg) {
+            GetLogger()->debug(dbgmsg);
+        }
 
+        
         static std::shared_ptr<spdlog::logger> GetLogger() {
             static std::shared_ptr<spdlog::logger> logger = spdlog::basic_logger_mt("uchariot_logger", "uchariot.log");
             return logger;
         }
 
-        //TODO: add function for periodic logging
         
 
 

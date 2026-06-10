@@ -7,6 +7,7 @@
 #include "rapidjson/document.h"
 #include "MessageQueue.h"
 #include "StateReporter.h"
+#include "uchariot_logger.h"
 
 #include "controllers/OverrideController.h"
 #include "controllers/PathingController.h"
@@ -28,6 +29,8 @@ class Robot {
    public:
     enum ControlMode { DISABLED, TELEOP, PATHING, FOLLOWING, SUMMON };
 
+    uchariot_logger _logger;
+    
     Vision _vision;
 
     Robot();
