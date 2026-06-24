@@ -2,6 +2,7 @@
 #include <string>
 #include "tinyxml2.h"
 #include "Robot.h"
+#include "uchariot_logger.h"
 
 Robot::Robot()
     : _vision(),
@@ -72,7 +73,7 @@ void Robot::Run(int rate, bool &running) {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     double dt = 1.0 / rate;
-    Utils::LogFmt("Robot Running");
+    uchariot_logger::LogFmt("Robot Running");
     while (running) {
         start_time = std::chrono::high_resolution_clock::now();
 
@@ -134,7 +135,7 @@ void Robot::Run(int rate, bool &running) {
         // Handle periodic update scheduling
         dt = Utils::ScheduleRate(rate, start_time);
         if (dt > 1.0 / rate) {
-            Utils::LogFmt("Robot Run overran by %f s", dt);
+            uchariot_logger::LogFmt("Robot Run overran by %f s", dt);
         }
         _runTime += dt;
     }
@@ -145,7 +146,7 @@ void Robot::HandleNetCmd(const std::string &cmd, rapidjson::Document &doc) {
     try {
         (_netHandlers.at(cmd))(doc);
     } catch (std::exception &e) {
-        Utils::LogFmt("Robot::HandleNetCmd - Could not parse command %s: %s",
+        uchariot_logger::LogFmt("Robot::HandleNetCmd - Could not parse command %s: %s",
                       cmd, e.what());
     }
 }
@@ -158,7 +159,7 @@ void Robot::ManageController() {
         _mode = _newMode;
         modeToController(_mode).Load();
         _enabled = false;
-        Utils::LogFmt("Switching to active controller %s", modeToController(_mode).name);
+        uchariot_logger::LogFmt("Switching to active controller %s", modeToController(_mode).name);
     }
 }
 
@@ -186,14 +187,14 @@ bool Robot::loadConfig(std::string filePath) {
     // Read XML file and check if it is loaded correctly
     int res = doc.LoadFile(filePath.c_str());
     if (res != tinyxml2::XML_SUCCESS) {
-        Utils::LogFmt("Robot::loadConfig - Could not load file %s, Err Code: " "%i", filePath.c_str(), res);
+        uchariot_logger::LogFmt("Robot::loadConfig - Could not load file %s, Err Code: " "%i", filePath.c_str(), res);
         return false;
     }
 
     // Load path as data string and verfy output
     tinyxml2::XMLElement* robot = doc.FirstChildElement("robot");
     if (robot == nullptr) {
-        Utils::LogFmt("Robot::loadConfig - No robot element found");
+        uchariot_logger::LogFmt("Robot::loadConfig - No robot element found");
         return false;
     }
 
@@ -217,9 +218,9 @@ bool Robot::loadConfig(std::string filePath) {
         } else if (std::strcmp(line->Name(), _summonController.name.c_str()) == 0) {
             _summonController.Configure(line);
         } else {
-            Utils::LogFmt("Robot::LoadConfig - Could not read line in XML");
+            uchariot_logger::LogFmt("Robot::LoadConfig - Could not read line in XML");
         }
     }
-    Utils::LogFmt("Loaded Robot Config");
+    uchariot_logger::LogFmt("Loaded Robot Config");
     return true;
 }

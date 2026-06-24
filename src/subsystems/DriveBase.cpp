@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 #include "subsystems/DriveBase.h"
+#include "uchariot_logger.h"
 
 #include <cmath>
 
@@ -30,7 +31,7 @@ DriveBase::DriveBase()
 void DriveBase::Update(double dt) {
     //TODO: Add logging for drivebase speeds and voltages for debugging
     
-    // Utils::LogFmt("Drivebase Speeds: lb %f  lf %f  rb %f  sb %f",
+    // uchariot_logger::LogFmt("Drivebase Speeds: lb %f  lf %f  rb %f  sb %f",
     // _cmds._lb_speed, _cmds._lf_speed, _cmds._rb_speed, _cmds._rf_speed);
 
     const double maxAng = MAX_DRIVE_SPEED / ROBOT_WIDTH;

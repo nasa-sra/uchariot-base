@@ -1,5 +1,6 @@
 #include "VescController.h"
 
+#include "uchariot_logger.h"
 #include <stdio.h>
 
 #include "Utils.h"

@@ -1,9 +1,10 @@
 #include "CanConnection.h"
 
 #include <fcntl.h>
+#include "uchariot_logger.h"
 
 CanConnection::CanConnection() {
-    Utils::LogFmt("Setting up can0");
+    uchariot_logger::LogFmt("Setting up can0");
 
 #ifndef SIMULATION
     // system("sudo ip link set can0 up type can bitrate 500000 restart-ms 100");
@@ -11,12 +12,12 @@ CanConnection::CanConnection() {
     system("sudo ip link set can0 type can bitrate 500000");
     system("sudo ifconfig can0 up");
 
-    Utils::LogFmt("Connecting to can0");
+    uchariot_logger::LogFmt("Connecting to can0");
 
     // 1.Create socket
     _socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if (_socket < 0) {
-        Utils::ErrFmt("CAN socket PF_CAN failed");
+        uchariot_logger::ErrFmt("CAN socket PF_CAN failed");
     }
 
     // 2.Specify can0 device
@@ -24,7 +25,7 @@ CanConnection::CanConnection() {
     strcpy(ifr.ifr_name, "can0");
     int ret = ioctl(_socket, SIOCGIFINDEX, &ifr);
     if (ret < 0) {
-        Utils::ErrFmt("CAN socket ioctl failed");
+        uchariot_logger::ErrFmt("CAN socket ioctl failed");
     }
 
     // 3.Bind the socket to can0
@@ -33,7 +34,7 @@ CanConnection::CanConnection() {
     addr.can_ifindex = ifr.ifr_ifindex;
     ret = bind(_socket, (struct sockaddr*)&addr, sizeof(addr));
     if (ret < 0) {
-        Utils::ErrFmt("CAN socket bind failed");
+        uchariot_logger::ErrFmt("CAN socket bind failed");
     }
 
     setsockopt(_socket, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
@@ -80,13 +81,13 @@ void CanConnection::Send(CanFrame in_frame) {
     while (bytesleft > 0) {
         int nbytes = write(_socket, &frame, bytesleft);
         if (nbytes == -1) {
-            Utils::LogFmt("CanConnection::Send Error on write - %s",
+            uchariot_logger::LogFmt("CanConnection::Send Error on write - %s",
                           std::strerror(errno));
             break;
         }
         bytesleft -= nbytes;
         if (count > 100) {
-            Utils::LogFmt("Failed to send can frame");
+            uchariot_logger::LogFmt("Failed to send can frame");
             break;
         }
         count++;
@@ -125,7 +126,7 @@ void CanConnection::Recieve() {
         FD_SET(_socket, &fds);
 
         if (select(_socket + 1, &fds, NULL, NULL, &tv) == -1) {
-            Utils::ErrFmt("CanConnection:Recieve - Error on select");
+            uchariot_logger::ErrFmt("CanConnection:Recieve - Error on select");
         }
         if (FD_ISSET(_socket, &fds)) {
             nbytes = read(_socket, &frame, sizeof(frame));
@@ -153,7 +154,7 @@ void CanConnection::LogFrame(CanFrame frame) {
 }
 
 void CanConnection::CloseConnection() {
-    Utils::LogFmt("Closing can network");
+    uchariot_logger::LogFmt("Closing can network");
     _running = false;
     _receiveThread.join();
 #ifndef SIMULATION

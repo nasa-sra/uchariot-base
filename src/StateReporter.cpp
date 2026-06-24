@@ -8,6 +8,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 #include "Utils.h"
+#include "uchariot_logger.h"
 
 #include "StateReporter.h"
 
@@ -282,7 +283,7 @@ void StateReporter::buildDoc(rapidjson::Value& doc, TreeNode* current,
  * determine the next member to visit. If the key contains multiple members, it
  * will recursively call itself to climb deeper into the JSON document. If the
  * key does not exist in the JSON document, it logs an error message using the
- * Utils::LogFmt function.
+ * uchariot_logger::LogFmt function.
  *
  * @param doc The rapidjson::Value object representing the JSON document to be
  * climbed.
@@ -301,7 +302,7 @@ rapidjson::Value::MemberIterator StateReporter::climbDoc(rapidjson::Value& doc,
     std::string nextBranch = key.substr(0, delim);
     auto member = doc.FindMember(nextBranch.c_str());
     if (member == doc.MemberEnd()) {
-        Utils::LogFmt("StateReporter::climbDoc - Failed to find branch %s",
+        uchariot_logger::LogFmt("StateReporter::climbDoc - Failed to find branch %s",
                       nextBranch.c_str());
     }
     return climbDoc(member->value, key.substr(delim + 1));
@@ -360,7 +361,7 @@ void StateReporter::sendState() {
         int rate = 10;  // Hz
         double dt = Utils::ScheduleRate(rate, start_time);
         if (dt > 1.0 / rate) {
-            Utils::LogFmt("StateReporter sendState overran by %f s", dt);
+            uchariot_logger::LogFmt("StateReporter sendState overran by %f s", dt);
         }
         _stateRefreshed = false;
     }
@@ -370,7 +371,7 @@ bool StateReporter::initLogFile() {
     struct stat sb;
     if (stat("./logs", &sb) != 0) {
         if (mkdir("./logs/", 0777) != 0) {
-            Utils::LogFmt("StateReporter - Failed to create logs directory");
+            uchariot_logger::LogFmt("StateReporter - Failed to create logs directory");
             return false;
         }
     }
@@ -379,7 +380,7 @@ bool StateReporter::initLogFile() {
         "./logs/" + Utils::CurrentDateTimeStr("%Y-%m-%d_%H%M%S") + ".csv";
     _logFile.open(logPath);
     if (!_logFile.is_open()) {
-        Utils::LogFmt("StateReporter - Failed to open log file at %s",
+        uchariot_logger::LogFmt("StateReporter - Failed to open log file at %s",
                       logPath.c_str());
         _logging = false;
         return false;
@@ -398,7 +399,7 @@ bool StateReporter::initLogFile() {
 
 void StateReporter::logState() {
     if (_logVarCount != _state.size()) {
-        Utils::LogFmt(
+        uchariot_logger::LogFmt(
             "StateReporter - logState:variables have been added to the state "
             "after logging init");
         return;

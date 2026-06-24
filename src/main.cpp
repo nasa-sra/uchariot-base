@@ -11,6 +11,7 @@
 #include "MessageQueue.h"
 #include "NetworkManager.h"
 #include "Robot.h"
+#include "uchariot_logger.h"
 #include "StateReporter.h"
 #include "Utils.h"
 

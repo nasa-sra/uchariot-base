@@ -1,6 +1,8 @@
 
 #include "controllers/SummonController.h"
 
+#include "uchariot_logger.h"
+
 SummonController::SummonController(Localization* localization, Vision* vision) : ControllerBase("summon"), 
     _vision(vision),
     _localization(localization) {}
@@ -61,7 +63,7 @@ ControlCmds SummonController::Run(ControlCmds cmds) {
 
     if (_runningTracking) {
         if (_targetDet.pose.z() < _stopDistance) {
-            Utils::LogFmt("Arrived at summon");
+            uchariot_logger::LogFmt("Arrived at summon");
             _runningTracking = false;
         }
 
@@ -73,7 +75,7 @@ ControlCmds SummonController::Run(ControlCmds cmds) {
 }
 
 void SummonController::Summon(Utils::GeoPoint target) {
-    Utils::LogFmt("Robot Summoned to %f, %f", target.lat, target.lon);
+    uchariot_logger::LogFmt("Robot Summoned to %f, %f", target.lat, target.lon);
     _targetPos = Utils::geoToLTP(target, _localization->GetGeoLocation()).head<2>();
     _summoned = true;
 }

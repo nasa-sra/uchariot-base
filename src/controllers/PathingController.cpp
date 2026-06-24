@@ -3,7 +3,9 @@
 #include <filesystem>
 
 #include "pathgen/PathGenerator.h"
+#include "uchariot_logger.h"
 #include "tinyxml2.h"
+#include "Utils.h"
 
 PathingController::PathingController(Localization* localization, Vision* vision)
     : ControllerBase("pathing") {
@@ -156,7 +158,7 @@ bool PathingController::loadPath(std::string filePath) {
  * otherwise.
  */
 bool PathingController::loadXMLPath(std::string filePath) {
-    Utils::LogFmt("Loading XML Auton... ");
+    uchariot_logger::LogFmt("Loading XML Auton... ");
 
     _path.clear();
     tinyxml2::XMLDocument doc;
@@ -166,7 +168,7 @@ bool PathingController::loadXMLPath(std::string filePath) {
     // Read XML file and check if it is loaded correctly
     int res = doc.LoadFile(filePath.c_str());
     if (res != tinyxml2::XML_SUCCESS) {
-        Utils::LogFmt(
+        uchariot_logger::LogFmt(
             "PathingContoller::loadXMLPath - Could not load file %s, Err Code: "
             "%i",
             filePath.c_str(), res);
@@ -176,7 +178,7 @@ bool PathingController::loadXMLPath(std::string filePath) {
     // Load path as data string and verfy output
     tinyxml2::XMLElement* path = doc.FirstChildElement("path");
     if (path == nullptr) {
-        Utils::LogFmt("PathingContoller::loadXMLPath - No path element found");
+        uchariot_logger::LogFmt("PathingContoller::loadXMLPath - No path element found");
         return false;
     }
 
@@ -261,13 +263,13 @@ bool PathingController::loadXMLPath(std::string filePath) {
                 _path.push_back(step);
             }
         } else {
-            Utils::LogFmt(
+            uchariot_logger::LogFmt(
                 "PathingContoller::loadXMLPath - Could not read line in XML "
                 "path");
         }
     }
     _path.back().tolerance = _endTolerance;
-    Utils::LogFmt("Loaded Auton with %i points", _path.size());
+    uchariot_logger::LogFmt("Loaded Auton with %i points", _path.size());
     return true;
 }
 
@@ -286,7 +288,7 @@ bool PathingController::loadXMLPath(std::string filePath) {
  * otherwise.
  */
 bool PathingController::loadKMLPath(std::string filePath) {
-    Utils::LogFmt("Loading KML Auton... ");
+    uchariot_logger::LogFmt("Loading KML Auton... ");
 
     // Generate path from KML file using PathGenerator
     if (PathGenerator::GeneratePath(filePath, _pathSpeed, _pathRadius) != 0)
@@ -311,7 +313,7 @@ bool PathingController::loadKMLPath(std::string filePath) {
         _path.push_back(step);
     }
 
-    Utils::LogFmt("Loaded Auton");
+    uchariot_logger::LogFmt("Loaded Auton");
     return true;
 }
 

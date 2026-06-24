@@ -1,6 +1,7 @@
 
 #include "subsystems/Vision.h"
 
+#include "uchariot_logger.h"
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
 
@@ -12,7 +13,7 @@ Vision::Vision() :
 
 void Vision::Update(double dt) {
     if (!_detectionsMutex.try_lock()) {
-        Utils::LogFmt("Vision::Update failed to get detections lock");
+        uchariot_logger::LogFmt("Vision::Update failed to get detections lock");
         return;
     }
 
@@ -32,7 +33,7 @@ void Vision::handleUpdate(std::string tag, rapidjson::Document &doc) {
 
     try {
         if (doc.HasParseError())
-            throw std::runtime_error(Utils::StrFmt(
+            throw std::runtime_error(uchariot_logger::StrFmt(
                 "JSON Parse Error offset %u: %s",
                 (unsigned)doc.GetErrorOffset(),
                 rapidjson::GetParseError_En(doc.GetParseError())));
@@ -71,14 +72,14 @@ void Vision::handleUpdate(std::string tag, rapidjson::Document &doc) {
             detections.push_back(det);
         }
     } catch (std::exception& e) {
-        Utils::LogFmt("Vision::updateDetections - Error: %s", e.what());
+        uchariot_logger::LogFmt("Vision::updateDetections - Error: %s", e.what());
     }
 
     if (_detectionsMutex.try_lock()) {
         _detections = detections;
         _detectionsMutex.unlock();
     } else {
-        Utils::LogFmt("Vision::updateDetections failed to get detections lock");
+        uchariot_logger::LogFmt("Vision::updateDetections failed to get detections lock");
     }
 }
 

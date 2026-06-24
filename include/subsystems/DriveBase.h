@@ -2,6 +2,7 @@
 
 #include "StateReporter.h"
 #include "VescController.h"
+#include "uchariot_logger.h"
 #include "subsystems/SubsystemBase.h"
 
 #define ROBOT_WIDTH 1.0      // m (yes really)
@@ -30,7 +31,7 @@ class DriveBase : public SubsystemBase {
 
     // void SetObstacleDetected(bool obstacleDetected) {
     //     _obstacleDetected = obstacleDetected;
-    //     Utils::LogFmt("Obstacle detected: %s",
+    //     uchariot_logger::LogFmt("Obstacle detected: %s",
     //                   obstacleDetected ? "true" : "false");
     // }
 

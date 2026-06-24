@@ -1,5 +1,6 @@
 #include "MessageQueue.h"
 
+#include "uchariot_logger.h"
 MessageQueue::MessageQueue(const std::string& name,
                            std::function<void(std::string)> callback) {
     _name = name.c_str();
@@ -8,7 +9,7 @@ MessageQueue::MessageQueue(const std::string& name,
 
     _msgid = msgget(_key, 0666 | IPC_CREAT);
     if (_msgid == -1) {
-        Utils::LogFmt("MessageQueue Failed to create message queue Error: %s",
+        uchariot_logger::LogFmt("MessageQueue Failed to create message queue Error: %s",
                       strerror(errno));
     }
 
@@ -17,7 +18,7 @@ MessageQueue::MessageQueue(const std::string& name,
 }
 
 void MessageQueue::Close() {
-    Utils::LogFmt("Closing message queue");
+    uchariot_logger::LogFmt("Closing message queue");
     _running = false;
     _recieveThread.join();
 }
@@ -33,7 +34,7 @@ void MessageQueue::recieve() {
             for (int i = 0; i < ms_data.msg_qnum; i++) {
                 bytesRead = msgrcv(_msgid, &buf, sizeof(buf), 1, IPC_NOWAIT);
                 if (bytesRead == -1) {
-                    Utils::LogFmt(
+                    uchariot_logger::LogFmt(
                         "MessageQueue::Recieve - Error recieving: %s",
                         strerror(errno));
                 }

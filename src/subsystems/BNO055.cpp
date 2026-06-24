@@ -2,6 +2,7 @@
 #include "subsystems/BNO055.h"
 #include "spdlog/spdlog.h"
 #include "StateReporter.h"
+#include "uchariot_logger.h"
 
 #define BNO055_ADDR 0x28
 
@@ -20,12 +21,12 @@ BNO055::BNO055() : IMUBase() {
     snprintf(filename, 19, "/dev/i2c-%d", _adapter_nr);
     _imuFd = open(filename, O_RDWR);
     if (_imuFd < 0) {
-        Utils::ErrFmt("Failed to open communication for I2C address %d",
+        uchariot_logger::ErrFmt("Failed to open communication for I2C address %d",
                       BNO055_ADDR);
     }
 
     if (ioctl(_imuFd, I2C_SLAVE, BNO055_ADDR) < 0) {
-        Utils::ErrFmt("Failed to configure the parameters for I2C atododdress %d",
+        uchariot_logger::ErrFmt("Failed to configure the parameters for I2C atododdress %d",
                       BNO055_ADDR);
     }
     uint8_t status = ReadRegister8(STATUS_REG);
@@ -35,11 +36,11 @@ BNO055::BNO055() : IMUBase() {
     uint8_t calib_status = ReadRegister8(CALIB_STATUS_REG);
 
     //TODO: Add more logging statuses to debugging IMU issues
-    Utils::LogFmt("Connected to BNO055 IMU Status %i, Calibration %i", status,
+    uchariot_logger::LogFmt("Connected to BNO055 IMU Status %i, Calibration %i", status,
                   (calib_status & 0b11000000) >> 6);
     if (status == 1) {
         uint8_t err = ReadRegister8(ERR_REG);
-        Utils::LogFmt("BNO055 Error Code %i", err);
+        uchariot_logger::LogFmt("BNO055 Error Code %i", err);
     }
 }
 
@@ -73,7 +74,7 @@ int BNO055::ReadRegister8(uint8_t register_add) {
 
     res = i2c_smbus_read_word_data(_imuFd, register_add);
     if (res < 0) {
-        Utils::ErrFmt("Read from I2C address %d failed", BNO055_ADDR);
+        uchariot_logger::ErrFmt("Read from I2C address %d failed", BNO055_ADDR);
         return -1;
     } else {
         return res;
@@ -120,7 +121,7 @@ int BNO055::ReadRegister16(uint8_t lsb_register_add) {
 int BNO055::writeRegister(uint8_t register_addr, uint8_t value) {
     int res = i2c_smbus_write_word_data(_imuFd, register_addr, value);
     if (res < 0) {
-        Utils::ErrFmt("Write to I2C address %d failed", BNO055_ADDR);
+        uchariot_logger::ErrFmt("Write to I2C address %d failed", BNO055_ADDR);
         return -1;
     }
 

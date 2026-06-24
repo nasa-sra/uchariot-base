@@ -1,6 +1,7 @@
 #include "subsystems/Localization.h"
 
 #include "Utils.h"
+#include "uchariot_logger.h"
 
 Localization::Localization(DriveBase* driveBase, IMUBase* imu, Vision* vision,
                            GPS* gps) {
@@ -31,7 +32,7 @@ void Localization::Update(double dt) {
     }
     _geoPos = Utils::LTPToGeo({_pose.pos[0], _pose.pos[1], 0.0}, _origin);
 
-    // Utils::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs,
+    // uchariot_logger::LogFmt("IMU %.4f    RS %.4f    ERR %.4f", heading_imu, heading_rs,
     // heading_imu - heading_rs);
 
     if (_useOdometryHeading) {

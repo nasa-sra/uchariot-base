@@ -2,6 +2,7 @@
 #include "pathgen/PathGenerator.h"
 
 #include "tinyxml2.h"
+#include "uchariot_logger.h"
 
 using namespace tinyxml2;
 
@@ -61,7 +62,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms,
         ("paths/" + filename.substr(0, filename.size() - 4) + ".kml").c_str());
 
     if (res != tinyxml2::XML_SUCCESS) {
-        Utils::LogFmt(
+        uchariot_logger::LogFmt(
             "PathingContoller::loadPath - Could not load file %s, Err Code: %i",
             filename, res);
         return -1;
@@ -75,7 +76,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms,
                            ->FirstChildElement("coordinates");
 
     if (path == nullptr) {
-        Utils::LogFmt(
+        uchariot_logger::LogFmt(
             "PathingContoller::loadPath - Could not load data, Err Code: %i",
             res);
         return -2;
@@ -143,7 +144,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms,
         curve->add_way_point(finPoints[i]);
     }
 
-    Utils::PrintLnFmt("Nodes: %i", curve->node_count());
+    uchariot_logger::PrintLnFmt("Nodes: %i", curve->node_count());
     std::cout << curve->total_length() << "\n";
 
     std::string pathFinalString = "";
@@ -171,7 +172,7 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms,
         ("paths/" + filename.substr(0, filename.size() - 4) + ".xml").c_str(),
         "w");
     if (fp == NULL) {
-        Utils::LogFmt("Write Failed");
+        uchariot_logger::LogFmt("Write Failed");
         return -3;
     }
 
