@@ -16,6 +16,7 @@ Minimum CMake version is 3.16.
 | libgps | connecting to gpsd server | sudo apt install libgps-dev | 
 | rapidjson | json parsing | header-only |
 | tinyxml | XML parsing | header-only |
+| spdlog | Logging interface | header-only |
 
 ## Crosscompiling
 

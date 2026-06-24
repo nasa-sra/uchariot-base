@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 #define _USE_MATH_DEFINES
-#include <gps.h>
+#include <GPS.h>
 #include <sys/time.h>
 
 #include <Eigen/Core>
@@ -54,20 +54,7 @@ T Clamp(T val, T upperBound, T lowerBound) {
     return std::min(std::max(val, lowerBound), upperBound);
 }
 
-// A constant expression function that converts std::string
-// types to char* C strings in variatic argument lists. The
-// function works by evaulating if a given type is of the
-// std::string type. If so, it returns the result of .c_str(),
-// otherwise, it just returns the param. This is designed to
-// be used in variatic argument comprehention.
-template <typename T>
-auto _convert(T&& t) {
-    if constexpr (std::is_same<std::remove_cv_t<std::remove_reference_t<T>>,
-                               std::string>::value)
-        return std::forward<T>(t).c_str();
-    else
-        return std::forward<T>(t);
-}
+
 
 
 // Returns true if element x is present inside of the vector v.
