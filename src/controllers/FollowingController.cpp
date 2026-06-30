@@ -4,9 +4,8 @@
 FollowingController::FollowingController(Vision* vision) : ControllerBase("following"), _vision(vision) {}
 
 void FollowingController::Configure(tinyxml2::XMLElement* xml) {
-    const char * targetNameC;
-    xml->QueryStringAttribute("targetName", &targetNameC);
-    _targetName = std::string(targetNameC);
+    const char* targetNameC = xml->Attribute("targetName");
+    if (targetNameC) _targetName = std::string(targetNameC);
     xml->QueryDoubleAttribute("maxFollowDistance", &_maxFollowDistance);
     xml->QueryDoubleAttribute("minFollowDistance", &_minFollowDistance);
     xml->QueryDoubleAttribute("distanceFilterAlpha", &_distanceFilterAlpha);

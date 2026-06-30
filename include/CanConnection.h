@@ -20,14 +20,14 @@
 #include "Utils.h"
 struct CanFrame {
     uint32_t arb_id;
-    uint8_t* data;
+    uint8_t data[8];
     size_t len;
 
-    CanFrame() {}
-    CanFrame(uint32_t arb_id, uint8_t* data, size_t len)
-        : arb_id(arb_id), data(data), len(len) {};
+    CanFrame() : arb_id(0), len(0) {}
+    CanFrame(uint32_t arb_id, const uint8_t* src, size_t len)
+        : arb_id(arb_id), len(len) { memcpy(data, src, len); }
     CanFrame(struct can_frame frame)
-        : arb_id(frame.can_id), data(frame.data), len(frame.len) {};
+        : arb_id(frame.can_id), len(frame.len) { memcpy(data, frame.data, frame.len); }
 };
 
 class CanConnection {

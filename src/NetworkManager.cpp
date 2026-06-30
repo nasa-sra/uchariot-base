@@ -111,7 +111,10 @@ void NetworkManager::acceptConnection() {
             Utils::LogFmt("%s - New client %i connected", _name, conn);
         }
         _clientNum++;
-        _clientSockets.push_back(conn);
+        {
+            std::lock_guard<std::mutex> lock(_socketsMutex);
+            _clientSockets.push_back(conn);
+        }
     }
 }
 
@@ -149,9 +152,12 @@ void NetworkManager::receivePacket(int fd) {
         } else {
             Utils::LogFmt("%s - Error on recv", _name);
         }
-        _clientSockets.erase(
-            std::remove(_clientSockets.begin(), _clientSockets.end(), fd),
-            _clientSockets.end());
+        {
+            std::lock_guard<std::mutex> lock(_socketsMutex);
+            _clientSockets.erase(
+                std::remove(_clientSockets.begin(), _clientSockets.end(), fd),
+                _clientSockets.end());
+        }
         _clientNum--;
         close(fd);
         FD_CLR(fd, &_fds);
@@ -234,6 +240,7 @@ void NetworkManager::handlePacket(char* buffer, int start, size_t len) {
  * error message and continues sending data to the remaining clients.
  */
 void NetworkManager::SendAll(const char* buffer, int len) {
+    std::lock_guard<std::mutex> lock(_socketsMutex);
     for (int fd : _clientSockets) {
         Send(fd, buffer, len);
     }
@@ -282,8 +289,11 @@ void NetworkManager::CloseConnections() {
     _running = false;
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    for (int fd : _clientSockets) {
-        close(fd);
+    {
+        std::lock_guard<std::mutex> lock(_socketsMutex);
+        for (int fd : _clientSockets) {
+            close(fd);
+        }
     }
     close(_net_socket);
 

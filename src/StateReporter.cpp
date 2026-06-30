@@ -150,8 +150,10 @@ void StateReporter::genericUpdateKey(std::string key,
         addKey(key, val);
     } else {
         it->second->value = val;
-        if (it->second->json != nullptr)
+        if (it->second->json != nullptr) {
+            std::lock_guard<std::mutex> lock(_docMutex);
             val.setJsonValue(it->second->json, _doc.GetAllocator());
+        }
     }
 }
 
@@ -351,9 +353,12 @@ void StateReporter::sendState() {
         }
 
         strbuf.Clear();
-        // rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
-        rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
-        _doc.Accept(writer);
+        {
+            std::lock_guard<std::mutex> lock(_docMutex);
+            // rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
+            rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
+            _doc.Accept(writer);
+        }
 
         _network->SendAll(strbuf.GetString(), strbuf.GetSize());
 

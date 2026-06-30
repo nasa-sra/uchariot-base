@@ -67,14 +67,15 @@ int PathGenerator::GeneratePath(std::string filename, double speed_ms,
         return -1;
     }
 
-    XMLElement* path = doc.FirstChildElement("kml")
-                           ->FirstChildElement("Document")
-                           ->FirstChildElement("Folder")
-                           ->FirstChildElement("Placemark")
-                           ->FirstChildElement("LineString")
-                           ->FirstChildElement("coordinates");
+    XMLElement* path = nullptr;
+    if (auto* kml = doc.FirstChildElement("kml"))
+    if (auto* document = kml->FirstChildElement("Document"))
+    if (auto* folder = document->FirstChildElement("Folder"))
+    if (auto* placemark = folder->FirstChildElement("Placemark"))
+    if (auto* linestring = placemark->FirstChildElement("LineString"))
+        path = linestring->FirstChildElement("coordinates");
 
-    if (path == nullptr) {
+    if (path == nullptr || path->GetText() == nullptr) {
         Utils::LogFmt(
             "PathingContoller::loadPath - Could not load data, Err Code: %i",
             res);

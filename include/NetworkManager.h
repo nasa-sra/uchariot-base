@@ -3,6 +3,7 @@
 #include "rapidjson/document.h"
 #include <cstdio>
 #include <functional>
+#include <mutex>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <thread>
@@ -43,6 +44,7 @@ private:
 
     bool _running{false};
     std::thread _serverThread;
+    std::mutex _socketsMutex;
 
     PacketCallback _packetCallback;
 };

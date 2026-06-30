@@ -90,7 +90,7 @@ void VescController::readStatus1Packet(uint8_t* data) {
 
 void VescController::readStatus5Packet(uint8_t* data) {
     std::reverse(data, data + 8);  // Convert to little endian
-    int32_t buf;
+    int16_t buf;
     memcpy(&buf, data + 2, 2);
     _voltageIn = buf / 10;
     // ignore tachometer

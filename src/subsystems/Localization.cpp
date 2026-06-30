@@ -24,7 +24,7 @@ void Localization::Update(double dt) {
     _pose.pos += vel * dt;
 
     gps_fix_t fix = _gps->GetFix();
-    if (fix.time.tv_nsec != _lastGPSUpdate.tv_nsec &&
+    if (fix.time.tv_nsec != _lastGPSUpdate.tv_nsec ||
         fix.time.tv_sec != _lastGPSUpdate.tv_sec) {
         _pose.pos = Utils::geoToLTP(Utils::GeoPoint(fix), _origin).head<2>();
         _lastGPSUpdate = fix.time;

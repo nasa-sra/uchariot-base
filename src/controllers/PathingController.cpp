@@ -205,7 +205,7 @@ bool PathingController::loadXMLPath(std::string filePath) {
             double speed = 0.0;
             line->QueryDoubleAttribute("speed", &speed);
             float tolerance = 0.0;
-            path->QueryFloatAttribute("tolerance", &tolerance);
+            line->QueryFloatAttribute("tolerance", &tolerance);
 
             if (speed == 0.0) {
                 speed = pathSpeed;
@@ -215,6 +215,10 @@ bool PathingController::loadXMLPath(std::string filePath) {
             }
 
             const char* coords = line->GetText();
+            if (!coords) {
+                Utils::LogFmt("PathingController::loadXMLPath - Empty coordinates element, skipping");
+                continue;
+            }
 
             std::string str(coords);
             std::stringstream ss(str);
@@ -238,7 +242,7 @@ bool PathingController::loadXMLPath(std::string filePath) {
             double speed = 0.0;
             line->QueryDoubleAttribute("speed", &speed);
             float tolerance = 0.0;
-            path->QueryFloatAttribute("tolerance", &tolerance);
+            line->QueryFloatAttribute("tolerance", &tolerance);
 
             if (speed == 0.0) {
                 speed = pathSpeed;
@@ -248,6 +252,10 @@ bool PathingController::loadXMLPath(std::string filePath) {
             }
 
             const char* coords = line->GetText();
+            if (!coords) {
+                Utils::LogFmt("PathingController::loadXMLPath - Empty points element, skipping");
+                continue;
+            }
 
             std::string str(coords);
             std::stringstream ss(str);
@@ -266,9 +274,11 @@ bool PathingController::loadXMLPath(std::string filePath) {
                 "path");
         }
     }
-    _path.back().tolerance = _endTolerance;
+    if (!_path.empty()) {
+        _path.back().tolerance = _endTolerance;
+    }
     Utils::LogFmt("Loaded Auton with %i points", _path.size());
-    return true;
+    return !_path.empty();
 }
 
 /**

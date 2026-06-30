@@ -69,7 +69,7 @@ void BNO055::Update(double dt) {
 int BNO055::ReadRegister8(uint8_t register_add) {
     int32_t res;
 
-    res = i2c_smbus_read_word_data(_imuFd, register_add);
+    res = i2c_smbus_read_byte_data(_imuFd, register_add);
     if (res < 0) {
         Utils::ErrFmt("Read from I2C address %d failed", BNO055_ADDR);
         return -1;
@@ -116,7 +116,7 @@ int BNO055::ReadRegister16(uint8_t lsb_register_add) {
  * - -1: The write operation failed.
  */
 int BNO055::writeRegister(uint8_t register_addr, uint8_t value) {
-    int res = i2c_smbus_write_word_data(_imuFd, register_addr, value);
+    int res = i2c_smbus_write_byte_data(_imuFd, register_addr, value);
     if (res < 0) {
         Utils::ErrFmt("Write to I2C address %d failed", BNO055_ADDR);
         return -1;

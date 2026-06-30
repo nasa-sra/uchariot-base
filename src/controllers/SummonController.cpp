@@ -11,9 +11,8 @@ void SummonController::Configure(tinyxml2::XMLElement* xml) {
     xml->QueryDoubleAttribute("headingKp", &_headingKp);
     xml->QueryDoubleAttribute("transitionDistance", &_transitionDistance);
     xml->QueryDoubleAttribute("stopDistance", &_stopDistance);
-    const char* targetNameC;
-    xml->QueryStringAttribute("targetName", &targetNameC);
-    _targetName = std::string(targetNameC);
+    const char* targetNameC = xml->Attribute("targetName");
+    if (targetNameC) _targetName = std::string(targetNameC);
 }
 
 void SummonController::Load() {

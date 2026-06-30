@@ -26,7 +26,10 @@ public:
     void ReportState(std::string prefix = "/");
 
     double GetClosestDetectionDisance() { return _closestDetectionDistance; }
-    std::vector<Detection> GetDetections() { return _detections; }
+    std::vector<Detection> GetDetections() {
+        std::lock_guard<std::mutex> lock(_detectionsMutex);
+        return _detections;
+    }
 
 private:
 

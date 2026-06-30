@@ -52,6 +52,8 @@ void Vision::handleUpdate(std::string tag, rapidjson::Document &doc) {
                 throw std::runtime_error("JSON detection without proper x");
             if (!jsonDets[i].HasMember("y") || !jsonDets[i]["y"].IsDouble())
                 throw std::runtime_error("JSON detection without proper y");
+            if (!jsonDets[i].HasMember("z") || !jsonDets[i]["z"].IsDouble())
+                throw std::runtime_error("JSON detection without proper z");
 
             Detection det;
             det.name = jsonDets[i]["name"].GetString();

@@ -1,8 +1,10 @@
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <fstream>
 #include <map>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -89,8 +91,9 @@ class StateReporter {
     std::ofstream _logFile;
     std::chrono::time_point<std::chrono::steady_clock> _startTime;
 
-    bool _stateRefreshed{false};
+    std::atomic<bool> _stateRefreshed{false};
     bool _telemetry{false};
     std::thread _telemetryThread;
     NetworkManager* _network{nullptr};
+    std::mutex _docMutex;
 };
