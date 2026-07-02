@@ -1,8 +1,10 @@
+#pragma once
 
 #include "SubsystemBase.h"
+#include "StateReporter.h"
 
 //
-class VoltageMeter : public SubsystemBase {
+class VoltageMeterBase : public SubsystemBase {
    public:
     VoltageMeter();
     void Update(double dt) override;
@@ -12,6 +14,10 @@ class VoltageMeter : public SubsystemBase {
         StateReporter::GetInstance().UpdateKey(prefix + "current", _current);
         StateReporter::GetInstance().UpdateKey(prefix + "power", _power);
     };
+
+    float GetVoltage() { return _voltage; }
+    float GetCurrent() { return _current; }
+    float GetPower() { return _power; }
 
    private:
     float _voltage = 0.0f;
