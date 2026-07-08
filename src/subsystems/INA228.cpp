@@ -113,18 +113,48 @@ int INA228::writeRegister(uint8_t register_addr, uint8_t value) {
     return res;
 }
 
-
+//TODO: Get actual scaling factors for values below
 float INA228::GetBusVoltage() {
     int voltage_raw = ReadRegister16(Register::VBUS);
     if (voltage_raw < 0) {
         return 0.0f;
     }
-    return static_cast<float>(voltage_raw) * 0.00125f; // Convert to volts
+    return static_cast<float>(voltage_raw) * 0.00125f; // Convert to volts 
 }
 
 // GetShuntVoltage()
+float INA228::GetShuntVOltage() {
+    int shunt_voltage_raw = ReadRegister16(Register::VSHUNT);
+    if (shunt_voltage_raw < 0) {
+        return 0.0f;
+    }
+    return static_cast<float>(shunt_voltage_raw) * 0.0001f; // Convert to volts
+}
 
 // GetPower()
+float INA228::GetPower() {
+    int power_raw = ReadRegister16(Register::POWER);
+    if (power_raw < 0) {
+        return 0.0f;
+    }
+    return static_cast<float>(power_raw) * 0.025f; // Convert to watts
+}
+
+float INA228::GetEnergy() {
+    int energy_raw = ReadRegister16(Register::ENERGY);
+    if (energy_raw < 0) {
+        return 0.0f;
+    }
+    return static_cast<float>(energy_raw) * 0.0001f; // Convert to watt-hours
+}
+
+float INA228::GetCharge() {
+    int charge_raw = ReadRegister16(Register::CHARGE);
+    if (charge_raw < 0) {
+        return 0.0f;
+    }
+    return static_cast<float>(charge_raw) * 0.0001f; // Convert to coulombs
+}
 
 // SetShuntCalibration()
 
