@@ -6,7 +6,7 @@
 //
 class VoltageMeterBase : public SubsystemBase {
    public:
-    VoltageMeter();
+    VoltageMeterBase();
     void Update(double dt) override;
     void ReportState(std::string prefix = "/") {
         prefix += "voltageMeter/";
@@ -15,17 +15,17 @@ class VoltageMeterBase : public SubsystemBase {
         StateReporter::GetInstance().UpdateKey(prefix + "power", _power);
     };
 
-    float GetVoltage() { return _voltage; }
-    float GetCurrent() { return _current; }
-    float GetPower() { return _power; }
+    virtual float GetVoltage() { return _voltage; }
+    virtual float GetCurrent() { return _current; }
+    virtual float GetPower() { return _power; }
 
-   private:
+   protected:
     float _voltage = 0.0f;
     float _current = 0.0f;
     float _power = 0.0f;
 };
 
-class SimVoltageMeter : public VoltageMeter {
+class SimVoltageMeter : public VoltageMeterBase {
    public:
     void Update(double dt) override;
 };
