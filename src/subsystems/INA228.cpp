@@ -50,6 +50,7 @@ void INA228::Update(double dt) {
     int voltage_raw = ReadRegister16(Register::VBUS);
     int current_raw = ReadRegister16(Register::CURRENT);
     int power_raw = ReadRegister16(Register::POWER);
+    int temperature_raw = ReadRegister16(Register::DIE_TEMP);
 
     if (voltage_raw >= 0) {
         _voltage = static_cast<float>(voltage_raw) * 0.00125f;
@@ -59,6 +60,9 @@ void INA228::Update(double dt) {
     }
     if (power_raw >= 0) {
         _power = static_cast<float>(power_raw) * 0.025f;
+    }
+    if (temperature_raw >= 0) {
+        _temperature = static_cast<float>(temperature_raw) * 0.125f;
     }
 }
 
@@ -113,12 +117,13 @@ int INA228::writeRegister(uint8_t register_addr, uint8_t value) {
     return res;
 }
 
-//TODO: Get actual scaling factors for values below
+
 float INA228::GetBusVoltage() {
     int voltage_raw = ReadRegister16(Register::VBUS);
     if (voltage_raw < 0) {
         return 0.0f;
     }
+    //TODO: Get actual scaling factors for values below
     return static_cast<float>(voltage_raw) * 0.00125f; // Convert to volts 
 }
 
@@ -128,6 +133,7 @@ float INA228::GetShuntVOltage() {
     if (shunt_voltage_raw < 0) {
         return 0.0f;
     }
+    //TODO: Get actual scaling factors for values below
     return static_cast<float>(shunt_voltage_raw) * 0.0001f; // Convert to volts
 }
 
@@ -137,6 +143,7 @@ float INA228::GetPower() {
     if (power_raw < 0) {
         return 0.0f;
     }
+    //TODO: Get actual scaling factors for values below
     return static_cast<float>(power_raw) * 0.025f; // Convert to watts
 }
 
@@ -145,6 +152,7 @@ float INA228::GetEnergy() {
     if (energy_raw < 0) {
         return 0.0f;
     }
+    //TODO: Get actual scaling factors for values below
     return static_cast<float>(energy_raw) * 0.0001f; // Convert to watt-hours
 }
 
@@ -153,6 +161,7 @@ float INA228::GetCharge() {
     if (charge_raw < 0) {
         return 0.0f;
     }
+    //TODO: Get actual scaling factors for values below
     return static_cast<float>(charge_raw) * 0.0001f; // Convert to coulombs
 }
 

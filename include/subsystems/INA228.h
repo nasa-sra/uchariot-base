@@ -45,11 +45,12 @@ class INA228 : public VoltageMeterBase {
     void Update(double dt) override;
 
     float GetVoltage() override;
-    float GetBusVoltage();
-    float GetShuntVOltage();
     float GetCurrent() override;
     float GetPower() override;
-    float GetTemperature();
+    float GetTemperature() override;
+    
+    float GetBusVoltage();
+    float GetShuntVOltage();
     float GetEnergy();
     float GetCharge();
 

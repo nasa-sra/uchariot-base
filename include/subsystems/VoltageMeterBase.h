@@ -18,11 +18,14 @@ class VoltageMeterBase : public SubsystemBase {
     virtual float GetVoltage() { return _voltage; }
     virtual float GetCurrent() { return _current; }
     virtual float GetPower() { return _power; }
+    virtual float GetTemperature() { return _temperature; }
 
    protected:
     float _voltage = 0.0f;
     float _current = 0.0f;
     float _power = 0.0f;
+    float _temperature = 0.0f;
+
 };
 
 class SimVoltageMeter : public VoltageMeterBase {

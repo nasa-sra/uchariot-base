@@ -18,6 +18,7 @@
 #include "subsystems/GPS.h"
 #include "subsystems/Vision.h"
 #include "subsystems/Localization.h"
+#include "subsystems/INA228.h"
 #ifndef SIMULATION
 #include "subsystems/BNO055.h"
 #else
@@ -61,6 +62,7 @@ class Robot {
 #endif
     GPS _gps;
     Localization _localization;
+    INA228 _voltageMeter;
 
     std::string _active_controller_name, _last_controller_name;
     ControllerBase *_active_controller;

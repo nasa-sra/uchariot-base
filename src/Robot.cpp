@@ -109,6 +109,7 @@ void Robot::Run(int rate, bool &running) {
 
         // Update subsystems
         _driveBase.Update(dt);
+        _voltageMeter.Update(dt);
         _imu.Update(dt);
         _gps.Update(dt);
         _vision.Update(dt);
@@ -126,6 +127,7 @@ void Robot::Run(int rate, bool &running) {
         _summonController.ReportState();
         _driveBase.ReportState();
         _localization.ReportState();
+        _voltageMeter.ReportState();
         _gps.ReportState();
         _imu.ReportState();
         _vision.ReportState();
