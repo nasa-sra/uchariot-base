@@ -57,4 +57,4 @@ endif()
 
 add_executable(uChariotBase ${SRCS})
 target_link_libraries( uChariotBase Eigen3::Eigen ${I2C_LIB} ${GPS_LIB})
-target_include_directories( uChariotBase PUBLIC ./include/)
+target_include_directories( uChariotBase PUBLIC ./include/ ./)

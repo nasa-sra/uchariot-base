@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 #define _USE_MATH_DEFINES
-#include <GPS.h>
+#include <gps.h>
 #include <sys/time.h>
 
 #include <Eigen/Core>
