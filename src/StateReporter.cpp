@@ -31,6 +31,13 @@ void StateReporter::UpdateKey(std::string key, double val) {
     }
 }
 
+void StateReporter::UpdateKey(std::string key, float val) {
+    if (std::isfinite(val)) {
+        val = (int(val * 1000 + 0.5)) / 1000.0f;
+        genericUpdateKey(key, ValueEntry(static_cast<double>(val)));
+    }
+}
+
 void StateReporter::UpdateKey(std::string key, std::string val) {
     genericUpdateKey(key, ValueEntry(val));
 }
