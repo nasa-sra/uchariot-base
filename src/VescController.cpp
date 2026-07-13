@@ -20,7 +20,7 @@ void VescController::Update() {
     if (!_connected) {
         _warningCounter++;
         if (_warningCounter == 10) {
-            Utils::LogFmt("Warning: Vesc Controller Id %i is not connected",
+            uchariot_logger::LogFmt("Warning: Vesc Controller Id %i is not connected",
                           _can_id);
             _warningCounter = 0;
         }

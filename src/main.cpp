@@ -21,6 +21,7 @@ void HandleSigInt(int s) { running = false; }
 
 int main() {
     signal(SIGINT, HandleSigInt);
+    uchariot_logger::init();
 
     CanConnection *can = &CanConnection::GetInstance();
     can->Start();
@@ -43,7 +44,7 @@ int main() {
     can->CloseConnection();
     network.CloseConnections();
     StateReporter::GetInstance().Close();
-    Utils::LogFmt("Shutdown");
+    uchariot_logger::LogFmt("Shutdown");
 
     return 0;
 }

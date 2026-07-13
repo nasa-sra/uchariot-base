@@ -47,7 +47,7 @@ ControlCmds PathingController::Run(ControlCmds cmds) {
         if (!_runningPath) {
             _pathName = "";
         } else {
-            Utils::LogFmt("Running Path ...");
+            uchariot_logger::LogFmt("Running Path ...");
             _localization->SetOrigin(_origin);
         }
     }
@@ -68,7 +68,7 @@ ControlCmds PathingController::Run(ControlCmds cmds) {
             _obstaclePresent = false;
             Detection obstacle;
             for (Detection& det : detections) {
-                Utils::LogFmt("Detection %s, conf: %f, width: %f", det.name, det.confidence, det.width);
+                uchariot_logger::LogFmt("Detection %s, conf: %f, width: %f", det.name, det.confidence, det.width);
                 if ((det.name == "person" || det.name == "rock") && det.confidence > _obstacleConfThresh && det.width > _obstacleSizeThresh) {
                     if (!_obstaclePresent) {
                         obstacle = det;
@@ -111,7 +111,7 @@ void PathingController::SetPathName(std::string name) {
     _pathName = name;
     if (_pathPaused) {
         _pathPaused = false;
-        Utils::LogFmt("Path resumed");
+        uchariot_logger::LogFmt("Path resumed");
     }
 }
 
