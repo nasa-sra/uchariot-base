@@ -1,12 +1,15 @@
 #include "subsystems/INA228.h"
 
 #include <cstdio>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 namespace {
 constexpr uint8_t INA228_ADDR = 0x40; // default address
 }  // namespace
 
-INA228::INA228() : _ina228Fd(-1) {}
+INA228::INA228() : _ina228Fd(-1) { InitializeINA228(); }
 
 bool INA228::InitializeINA228() {
     if (_ina228Fd >= 0) {
@@ -47,22 +50,27 @@ void INA228::Update(double dt) {
         return;
     }
 
-    int voltage_raw = ReadRegister16(Register::VBUS);
-    int current_raw = ReadRegister16(Register::CURRENT);
-    int power_raw = ReadRegister16(Register::POWER);
+    int32_t voltage_raw = ReadRegister24(Register::VBUS);
+    int32_t current_raw = ReadRegister24(Register::CURRENT);
+    int32_t power_raw = ReadRegister24(Register::POWER);
     int temperature_raw = ReadRegister16(Register::DIE_TEMP);
 
     if (voltage_raw >= 0) {
-        _voltage = static_cast<float>(voltage_raw) * 0.00125f;
+        // VBUS: 20-bit unsigned in bits[23:4], 195.3125 µV/LSB
+        _voltage = static_cast<float>(voltage_raw >> 4) * 195.3125e-6f;
     }
     if (current_raw >= 0) {
-        _current = static_cast<float>(current_raw) * 0.0001f;
+        // CURRENT: 20-bit signed; sign-extend from bit 23, then divide by 16 per Adafruit ref
+        if (current_raw & 0x800000) current_raw |= 0xFF000000;
+        _current = static_cast<float>(current_raw) / 16.0f * _current_lsb;
     }
     if (power_raw >= 0) {
-        _power = static_cast<float>(power_raw) * 0.025f;
+        // POWER: 24-bit unsigned; scale = 3.2 * _current_lsb per Adafruit ref
+        _power = static_cast<float>(power_raw) * 3.2f * _current_lsb;
     }
     if (temperature_raw >= 0) {
-        _temperature = static_cast<float>(temperature_raw) * 0.125f;
+        // DIE_TEMP: 16-bit signed, 7.8125 m°C/LSB
+        _temperature = static_cast<float>((int16_t)temperature_raw) * 0.0078125f;
     }
 }
 
@@ -71,6 +79,8 @@ float INA228::GetVoltage() { return _voltage; }
 float INA228::GetCurrent() { return _current; }
 
 float INA228::GetPower() { return _power; }
+
+float INA228::GetTemperature() { return _temperature; }
 
 int INA228::ReadRegister8(uint8_t register_addr) {
     if (_ina228Fd < 0) {
@@ -99,7 +109,24 @@ int INA228::ReadRegister16(uint8_t register_addr) {
         return -1;
     }
 
-    return res;
+    // INA228 sends big-endian; i2c_smbus_read_word_data returns little-endian
+    return (int)(uint16_t)__builtin_bswap16((uint16_t)res);
+}
+
+int32_t INA228::ReadRegister24(uint8_t register_addr) {
+    if (_ina228Fd < 0) {
+        Utils::LogFmt("INA228 device is not initialized");
+        return -1;
+    }
+
+    uint8_t buf[3] = {0};
+    int res = i2c_smbus_read_i2c_block_data(_ina228Fd, register_addr, 3, buf);
+    if (res < 3) {
+        Utils::LogFmt("INA228 read block from register 0x%02X failed", register_addr);
+        return -1;
+    }
+
+    return (int32_t)(((uint32_t)buf[0] << 16) | ((uint32_t)buf[1] << 8) | buf[2]);
 }
 
 int INA228::writeRegister(uint8_t register_addr, uint8_t value) {
@@ -117,34 +144,46 @@ int INA228::writeRegister(uint8_t register_addr, uint8_t value) {
     return res;
 }
 
+int INA228::writeRegister16(uint8_t register_addr, uint16_t value) {
+    if (_ina228Fd < 0) {
+        Utils::LogFmt("INA228 device is not initialized");
+        return -1;
+    }
+
+    // INA228 is big-endian; swap bytes before writing
+    int res = i2c_smbus_write_word_data(_ina228Fd, register_addr,
+                                        __builtin_bswap16(value));
+    if (res < 0) {
+        Utils::LogFmt("INA228 write word to register 0x%02X failed", register_addr);
+    }
+
+    return res;
+}
+
+bool INA228::SetShuntCalibration(float shunt_res, float max_current) {
+    _shunt_res = shunt_res;
+    _current_lsb = max_current / (float)(1UL << 19);
+    // SHUNT_CAL = 13107.2 * 1e6 * shunt_res * current_lsb (ADCRANGE=0)
+    uint16_t shunt_cal = (uint16_t)(13107.2f * 1000000.0f * _shunt_res * _current_lsb);
+    return writeRegister16(Register::SHUNT_CAL, shunt_cal) >= 0;
+}
 
 float INA228::GetBusVoltage() {
-    int voltage_raw = ReadRegister16(Register::VBUS);
+    int32_t voltage_raw = ReadRegister24(Register::VBUS);
     if (voltage_raw < 0) {
         return 0.0f;
     }
-    //TODO: Get actual scaling factors for values below
-    return static_cast<float>(voltage_raw) * 0.00125f; // Convert to volts 
+    return static_cast<float>(voltage_raw >> 4) * 195.3125e-6f;
 }
 
-// GetShuntVoltage()
-float INA228::GetShuntVOltage() {
-    int shunt_voltage_raw = ReadRegister16(Register::VSHUNT);
-    if (shunt_voltage_raw < 0) {
+float INA228::GetShuntVoltage() {
+    int32_t shunt_raw = ReadRegister24(Register::VSHUNT);
+    if (shunt_raw < 0) {
         return 0.0f;
     }
-    //TODO: Get actual scaling factors for values below
-    return static_cast<float>(shunt_voltage_raw) * 0.0001f; // Convert to volts
-}
-
-// GetPower()
-float INA228::GetPower() {
-    int power_raw = ReadRegister16(Register::POWER);
-    if (power_raw < 0) {
-        return 0.0f;
-    }
-    //TODO: Get actual scaling factors for values below
-    return static_cast<float>(power_raw) * 0.025f; // Convert to watts
+    // VSHUNT: 20-bit signed; sign-extend from bit 23, 312.5 nV/LSB (ADCRANGE=0 default)
+    if (shunt_raw & 0x800000) shunt_raw |= 0xFF000000;
+    return static_cast<float>(shunt_raw) / 16.0f * 312.5e-9f;
 }
 
 float INA228::GetEnergy() {

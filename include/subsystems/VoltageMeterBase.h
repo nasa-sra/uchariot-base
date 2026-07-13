@@ -6,8 +6,8 @@
 //
 class VoltageMeterBase : public SubsystemBase {
    public:
-    VoltageMeterBase();
-    void Update(double dt) override;
+    VoltageMeterBase() = default;
+    void Update(double dt) override {}
     void ReportState(std::string prefix = "/") {
         prefix += "voltageMeter/";
         StateReporter::GetInstance().UpdateKey(prefix + "voltage", _voltage);
@@ -30,5 +30,5 @@ class VoltageMeterBase : public SubsystemBase {
 
 class SimVoltageMeter : public VoltageMeterBase {
    public:
-    void Update(double dt) override;
+    void Update(double dt) override {}
 };

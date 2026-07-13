@@ -6,7 +6,7 @@
 #include "subsystems/VoltageMeterBase.h"
 
 extern "C" {
-#include </usr/include/i2c/smbus.h>
+#include <i2c/smbus.h>
 #include <linux/i2c-dev.h>
 }
 
@@ -42,23 +42,28 @@ class INA228 : public VoltageMeterBase {
     INA228();
 
     bool InitializeINA228();
+    bool SetShuntCalibration(float shunt_res, float max_current);
     void Update(double dt) override;
 
     float GetVoltage() override;
     float GetCurrent() override;
     float GetPower() override;
     float GetTemperature() override;
-    
+
     float GetBusVoltage();
-    float GetShuntVOltage();
+    float GetShuntVoltage();
     float GetEnergy();
     float GetCharge();
 
    private:
     int _ina228Fd{-1};
     int _adapter_nr{1};
+    float _current_lsb{0.0f};
+    float _shunt_res{0.0f};
 
-    int ReadRegister16(uint8_t register_addr);
     int ReadRegister8(uint8_t register_addr);
+    int ReadRegister16(uint8_t register_addr);
+    int32_t ReadRegister24(uint8_t register_addr);
     int writeRegister(uint8_t register_addr, uint8_t value);
+    int writeRegister16(uint8_t register_addr, uint16_t value);
 };
