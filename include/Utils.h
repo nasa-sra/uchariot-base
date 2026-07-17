@@ -126,7 +126,6 @@ template <typename... A>
 void ErrFmt(const std::string& fmt, A&&... args) {
     std::cerr << _strfmt("[" + CurrentDateTimeStr() + "] " + fmt + "\n",
                          _convert(std::forward<A>(args))...);
-    std::exit(1);
 }
 
 // Returns true if element x is present inside of the vector v.
