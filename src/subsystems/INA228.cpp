@@ -101,41 +101,19 @@ void INA228::Update(double dt) {
     if (voltage_raw >= 0) {
         // VBUS: 20-bit unsigned in bits[23:4], 195.3125 µV/LSB
         _voltage = static_cast<float>(voltage_raw >> 4) * 195.3125e-6f;
-        static bool vbus_logged = false;
-        if (!vbus_logged) {
-            Utils::LogFmt("INA228 VBUS raw=0x%06X counts=%d voltage=%.4fV",
-                          voltage_raw, voltage_raw >> 4, _voltage);
-            vbus_logged = true;
-        }
     }
     if (current_raw >= 0) {
         // CURRENT: 20-bit signed; sign-extend from bit 23, then divide by 16 per Adafruit ref
         if (current_raw & 0x800000) current_raw |= 0xFF000000;
         _current = static_cast<float>(current_raw) / 16.0f * _current_lsb;
-        static bool current_logged = false;
-        if (!current_logged) {
-            Utils::LogFmt("INA228 CURRENT raw=0x%06X current=%.4fA (current_lsb=%.6f)",
-                          current_raw & 0xFFFFFF, _current, _current_lsb);
-            current_logged = true;
-        }
     }
     if (power_raw >= 0) {
         // POWER: 24-bit unsigned; scale = 3.2 * _current_lsb per Adafruit ref
         _power = static_cast<float>(power_raw) * 3.2f * _current_lsb;
-        static bool power_logged = false;
-        if (!power_logged) {
-            Utils::LogFmt("INA228 POWER raw=0x%06X power=%.4fW", power_raw, _power);
-            power_logged = true;
-        }
     }
     if (temperature_raw >= 0) {
         // DIE_TEMP: 16-bit signed, 7.8125 m°C/LSB
         _temperature = static_cast<float>((int16_t)temperature_raw) * 0.0078125f;
-        static bool temp_logged = false;
-        if (!temp_logged) {
-            Utils::LogFmt("INA228 TEMP raw=0x%04X temperature=%.2fC", temperature_raw, _temperature);
-            temp_logged = true;
-        }
     }
 }
 
