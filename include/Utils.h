@@ -118,7 +118,7 @@ void PrintLnFmt(const std::string& fmt, A&&... args) {
 template <typename... A>
 void LogFmt(const std::string& fmt, A&&... args) {
     std::cout << _strfmt("[" + CurrentDateTimeStr() + "] " + fmt + "\n",
-                         _convert(std::forward<A>(args))...);
+                         _convert(std::forward<A>(args))...) << std::flush;
 }
 
 // Handle errors.
