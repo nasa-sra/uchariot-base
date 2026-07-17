@@ -1,13 +1,36 @@
 #include "subsystems/INA228.h"
 
+#include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
 namespace {
-constexpr uint8_t INA228_ADDR = 0x40; // default address
+
+constexpr uint8_t INA228_ADDR = 0x40;  // Default I2C address
+
+constexpr uint16_t INA228_MANUFACTURER_ID = 0x5449;
+
+inline int32_t SignExtend20(uint32_t raw) {
+    raw >>= 4;  // Move the 20-bit value down to bits [19:0]
+
+    if (raw & (1UL << 19)) {
+        raw |= 0xFFF00000;
+    }
+
+    return static_cast<int32_t>(raw);
+}
+
 }  // namespace
+
+INA228::~INA228() {
+    if (_ina228Fd >= 0) {
+        close(_ina228Fd);
+        _ina228Fd = -1;
+    }
+}
 
 INA228::INA228() : _ina228Fd(-1) { InitializeINA228(); }
 
@@ -18,30 +41,48 @@ bool INA228::InitializeINA228() {
 
     char filename[20];
     std::snprintf(filename, sizeof(filename), "/dev/i2c-%d", _adapter_nr);
+
     _ina228Fd = open(filename, O_RDWR);
+
     if (_ina228Fd < 0) {
-        Utils::ErrFmt("Failed to open communication for INA228 on %s",
-                      filename);
+        Utils::ErrFmt("Failed to open INA228 on %s", filename);
         return false;
     }
 
     if (ioctl(_ina228Fd, I2C_SLAVE, INA228_ADDR) < 0) {
-        Utils::ErrFmt("Failed to configure the parameters for INA228 at 0x%02X",
+        Utils::ErrFmt("Failed to configure INA228 address 0x%02X",
                       INA228_ADDR);
+
         close(_ina228Fd);
         _ina228Fd = -1;
         return false;
     }
 
-    int status = ReadRegister16(Register::CONFIG);
-    if (status < 0) {
-        Utils::LogFmt("INA228 initialization did not read a valid status register");
+    uint16_t manufacturer = ReadRegister16(Register::MFG_UID);
+
+    if (manufacturer != INA228_MANUFACTURER_ID) {
+        Utils::ErrFmt(
+            "Unexpected INA228 manufacturer ID: 0x%04X",
+            manufacturer);
+
+        close(_ina228Fd);
+        _ina228Fd = -1;
         return false;
     }
 
-    SetShuntCalibration(0.015f, 10.0f);
+    uint16_t device = ReadRegister16(Register::DEVICE_UID);
 
-    Utils::LogFmt("Connected to INA228 sensor");
+    Utils::LogFmt(
+        "Detected INA228 (Device ID: 0x%04X)",
+        device);
+
+    if (!SetShuntCalibration(0.015f, 10.0f)) {
+        Utils::ErrFmt("Failed to configure INA228 calibration");
+        return false;
+    }
+
+    Utils::LogFmt("Connected to INA228");
+
     return true;
 }
 
@@ -106,51 +147,74 @@ float INA228::GetPower() { return _power; }
 
 float INA228::GetTemperature() { return _temperature; }
 
-int INA228::ReadRegister8(uint8_t register_addr) {
+bool INA228::ReadRegister(uint8_t reg, uint8_t* buffer, size_t length) {
     if (_ina228Fd < 0) {
-        Utils::LogFmt("INA228 device is not initialized");
-        return -1;
+        Utils::ErrFmt("INA228 device is not initialized");
+        return false;
     }
 
-    int res = i2c_smbus_read_byte_data(_ina228Fd, register_addr);
-    if (res < 0) {
-        Utils::LogFmt("INA228 read byte from register 0x%02X failed", register_addr);
-        return -1;
+    int bytesRead = i2c_smbus_read_i2c_block_data(
+        _ina228Fd,
+        reg,
+        static_cast<uint8_t>(length),
+        buffer);
+
+    if (bytesRead != static_cast<int>(length)) {
+        Utils::ErrFmt(
+            "Failed reading %zu bytes from register 0x%02X",
+            length,
+            reg);
+        return false;
     }
 
-    return res;
+    return true;
 }
 
-int INA228::ReadRegister16(uint8_t register_addr) {
-    if (_ina228Fd < 0) {
-        Utils::LogFmt("INA228 device is not initialized");
-        return -1;
+
+uint8_t INA228::ReadRegister8(uint8_t reg) {
+    uint8_t buffer[1];
+
+    if (!ReadRegister(reg, buffer, sizeof(buffer))) {
+        return 0xFF;
     }
 
-    int res = i2c_smbus_read_word_data(_ina228Fd, register_addr);
-    if (res < 0) {
-        Utils::LogFmt("INA228 read word from register 0x%02X failed", register_addr);
-        return -1;
-    }
-
-    // INA228 sends big-endian; i2c_smbus_read_word_data returns little-endian
-    return (int)(uint16_t)__builtin_bswap16((uint16_t)res);
+    return buffer[0];
 }
 
-int32_t INA228::ReadRegister24(uint8_t register_addr) {
-    if (_ina228Fd < 0) {
-        Utils::LogFmt("INA228 device is not initialized");
-        return -1;
+uint16_t INA228::ReadRegister16(uint8_t reg) {
+    uint8_t buffer[2];
+
+    if (!ReadRegister(reg, buffer, sizeof(buffer))) {
+        return UINT16_MAX;
     }
 
-    uint8_t buf[3] = {0};
-    int res = i2c_smbus_read_i2c_block_data(_ina228Fd, register_addr, 3, buf);
-    if (res < 3) {
-        Utils::LogFmt("INA228 read block from register 0x%02X failed", register_addr);
-        return -1;
+    return (static_cast<uint16_t>(buffer[0]) << 8) |
+           static_cast<uint16_t>(buffer[1]);
+}
+
+uint16_t INA228::ReadRegister16(uint8_t reg) {
+    uint8_t buffer[2];
+
+    if (!ReadRegister(reg, buffer, sizeof(buffer))) {
+        return UINT16_MAX;
     }
 
-    return (int32_t)(((uint32_t)buf[0] << 16) | ((uint32_t)buf[1] << 8) | buf[2]);
+    return (static_cast<uint16_t>(buffer[0]) << 8) |
+           static_cast<uint16_t>(buffer[1]);
+}
+
+uint64_t INA228::ReadRegister40(uint8_t reg) {
+    uint8_t buffer[5];
+
+    if (!ReadRegister(reg, buffer, sizeof(buffer))) {
+        return UINT64_MAX;
+    }
+
+    return (static_cast<uint64_t>(buffer[0]) << 32) |
+           (static_cast<uint64_t>(buffer[1]) << 24) |
+           (static_cast<uint64_t>(buffer[2]) << 16) |
+           (static_cast<uint64_t>(buffer[3]) << 8) |
+           static_cast<uint64_t>(buffer[4]);
 }
 
 int INA228::writeRegister(uint8_t register_addr, uint8_t value) {

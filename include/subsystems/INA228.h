@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 
 #include "Utils.h"
 #include "subsystems/VoltageMeterBase.h"
@@ -40,6 +41,7 @@ namespace Register {
 class INA228 : public VoltageMeterBase {
    public:
     INA228();
+    ~INA228() override;
 
     bool InitializeINA228();
     bool SetShuntCalibration(float shunt_res, float max_current);
@@ -61,9 +63,12 @@ class INA228 : public VoltageMeterBase {
     float _current_lsb{0.0f};
     float _shunt_res{0.0f};
 
-    int ReadRegister8(uint8_t register_addr);
-    int ReadRegister16(uint8_t register_addr);
-    int32_t ReadRegister24(uint8_t register_addr);
+    bool ReadRegister(uint8_t reg, uint8_t* buffer, size_t length);
+
+    uint8_t ReadRegister8(uint8_t reg);
+    uint16_t ReadRegister16(uint8_t reg);
+    uint32_t ReadRegister24(uint8_t reg);
+    uint64_t ReadRegister40(uint8_t reg);
     int writeRegister(uint8_t register_addr, uint8_t value);
     int writeRegister16(uint8_t register_addr, uint16_t value);
 };
