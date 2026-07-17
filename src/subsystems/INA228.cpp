@@ -192,15 +192,16 @@ uint16_t INA228::ReadRegister16(uint8_t reg) {
            static_cast<uint16_t>(buffer[1]);
 }
 
-uint16_t INA228::ReadRegister16(uint8_t reg) {
-    uint8_t buffer[2];
+uint32_t INA228::ReadRegister24(uint8_t reg) {
+    uint8_t buffer[3];
 
     if (!ReadRegister(reg, buffer, sizeof(buffer))) {
-        return UINT16_MAX;
+        return UINT32_MAX;
     }
 
-    return (static_cast<uint16_t>(buffer[0]) << 8) |
-           static_cast<uint16_t>(buffer[1]);
+    return (static_cast<uint32_t>(buffer[0]) << 16) |
+           (static_cast<uint32_t>(buffer[1]) << 8) |
+           static_cast<uint32_t>(buffer[2]);
 }
 
 uint64_t INA228::ReadRegister40(uint8_t reg) {
