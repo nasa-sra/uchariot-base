@@ -18,7 +18,9 @@
 #include "subsystems/GPS.h"
 #include "subsystems/Vision.h"
 #include "subsystems/Localization.h"
+#include "subsystems/VoltageMeterBase.h"
 #ifndef SIMULATION
+#include "subsystems/INA228.h"
 #include "subsystems/BNO055.h"
 #else
 #include "subsystems/IMUBase.h"
@@ -56,8 +58,10 @@ class Robot {
     DriveBase _driveBase;
 #ifndef SIMULATION
     BNO055 _imu;
+    INA228 _voltageMeter;
 #else
     SimIMU _imu;
+    SimVoltageMeter _voltageMeter;
 #endif
     GPS _gps;
     Localization _localization;

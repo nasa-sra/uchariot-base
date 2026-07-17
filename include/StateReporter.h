@@ -21,6 +21,7 @@ class StateReporter {
     void UpdateKey(std::string key, bool val);
     void UpdateKey(std::string key, int val);
     void UpdateKey(std::string key, double val);
+    void UpdateKey(std::string key, float val);
     void UpdateKey(std::string key, std::string val);
 
     void PushState();
@@ -42,6 +43,7 @@ class StateReporter {
         ValueEntry(bool _value) : boolValue(_value), valueType(BOOL) {}
         ValueEntry(int _value) : intValue(_value), valueType(INT) {}
         ValueEntry(double _value) : doubleValue(_value), valueType(DOUBLE) {}
+        ValueEntry(float _value) : doubleValue(static_cast<double>(_value)), valueType(DOUBLE) {}
         ValueEntry(std::string _value)
             : stringValue(_value), valueType(STRING) {}
 

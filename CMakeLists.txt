@@ -29,6 +29,7 @@ set(SRCS
     src/subsystems/Vision.cpp
     src/subsystems/BNO055.cpp
     src/subsystems/GPS.cpp
+    src/subsystems/INA228.cpp
     
     src/tinyxml2.cpp
     src/pathgen/Bezier.cpp

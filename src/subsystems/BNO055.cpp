@@ -14,22 +14,24 @@
 #define EUL_Y_LOW_REG 0x1C
 #define EUL_Z_LOW_REG 0x1A
 
-BNO055::BNO055() : IMUBase() {
+BNO055::BNO055() : IMUBase(), _imuFd(-1) {
     char filename[20];
 
     snprintf(filename, 19, "/dev/i2c-%d", _adapter_nr);
     _imuFd = open(filename, O_RDWR);
     if (_imuFd < 0) {
-        Utils::ErrFmt("Failed to open communication for I2C address %d",
-                      BNO055_ADDR);
+        Utils::ErrFmt("Failed to open I2C bus %s for BNO055", filename);
+        return;
     }
 
     if (ioctl(_imuFd, I2C_SLAVE, BNO055_ADDR) < 0) {
-        Utils::ErrFmt("Failed to configure the parameters for I2C address %d",
-                      BNO055_ADDR);
+        Utils::ErrFmt("Failed to configure BNO055 at I2C address 0x%02X", BNO055_ADDR);
+        close(_imuFd);
+        _imuFd = -1;
+        return;
     }
-    uint8_t status = ReadRegister8(STATUS_REG);
 
+    uint8_t status = ReadRegister8(STATUS_REG);
     writeRegister(OPR_MODE_REG, 0b00001100);  // Set IMU mode
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     uint8_t calib_status = ReadRegister8(CALIB_STATUS_REG);
@@ -44,6 +46,7 @@ BNO055::BNO055() : IMUBase() {
 #define DEG2RAD (M_PI / 180.0)  // Degrees to radians conversion factor
 
 void BNO055::Update(double dt) {
+    if (_imuFd < 0) return;
     int16_t x, y, z;
     x = ReadRegister16(EUL_X_LOW_REG);
     y = ReadRegister16(EUL_Y_LOW_REG);
@@ -67,6 +70,7 @@ void BNO055::Update(double dt) {
  * - On failure, the function returns -1 and logs an error message.
  */
 int BNO055::ReadRegister8(uint8_t register_add) {
+    if (_imuFd < 0) return -1;
     int32_t res;
 
     res = i2c_smbus_read_word_data(_imuFd, register_add);
@@ -116,6 +120,7 @@ int BNO055::ReadRegister16(uint8_t lsb_register_add) {
  * - -1: The write operation failed.
  */
 int BNO055::writeRegister(uint8_t register_addr, uint8_t value) {
+    if (_imuFd < 0) return -1;
     int res = i2c_smbus_write_word_data(_imuFd, register_addr, value);
     if (res < 0) {
         Utils::ErrFmt("Write to I2C address %d failed", BNO055_ADDR);
