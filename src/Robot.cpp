@@ -20,7 +20,9 @@ Robot::Robot()
     _netHandlers["set_controller"] = [this](rapidjson::Document &doc) {
         if (!doc.HasMember("name") || !doc["name"].IsString())
             throw std::runtime_error("no name");
-        _newMode = nameToMode(doc["name"].GetString());
+        ControlMode requested = nameToMode(doc["name"].GetString());
+        if (requested != _mode) _enabled = false;
+        _newMode = requested;
     };
     _netHandlers["teleop_drive"] = [this](rapidjson::Document &doc) {
         if (!doc.HasMember("velocity") || !doc["velocity"].IsDouble())
@@ -116,7 +118,7 @@ void Robot::Run(int rate, bool &running) {
         _localization.Update(dt);
 
         // Report state
-        StateReporter::GetInstance().UpdateKey("/enabled", _enabled);
+        StateReporter::GetInstance().UpdateKey("/enabled", _enabled.load());
         StateReporter::GetInstance().UpdateKey("/runTime", _runTime);
         StateReporter::GetInstance().UpdateKey("/controller", modeToController(_mode).name);
 
@@ -157,9 +159,8 @@ void Robot::Shutdown() { _vision.Disconnect(); }
 void Robot::ManageController() {
     if (_newMode != _mode) {
         modeToController(_mode).Unload();
-        _mode = _newMode;
+        _mode = _newMode.load();
         modeToController(_mode).Load();
-        _enabled = false;
         Utils::LogFmt("Switching to active controller %s", modeToController(_mode).name);
     }
 }

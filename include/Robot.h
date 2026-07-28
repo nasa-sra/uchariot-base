@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <thread>
@@ -46,8 +47,8 @@ class Robot {
     ControllerBase &modeToController(ControlMode mode);
     bool loadConfig(std::string filePath);
 
-    ControlMode _mode{DISABLED};
-    ControlMode _newMode{DISABLED};
+    std::atomic<ControlMode> _mode{DISABLED};
+    std::atomic<ControlMode> _newMode{DISABLED};
 
     OverrideController _overrideController;
     TeleopController _teleopController;
@@ -72,5 +73,5 @@ class Robot {
     std::map<const std::string, std::function<void(rapidjson::Document &doc)>> _netHandlers;
 
     double _runTime {0.0};
-    bool _enabled {false};
+    std::atomic<bool> _enabled {false};
 };
