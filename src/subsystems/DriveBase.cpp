@@ -27,7 +27,28 @@ DriveBase::DriveBase()
     _right_back.SetMode(mode);
 }
 
+void DriveBase::SetCoastMode(bool coast) {
+    _coast = coast;
+    if (!_coast) {
+        return;
+    }
+
+    _left_front.SetCoast();
+    _right_front.SetCoast();
+    _left_back.SetCoast();
+    _right_back.SetCoast();
+}
+
 void DriveBase::Update(double dt) {
+    if (_coast) {
+        _left_front.SetCoast();
+        _right_front.SetCoast();
+        _left_back.SetCoast();
+        _right_back.SetCoast();
+        _cmds = {0, 0};
+        return;
+    }
+
     // Utils::LogFmt("Drivebase Speeds: lb %f  lf %f  rb %f  sb %f",
     // _cmds._lb_speed, _cmds._lf_speed, _cmds._rb_speed, _cmds._rf_speed);
 

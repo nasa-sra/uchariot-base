@@ -104,7 +104,9 @@ void Robot::Run(int rate, bool &running) {
         }
         cmds = _overrideController.Run(cmds);
 
-        if (_enabled) {
+        const bool coastMode = !_enabled.load() || _mode.load() == ControlMode::DISABLED;
+        _driveBase.SetCoastMode(coastMode);
+        if (!coastMode && _enabled) {
             // Commmand subsystems
             _driveBase.SetCmds(cmds.drive);
         }
@@ -154,7 +156,10 @@ void Robot::HandleNetCmd(const std::string &cmd, rapidjson::Document &doc) {
     }
 }
 
-void Robot::Shutdown() { _vision.Disconnect(); }
+void Robot::Shutdown() {
+    _driveBase.SetCoastMode(true);
+    _vision.Disconnect();
+}
 
 void Robot::ManageController() {
     if (_newMode != _mode) {
