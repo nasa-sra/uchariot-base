@@ -27,6 +27,7 @@ class DriveBase : public SubsystemBase {
     void ReportState(std::string prefix = "/") override;
     DriveBaseFeedback GetVelocities();
     inline void SetCmds(DriveBaseCmds cmds) { _cmds = cmds; }
+    void SetCoastMode(bool coast);
 
     // void SetObstacleDetected(bool obstacleDetected) {
     //     _obstacleDetected = obstacleDetected;
@@ -43,4 +44,5 @@ class DriveBase : public SubsystemBase {
     VescController _right_back;
 
     double _voltage;
+    bool _coast{false};
 };

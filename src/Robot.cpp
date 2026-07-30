@@ -80,6 +80,9 @@ void Robot::Run(int rate, bool &running) {
 
         // Swap out controllers if it is changed via network manager
         ManageController();
+        // Command drivebase to coast when in DISABLED mode so VESC controllers
+        // receive an explicit zero-duty (coast) command prior to deployment.
+        _driveBase.SetCoastMode(_mode == ControlMode::DISABLED);
 
         // Run the active controller
         ControlCmds cmds;
@@ -154,7 +157,11 @@ void Robot::HandleNetCmd(const std::string &cmd, rapidjson::Document &doc) {
     }
 }
 
-void Robot::Shutdown() { _vision.Disconnect(); }
+void Robot::Shutdown() {
+    // Ensure motors are commanded to coast on shutdown
+    _driveBase.SetCoastMode(true);
+    _vision.Disconnect();
+}
 
 void Robot::ManageController() {
     if (_newMode != _mode) {

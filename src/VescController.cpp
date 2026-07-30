@@ -52,6 +52,11 @@ void VescController::SetCmd(float cmd) {
     }
 }
 
+void VescController::SetCoast() {
+    _cmdDutyCycle = 0.0;
+    sendDutyCycle(0.0f);
+}
+
 static void print_buf(const char* title, const unsigned char* buf,
                       size_t buf_len) {
     size_t i = 0;

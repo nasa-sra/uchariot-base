@@ -15,6 +15,7 @@ class VescController {
 
     void SetMode(Mode mode);
     void SetCmd(float cmd);
+    void SetCoast();
     void SetScale(float scale) { _scale = scale; }
 
     double GetVoltage() { return _voltageIn; }
