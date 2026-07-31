@@ -37,17 +37,9 @@ Robot::Robot()
             throw std::runtime_error("no name");
         _pathingController.SetPathName(doc["name"].GetString());
     };
-    auto reverseHeadingHandler = [this](rapidjson::Document &doc) {
-        _driveBase.ReverseHeading();
-    };
-    auto resetHeadingHandler = [this](rapidjson::Document &doc) {
-        _driveBase.ResetHeading();
+    _netHandlers["reset_heading"] = [this](rapidjson::Document &doc) {
         _localization.ResetHeading();
     };
-    _netHandlers["reverse_heading"] = reverseHeadingHandler;
-    _netHandlers["reverse heading"] = reverseHeadingHandler;
-    _netHandlers["reset_heading"] = resetHeadingHandler;
-    _netHandlers["reset heading"] = resetHeadingHandler;
     _netHandlers["reset_pose"] = [this](rapidjson::Document &doc) {
         _localization.ResetPose();
     };
