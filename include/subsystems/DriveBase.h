@@ -30,7 +30,9 @@ class DriveBase : public SubsystemBase {
 
     void ReverseHeading();
     void ResetHeading();
-
+    void ToggleCoastBackMotors() { _coastBackMotors = !_coastBackMotors; }
+    void SetCoastBackMotors(bool coast) { _coastBackMotors = coast; }
+ 
     // void SetObstacleDetected(bool obstacleDetected) {
     //     _obstacleDetected = obstacleDetected;
     //     Utils::LogFmt("Obstacle detected: %s",
@@ -47,4 +49,5 @@ class DriveBase : public SubsystemBase {
  
     double _voltage;
     double _headingSign{1.0};
+    bool _coastBackMotors{false};
 };

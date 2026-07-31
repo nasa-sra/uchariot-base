@@ -46,8 +46,15 @@ void DriveBase::Update(double dt) {
 
     _left_front.SetCmd(left);
     _right_front.SetCmd(right);
-    _left_back.SetCmd(left);
-    _right_back.SetCmd(right);
+
+    if (_coastBackMotors) {
+        _left_back.SetCoast();
+        _right_back.SetCoast();
+    } else {
+        _left_back.SetCmd(left);
+        _right_back.SetCmd(right);
+    }
+
     _cmds = {0, 0};
 
     _left_front.Update();

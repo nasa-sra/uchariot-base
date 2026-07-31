@@ -1,4 +1,3 @@
-
 #include <string>
 #include "tinyxml2.h"
 #include "Robot.h"
@@ -72,6 +71,12 @@ Robot::Robot()
             throw std::runtime_error("no longitude");
         Utils::GeoPoint target(std::stod(doc["latitude"].GetString()), std::stod(doc["longitude"].GetString()));
         _summonController.Summon(target);
+    };
+    _netHandlers["Coast Back Motors"] = [this](rapidjson::Document &doc) {
+        _driveBase.ToggleCoastBackMotors();
+    };
+    _netHandlers["Coast_Back_Motors"] = [this](rapidjson::Document &doc) {
+        _driveBase.ToggleCoastBackMotors();
     };
 
     loadConfig("../config/robotConfig.xml");

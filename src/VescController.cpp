@@ -52,6 +52,29 @@ void VescController::SetCmd(float cmd) {
     }
 }
 
+void VescController::SetCoast() {
+    switch (_mode) {
+        case DUTY_CYCLE:
+            _cmdDutyCycle = 0.0;
+            sendDutyCycle(_cmdDutyCycle);
+            break;
+        case VELOCITY:
+            _cmdVelocity = 0.0;
+            sendRPM(_cmdVelocity * _scale);
+            break;
+        case POSITION:
+            _cmdPosition = 0.0;
+            sendPosition(_cmdPosition * _scale);
+            break;
+        case CURRENT:
+            _cmdCurrent = 0.0;
+            sendCurrent(_cmdCurrent);
+            break;
+        default:
+            break;
+    }
+}
+
 static void print_buf(const char* title, const unsigned char* buf,
                       size_t buf_len) {
     size_t i = 0;
