@@ -7,6 +7,7 @@ void DriveBaseCmds::ReportState(std::string prefix) {
     StateReporter::GetInstance().UpdateKey(prefix + "velocity", velocity);
     StateReporter::GetInstance().UpdateKey(prefix + "angular_velocity",
                                            angularVelocity);
+    StateReporter::GetInstance().UpdateKey(prefix + "Heading", reverseHeading);
 }
 
 DriveBase::DriveBase()
@@ -15,6 +16,7 @@ DriveBase::DriveBase()
     float wheelRadius = 0.254;  // m
     float scale = gearRatio * 60 /
                   (2 * M_PI * wheelRadius);  // converts from m/s to motor RPM
+    float orientation = 1; //orientation 1 : front , -1 : backwards
     _left_front.SetScale(scale);
     _right_front.SetScale(scale);
     _left_back.SetScale(scale);
@@ -40,10 +42,16 @@ void DriveBase::Update(double dt) {
     double maxDv = accelerationLimit * dt;
 
     double left = std::clamp((omega * ROBOT_WIDTH / 2) + vel, -MAX_DRIVE_SPEED, MAX_DRIVE_SPEED);
-    left = std::clamp(left, _left_front.GetCmdVelocity() - maxDv, _left_front.GetCmdVelocity() + maxDv);
+    left = orientation * std::clamp(left, _left_front.GetCmdVelocity() - maxDv, _left_front.GetCmdVelocity() + maxDv);
     double right = std::clamp(vel - (omega * ROBOT_WIDTH / 2), -MAX_DRIVE_SPEED, MAX_DRIVE_SPEED);
-    right = std::clamp(right, _right_front.GetCmdVelocity() - maxDv, _right_front.GetCmdVelocity() + maxDv);
+    right = orientation * std::clamp(right, _right_front.GetCmdVelocity() - maxDv, _right_front.GetCmdVelocity() + maxDv);
 
+    if (orientation == -1) {
+        reverseHeading = true
+    } else {
+        reverseHeading = false;
+    }
+    
     _left_front.SetCmd(left);
     _right_front.SetCmd(right);
     _left_back.SetCmd(left);
@@ -56,6 +64,14 @@ void DriveBase::Update(double dt) {
     _right_back.Update();
 
     _voltage = (_left_front.GetVoltage() + _right_front.GetVoltage() + _left_back.GetVoltage() + _right_back.GetVoltage()) / 4;
+}
+
+void DriveBase::ReverseOrientation(boolean heading) {
+    if (heading == true) {
+        orientation = -1 
+    } else {
+        orientaiton = 1
+    }
 }
 
 void DriveBase::ReportState(std::string prefix) {

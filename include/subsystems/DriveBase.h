@@ -10,6 +10,7 @@
 struct DriveBaseCmds {
     double velocity;
     double angularVelocity;
+    boolean heading; 
 
     void ReportState(std::string prefix = "/");
 };
@@ -33,6 +34,8 @@ class DriveBase : public SubsystemBase {
     //     Utils::LogFmt("Obstacle detected: %s",
     //                   obstacleDetected ? "true" : "false");
     // }
+
+    void reverseOrientation(boolean heading);
 
    private:
     DriveBaseCmds _cmds;
