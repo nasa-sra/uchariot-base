@@ -28,6 +28,9 @@ class DriveBase : public SubsystemBase {
     DriveBaseFeedback GetVelocities();
     inline void SetCmds(DriveBaseCmds cmds) { _cmds = cmds; }
 
+    void ReverseHeading();
+    void ResetHeading();
+
     // void SetObstacleDetected(bool obstacleDetected) {
     //     _obstacleDetected = obstacleDetected;
     //     Utils::LogFmt("Obstacle detected: %s",
@@ -41,6 +44,7 @@ class DriveBase : public SubsystemBase {
     VescController _right_front;
     VescController _left_back;
     VescController _right_back;
-
+ 
     double _voltage;
+    double _headingSign{1.0};
 };

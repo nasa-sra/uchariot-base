@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 #include "subsystems/DriveBase.h"
 
+#include <algorithm>
 #include <cmath>
 
 void DriveBaseCmds::ReportState(std::string prefix) {
@@ -32,8 +33,7 @@ void DriveBase::Update(double dt) {
     // _cmds._lb_speed, _cmds._lf_speed, _cmds._rb_speed, _cmds._rf_speed);
 
     const double maxAng = MAX_DRIVE_SPEED / ROBOT_WIDTH;
-    double vel = std::clamp(_cmds.velocity, -MAX_DRIVE_SPEED, MAX_DRIVE_SPEED);
-
+    double vel = std::clamp(_cmds.velocity * _headingSign, -MAX_DRIVE_SPEED, MAX_DRIVE_SPEED);
     double omega = std::clamp(2 * _cmds.angularVelocity, -maxAng, maxAng);
 
     double accelerationLimit = 3.0;  // m/s^2
@@ -61,11 +61,20 @@ void DriveBase::Update(double dt) {
 void DriveBase::ReportState(std::string prefix) {
     prefix += "drive_base/";
     StateReporter::GetInstance().UpdateKey(prefix + "voltage", _voltage);
+    StateReporter::GetInstance().UpdateKey(prefix + "heading_sign", _headingSign);
 
     _left_front.ReportState(prefix + "left_front/");
     _right_front.ReportState(prefix + "right_front/");
     _left_back.ReportState(prefix + "left_back/");
     _right_back.ReportState(prefix + "right_back/");
+}
+
+void DriveBase::ReverseHeading() {
+    _headingSign = -1.0;
+}
+
+void DriveBase::ResetHeading() {
+    _headingSign = 1.0;
 }
 
 DriveBaseFeedback DriveBase::GetVelocities() {
