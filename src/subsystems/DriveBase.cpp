@@ -34,8 +34,7 @@ void DriveBase::Update(double dt) {
 
     const double maxAng = MAX_DRIVE_SPEED / ROBOT_WIDTH;
     double vel = std::clamp(_cmds.velocity * _headingSign, -MAX_DRIVE_SPEED, MAX_DRIVE_SPEED);
-
-    double omega = std::clamp(2 * _cmds.angularVelocity * _headingSign, -maxAng, maxAng);
+    double omega = std::clamp(2 * _cmds.angularVelocity, -maxAng, maxAng);
 
     double accelerationLimit = 3.0;  // m/s^2
     double maxDv = accelerationLimit * dt;
